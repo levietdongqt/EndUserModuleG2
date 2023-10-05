@@ -8,7 +8,6 @@ export const CartProvider = ({ children }) => {
     const [cookies]=useCookies(['cart'])
     const [cart, setCart] = useState( cookies.cart || []);
     const [refresh, setRefresh] = useState(false);
-    
     const values = {
         cart,
         setCart,

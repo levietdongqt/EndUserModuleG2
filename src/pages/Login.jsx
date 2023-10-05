@@ -3,21 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Box, FormControl, FormLabel, InputGroup, Input, Text, InputRightElement, Button, Checkbox, useToast } from '@chakra-ui/react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+//import GoogleIcon from '@mui/icons-material/Google';
 import { useFormik } from 'formik';
 
 import { useUserContext } from '../contexts/UserContext';
 import LoginValidations from '../validations/LoginValidations';
-import { Login as LogIn } from '../services/AuthServices';
+import { Login as LogIn,OAuth2Request } from '../services/AuthServices';
+import { useGoogleLogin  } from '@react-oauth/google';
+import { testRequest } from '../services/TestService';
 
 const Login = () => {
 
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(false);
-  const { setCurrentUser } = useUserContext();
+  const { setCurrentUser,setToken } = useUserContext();
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
+  const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['access_token']);
   const navigate = useNavigate();
   const toast = useToast();
+  const handldeResponse = (result,remember) => {
+    if (result.data.status === 200) {
+      console.log(result.data)
+      setCurrentUser(result.data.result);
+      setToken(result.data.token);
+      toast({
+        title: 'Logged in.',
+        description: 'You have successfully logged in.',
+        status: 'success',
+        duration: 2000,
+        isClosable: true
+      });
+      navigate('/');
+      if (remember) {
+        setCookie('currentUser', result.data.result, { path: '/' });
+        setTokenCookie('access_token',result.data.token,{ path: '/' })
+      } else {
+        removeCookie('currentUser', { path: '/' });
+        removeTokenCookie('access_token',result.data.token,{ path: '/' })
+      };
+    } else {
+      resetForm();
+      toast({
+        title: 'Error!',
+        description: 'Wrong email or password.',
+        status: 'error',
+        duration: 2000,
+        isClosable: true
+      });
+    }
 
+
+  }
   const { values, handleSubmit, handleChange, isValid, resetForm } = useFormik({
     initialValues: {
       email: '',
@@ -26,37 +62,25 @@ const Login = () => {
     onSubmit: values => {
       LogIn(values.email, values.password)
         .then((result) => {
-            if (result.data.status === 200) {
-              console.log(result.data)
-              setCurrentUser(result.data.result);
-              toast({
-                title: 'Logged in.',
-                description: 'You have successfully logged in.',
-                status: 'success',
-                duration: 2000,
-                isClosable: true
-              });
-              navigate('/');
-                if (remember) {
-                  setCookie('currentUser', result.data.result, { path: '/' });
-                } else {
-                  removeCookie('currentUser', { path: '/' });
-                };
-            } else {
-              resetForm();
-              toast({
-                title: 'Error!',
-                description: 'Wrong email or password.',
-                status: 'error',
-                duration: 2000,
-                isClosable: true
-              });
-            }
+          handldeResponse(result,remember);
         });
     },
     validationSchema: LoginValidations
   });
-
+  const login = useGoogleLogin({
+    onSuccess: (response) => {
+      OAuth2Request(response.access_token).then((result) => {
+        console.log(result)
+        handldeResponse(result,true);
+        console.log("Login thanh cong");
+        
+        testRequest().then((result) => {
+          console.log(result)
+        })
+      })
+    },
+    onError: (error) => console.log('Login Failed:', error)
+});
   return (
     <Box
       display='flex'
@@ -97,6 +121,8 @@ const Login = () => {
         <Checkbox value={remember} onChange={() => setRemember(!remember)} mt={5} >Remember me</Checkbox>
         <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} onClick={handleSubmit} >Login</Button>
         <br />
+        <Text my={3} width='100%' textAlign='center' >or</Text>
+        <Button width='100%' variant='outline' colorScheme='facebook' onClick={() => login()} >Google</Button>
         <Text my={3} width='100%' textAlign='center' >or</Text>
         <Button width='100%' variant='outline' colorScheme='facebook' onClick={() => navigate('/register')} >Register</Button>
       </Box>

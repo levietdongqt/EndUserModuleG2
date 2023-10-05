@@ -6,11 +6,14 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
 
     const [cookies] = useCookies(['currentUser']);
+    const [tokenCookie] = useCookies(['access_token']);
     const [currentUser, setCurrentUser] = useState(cookies.currentUser || '');
-
+    const [access_token,setToken]  = useState(tokenCookie.access_token || '');
     const values = {
         currentUser,
-        setCurrentUser
+        setCurrentUser,
+        access_token,
+        setToken
     }
 
     return <UserContext.Provider value={values}>{children}</UserContext.Provider>
