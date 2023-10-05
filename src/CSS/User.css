@@ -1,0 +1,16 @@
+.hover-effect {
+  cursor: pointer;
+  color: #4d4d4d; /* Default text color */
+}
+
+.hover-effect:hover {
+  color: red; /* Text color changes to red on hover */
+  text-decoration: none; /* Remove the underline on hover */
+}
+
+
+.formDetail {
+  font-size: 22px;
+  font-weight: 500; /* Corrected value */
+  color: #2C5282;
+}
