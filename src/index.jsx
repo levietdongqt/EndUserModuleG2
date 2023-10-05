@@ -10,9 +10,12 @@ import ReactTooltip from 'react-tooltip';
 import { UserProvider } from './contexts/UserContext';
 import { SearchProvider } from './contexts/SearchContext';
 import { CartProvider } from './contexts/CartContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <GoogleOAuthProvider clientId="349595782448-43gvctriiege3k72basdtv2qhu3f1nbq.apps.googleusercontent.com">
   <React.StrictMode>
     <BrowserRouter>
       <ChakraProvider>
@@ -28,4 +31,5 @@ root.render(
       </ChakraProvider>
     </BrowserRouter>
   </React.StrictMode>
+  </GoogleOAuthProvider>
 );

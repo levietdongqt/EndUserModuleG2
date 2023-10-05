@@ -17,3 +17,6 @@ export const Login = async (email, password)=>{
         password
     });
 };
+export const OAuth2Request = async (access_token)=>{
+    return await axios.post(`${process.env.REACT_APP_API_BASE_URL}/auth/handle-google-response`,{access_token});
+};
