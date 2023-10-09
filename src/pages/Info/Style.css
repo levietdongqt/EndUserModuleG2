@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap');
+
+.hover-effect {
+  cursor: pointer;
+  color: #4d4d4d; /* Default text color */
+}
+
+.hover-effect:hover {
+  color: red; /* Text color changes to red on hover */
+  text-decoration: none; /* Remove the underline on hover */
+}
+
+
+.formDetail {
+  font-size: 22px;
+  font-weight: 500; /* Corrected value */
+  color: #2C5282;
+}
+
+
+/* CustomTable.css */
+/* Trong file CSS của bạn (ví dụ: style.css) */
+.custom-table {
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  padding: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-left:5%;
+}
+
+.section-title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.table-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-row {
+  width: auto;
+  margin-left: 5%; 
+  display: flex;
+}
+
+.info-value{
+  /* padding-left: 20%; */
+  /* margin-block-start: 20%; */
+}
+
+.bold {
+  font-weight: bold;
+  margin-right: 10px; 
+
+}
+
+.edit-icon {
+  cursor: pointer;
+}
+
+
+/* Đảm bảo rằng tên động dài không bị tràn dòng */
+.info-row span:nth-child(1) {
+  flex-grow: 1;
+}
+
+.arrow-left {
+  text-align: left; /* Căn chỉnh nội dung sang trái */
+}
+
+
+
+.navbar a.nav-link {
+  color: #2C5282; /* Màu chữ ban đầu */
+  transition: color 0.03s, background-color 0.03s; /* Hiệu ứng thay đổi màu chữ và màu nền */
+  border-radius: 10px; /* Bo góc cho liên kết */
+}
+
+.navbar a.nav-link:hover {
+  color: #ffffff; /* Màu chữ khi hover */
+  background-color: #2C5282; /* Màu nền khi hover */
+}
+
+
+.section-header {
+  text-align: center; /* Căn giữa tiêu đề */
+  margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
+}
+
+.section-title {
+  font-weight: bold; /* Chữ in đậm */
+  font-size: 24px; /* Kích thước tiêu đề */
+  color: #2C5282;
+}
+
+
+/* CSS */
+.avatar-container {
+  text-align: center; /* Căn giữa nội dung theo chiều ngang */
+  margin-bottom: 20px; /* Khoảng cách dưới avatar và bảng */
+}
+
+.avatar-image {
+  width: 120px; /* Đặt kích thước avatar tùy chọn */
+  height: 120px;
+  border-radius: 50%; /* Bo góc để làm tròn avatar */
+  margin: 2%;
+}
+
+
+/* Trong file CSS của bạn (ví dụ: style.css) */
+.section-wrapper {
+  display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử con theo chiều ngang */
+  align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
+  justify-content: space-between; /* Các phần tử con được căn giữa và tách xa nhau */
+}
+
+
+
+
+.card-title {
+  font-weight: bold; /* Chữ in đậm */
+  font-size: 24px; /* Kích thước tiêu đề */
+  color: #2C5282;
+  display:block;
+}
+
+.card-row {
+  display: flex;
+  align-items: center; /* Căn theo chiều dọc */
+  width: 100%; /* Đảm bảo rằng mỗi hàng chiếm hết chiều rộng */
+  margin-left: 2%;
+}
+
+.card-value{
+  margin-top: 3px;
+  margin-right: 6%;
+  padding-left: 1%;
+
+}
+.card-infoTran {
+  display:inline-flex;
+  justify-content: space-between;
+}
+
+.card-bold {
+  font-weight: bold;
+  margin-right: 10px; 
+}

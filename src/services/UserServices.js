@@ -1,5 +1,7 @@
 import axios from "axios";
+import baseRequest from "../contexts/AxiosContext";
 
+//GETALL
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
     const response = await axios.get(
@@ -21,17 +23,17 @@ export const getAllUsers = async (search, st, page, pageSize) => {
   }
 };
 
+//GETUSER BYID
 export const getUserById = async (id) => {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_API_BASE_URL}/User/${id}`
-  );
+  const { data } = await baseRequest.get(`/User/${id}`);
   return data;
 };
 
+//EDIT USER
 export const updateUser = async (userDTO) => {
   try {
-    const response = await axios.put(
-      `${process.env.REACT_APP_API_BASE_URL}/User/Edit`,
+    const response = await baseRequest.put(
+      `/User/Edit`,
       userDTO // Truyền dữ liệu cần cập nhật từ userDTO
     );
 
@@ -48,9 +50,10 @@ export const updateUser = async (userDTO) => {
   }
 };
 
+//CHANGE PASSWORD
 export const changePassword = async (userDTO) => {
-  const response = await axios.put(
-    `${process.env.REACT_APP_API_BASE_URL}/User/ChangePass`,
+  const response = await baseRequest.put(
+    `/User/ChangePass`,
     userDTO // Truyền requestData chứa cả userDTO, oldPassword, và newPassword
   );
 
@@ -58,16 +61,12 @@ export const changePassword = async (userDTO) => {
 };
 
 export const deleteUser = async (id) => {
-  const { data } = await axios.delete(
-    `${process.env.REACT_APP_API_BASE_URL}/users/${id}`
-  );
+  const { data } = await baseRequest.delete(`/users/${id}`);
   return data;
 };
 
 export const addFavorite = async (id, productId) => {
-  const { data } = await axios.post(
-    `${process.env.REACT_APP_API_BASE_URL}/users/${id}/favorite/${productId}`
-  );
+  const { data } = await baseRequest.post(`/users/${id}/favorite/${productId}`);
   return data;
 };
 

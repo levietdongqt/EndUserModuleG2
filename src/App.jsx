@@ -9,7 +9,7 @@ import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Favorites from './pages/Favorites';
 import Product from './pages/Product';
-import Infos from './pages/Infos';
+import Infos from './pages/Info/Infos';
 import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
@@ -44,7 +44,7 @@ const App = () => {
         <Route path='/search' element={<Search />} />
         <Route path='/payment' element={<Payment />} />
         {
-            admin
+          admin
             ?
             <>
               <Route path='/admin/products' element={<ProductsforAdmin />} />
