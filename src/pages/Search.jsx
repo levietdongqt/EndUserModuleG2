@@ -5,6 +5,7 @@ import { Box, SimpleGrid, Button, Select, Text, Icon, Heading } from '@chakra-ui
 import ClothesCard from '../components/ClothesCard';
 import FilterMenu from '../components/FilterMenu';
 import { getProductByCategoryId, getProductBySearch } from '../services/ProductServices';
+import {getCategoryById}  from "../services/CategoryServices";
 import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
 
@@ -19,9 +20,9 @@ const Search = () => {
 
   useEffect(() => {
     if (state !== null) {
-      getProductByCategoryId(state.categoryId)
+      getCategoryById(state.categoryId)
         .then((result) => {
-          setProducts(result.products);
+          setProducts(result.result);
         });
       setSortBy("recommended");
     }
@@ -69,8 +70,12 @@ const Search = () => {
       <SimpleGrid minChildWidth={280} gap={3} spacingX={5} >
         <FilterMenu openFilter={openFilter} columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }} setProducts={setProducts} setSortBy={setSortBy} />
         {
-          products && products.map((product, index) => {
-            return <ClothesCard key={index} productId={product._id} />
+          products && products.map((product) => {
+            return product.collections.map((collection,index)=>{
+              return collection.templateDTO.map((templates) =>{
+                return <ClothesCard key={templates.name} templateId={templates.id}/>
+              })
+            })
           })
         }
         {

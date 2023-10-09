@@ -10,7 +10,7 @@ import ReviewModal from '../components/ReviewModal';
 import { useCartContext } from '../contexts/CartContext';
 import { useUserContext } from '../contexts/UserContext';
 import useGetFavoriteStatus from '../hooks/useGetFavoriteStatus';
-import { getProductById } from '../services/ProductServices';
+import { getTemplateById } from '../services/TemplateServices';
 import { addFavorite, deleteFavorite } from '../services/UserServices';
 import { getCommentByProductId } from '../services/CommentServices';
 import { getRatingByProductId } from '../services/RatingServices';
@@ -40,10 +40,10 @@ const Product = () => {
   useEffect(() => {
     setIsFavorite(status);
 
-    getProductById(location.state.productId)
+    getTemplateById(location.state.id)
       .then((result) => {
-        setProduct(result.product);
-        setSizes(result.product.sizes);
+        setProduct(result.result);
+        setSizes(result.result.sizes);
       });
 
     getRatingByProductId(location.state.productId)
@@ -56,13 +56,13 @@ const Product = () => {
         setRatingCount(result.ratings.length);
       });
 
-    getCommentByProductId(location.state.productId)
+    getCommentByProductId(location.state.Id)
       .then((result) => {
         setComments(result.comment);
       });
 
     cart.forEach((item) => {
-      if (item.id === location.state.productId) {
+      if (item.id === location.state.Id) {
         setInCart(true);
         setAmount(item.amount);
       }

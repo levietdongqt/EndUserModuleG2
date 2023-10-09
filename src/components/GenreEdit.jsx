@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, Input, Button, Select, useToast } from '@chakra-ui/react'
-import { getAllGenres, addGenre, updateGenre, deleteGenre } from '../services/GenreServices';
+import { getAllTemplate, addTemplate, updateTemplate, deleteTemplate } from '../services/TemplateServices';
 
 const GenreEdit = ({ isEdit }) => {
 
@@ -12,14 +12,14 @@ const GenreEdit = ({ isEdit }) => {
     const toast = useToast();
 
     useEffect(() => {
-        getAllGenres()
+        getAllTemplate()
             .then((result) => {
                 setAllGenres(result.allGenres);
             });
     }, [isEdit]);
 
     const onClickAdd = () => {
-        addGenre(genreName, status)
+        addTemplate(genreName, status)
             .then((result) => {
                 if (result.status) {
                     toast({
@@ -44,7 +44,7 @@ const GenreEdit = ({ isEdit }) => {
     };
 
     const onClickEdit = () => {
-        updateGenre(selectedId, selectedGenre, status)
+        updateTemplate(selectedId, selectedGenre, status)
             .then((result) => {
                 if (result.status) {
                     toast({
@@ -67,7 +67,7 @@ const GenreEdit = ({ isEdit }) => {
     };
 
     const onClickDelete = () => {
-        deleteGenre(selectedId)
+        deleteTemplate(selectedId)
             .then((result) => {
                 if (result.status) {
                     toast({
