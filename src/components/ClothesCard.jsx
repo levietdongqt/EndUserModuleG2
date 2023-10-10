@@ -11,7 +11,7 @@ import { addFavorite, deleteFavorite } from '../services/UserServices';
 import useGetFavoriteStatus from '../hooks/useGetFavoriteStatus';
 import ReviewModal from './ReviewModal';
 
-const ClothesCard = ({ templateId, isDelivered }) => {
+const ClothesCard = ({ templateId, isDelivered}) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [cookies, setCookies, removeCookie] = useCookies(['cart']);
@@ -31,7 +31,6 @@ const ClothesCard = ({ templateId, isDelivered }) => {
       getTemplateById(templateId)
         .then(result => {
           setTemplate(result.result);
-          console.log("test",result.result[0].name);
         });
       cart.forEach((item) => {
         if (item.id === templateId) {
@@ -95,6 +94,7 @@ const ClothesCard = ({ templateId, isDelivered }) => {
     }
     setRefresh(!refresh);
   };
+
   return(<>
     <Box
         width='100%'
@@ -106,27 +106,26 @@ const ClothesCard = ({ templateId, isDelivered }) => {
         mx={{ base: 0, md: 2 }}
     >
       {
-          template && template.map((item, index) => {
-            return item.templateImages.map((x, imageIndex) => {
-              return (
-                  <Image
-                      key={`${index}-${imageIndex}`}
-                      width='100%'
-                      height='auto'
-                      maxWidth={500}
-                      objectFit='cover'
-                      maxHeight={620}
-                      src={x.imageUrl}
-                      onClick={() => navigate(`/product/${template.id}`, { state: { "productId": template.id } })}
-                  />
-              );
-            });
+          template &&
+          template.map((item, index) => {
+            const firstImage = item.templateImages[0];
+            return (
+                <Image
+                    key={`${index}-${firstImage.imageUrl}`}
+                    width='100%'
+                    height='auto'
+                    maxWidth={500}
+                    objectFit='cover'
+                    maxHeight={600}
+                    src={firstImage.imageUrl}
+                    onClick={() => navigate(`/template/${template[0].id}`, { state: { "productId": template[0].id } })}
+                    style={{ height: '260px' }}
+                />
+            );
           })
       }
-
-      <Box px={3} py={5} bg='#fff' position='relative' width='100%' height={230} maxWidth={500} >
-        <Text onClick={() => navigate(`/product/${template.id}`, { state: { "productId": template.id } })} fontWeight={500} fontSize={26} >{template.name}</Text>
-        <Text onClick={() => navigate(`/product/${template.id}`, { state: { "productId": template.id } })} mb={10} fontSize={18} >{template.description}</Text>
+      <Box px={3} py={5} bg='#fff' position='relative' width='100%' height={150} maxWidth={500} >
+        <Text onClick={() => navigate(`/template/${template[0].id}`, { state: { "productId": template[0].id } })} fontWeight={500} fontSize={18} >{template[0]?.name}</Text>
         <Box
             mt={5}
             py={3}
@@ -137,31 +136,22 @@ const ClothesCard = ({ templateId, isDelivered }) => {
             justifyContent='space-between'
             pr={5} pl={2}
         >
-
-          <Text onClick={() => navigate(`/product/${template.id}`, { state: { "productId": template.id } })} fontSize={26} fontWeight={500} >{template.price} $</Text>
+          <Text onClick={() => navigate(`/template/${template[0].id}`, { state: { "productId": template[0].id } })} fontSize={18} fontWeight={500} >{template[0]?.pricePlus} $</Text>
           <Box display='flex' alignItems='center' margin='right' >
             {
-              inCart
-                  ?
-                  <>
-                    <Button onClick={onClickRemoveCart} disabled={amount === 0} colorScheme='facebook'>-</Button>
-                    <Text fontSize={25} px={2} >{amount}</Text>
-                    <Button onClick={onClickAddCart} colorScheme='facebook' >+</Button>
-                  </>
-                  :
                   <>
                     <Icon
                         onClick={onClickFavorite}
                         as={Favorite}
-                        fontSize={36}
+                        fontSize={28}
                         transition={.5}
-                        color={!isFavorite ? 'blackAlpha.400' : 'facebook.500'}
-                        _hover={{ color: 'facebook.500' }}
+                        color={!isFavorite ? 'blackAlpha.400' : 'red'}
+                        _hover={{ color: 'red' }}
                     />
                     <Icon
                         onClick={onClickAddCart}
                         as={ShoppingCart}
-                        fontSize={36}
+                        fontSize={28}
                         transition={.5}
                         color='blackAlpha.400'
                         _hover={{ color: 'facebook.500' }}

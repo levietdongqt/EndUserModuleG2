@@ -63,7 +63,7 @@ const FilterMenu = ({ openFilter, setProducts, setSortBy }) => {
 
     return (
         <Box
-            display={openFilter ? 'block' : 'none'} minHeight={725} maxHeight={850} p={3} backgroundColor='#fff' maxWidth={400}>
+            display={openFilter ? 'block' : 'none'} minHeight={500} maxHeight={700} p={3} backgroundColor='#fff' maxWidth={400}>
             <Box px={2}>
                 <Text fontSize={20} my={3} fontWeight={500} >Price Range</Text>
                 <RangeSlider
@@ -105,19 +105,6 @@ const FilterMenu = ({ openFilter, setProducts, setSortBy }) => {
                     <Radio colorScheme='facebook' value='unisex' fontWeight={600} >Unisex</Radio>
                 </RadioGroup>
                 <Divider my={3} />
-            </Box>
-            <Box display='flex'
-                flexDirection='column' pb={3}>
-                <Text fontSize={20} mb={3} fontWeight={500} >Color</Text>
-                <RadioGroup display='flex' flexDirection='column' onChange={setColor} onClick={onChangeColor} value={color} >
-                    <Radio mb={2} colorScheme='facebook' value='all' fontWeight={600} >All</Radio>
-                    <Radio mb={2} colorScheme='facebook' value='blue' fontWeight={600} >Blue</Radio>
-                    <Radio mb={2} colorScheme='blackAlpha' value='white' fontWeight={600} >White</Radio>
-                    <Radio mb={2} colorScheme='green' value='green' fontWeight={600} >Green</Radio>
-                    <Radio mb={2} colorScheme='gray' value='black' fontWeight={600} >Black</Radio>
-                    <Radio mb={2} colorScheme='red' value='red' fontWeight={600} >Red</Radio>
-                </RadioGroup>
-                <Button mt={5} colorScheme='facebook' onClick={onClickSearch} >Search</Button>
             </Box>
         </Box>
     )

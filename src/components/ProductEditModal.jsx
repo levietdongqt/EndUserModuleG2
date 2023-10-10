@@ -45,7 +45,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
                         resetForm();
                         toast({
                             title: 'Added!',
-                            description: 'Product successfully added.',
+                            description: 'Template successfully added.',
                             status: 'success',
                             duration: 2000,
                             isClosable: true
@@ -87,7 +87,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
                     onClose(true);
                     toast({
                         title: 'Edited!',
-                        description: 'Product successfully edited.',
+                        description: 'Template successfully edited.',
                         status: 'success',
                         duration: 2000,
                         isClosable: true

@@ -41,7 +41,7 @@ const ProductsforAdmin = () => {
         } else {
           toast({
             title: 'Deleted!',
-            description: 'Product succesfully deleted.',
+            description: 'Template succesfully deleted.',
             status: 'success',
             duration: 2000,
             isClosable: true
