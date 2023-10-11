@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { Box, FormLabel, FormErrorMessage, Input, Text, InputRightElement, useToast } from '@chakra-ui/react';
+import {
+    Box, FormLabel, FormErrorMessage, Input, Text, InputRightElement, useToast, Avatar, AvatarBadge, AvatarGroup, Heading, Flex, Container,
+    InputGroup, InputLeftAddon, Button, Radio, RadioGroup, Grid, GridItem, Stack, HStack, VStack, useRadio, useRadioGroup,
+} from '@chakra-ui/react';
 import { useUserContext } from '../../contexts/UserContext';
-import { getUserById, changePassword } from '../../services/UserServices';
-import { Form, Row, Col, Button, Modal, Navbar, Nav, Table, Container, InputGroup, FormControl } from 'react-bootstrap';
+import { getUserById, changePassword, updateUser } from '../../services/UserServices';
+import { Form, Row, Col, Modal, Navbar, Nav, Table, FormControl } from 'react-bootstrap';
 import { FaEdit, FaPhone, FaEnvelope, FaDollarSign } from 'react-icons/fa';
 import '../Info/Style.css';
-import Avatar from '@mui/material/Avatar';
 
 
 
 
 
-/* src/index.css */
+
 
 export const Infos = () => {
     const { currentUser } = useUserContext(); //Lấy user đã đăng nhập ở đây
     const [user, setUser] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const gender = user.gender ? "Female" : "Male";
 
 
 
@@ -26,104 +29,140 @@ export const Infos = () => {
         getUserByIdAsync(currentUser.id);
     }, []);
 
+
+    //GET BY ID
     const getUserByIdAsync = async (id) => {
         var res = await getUserById(id);
         console.log(res);
         setUser(res.result);
     };
 
-    const gender = user.gender ? "female" : "male";
-    // const EditableField = ({ label, field, initialValue }) => {
-    //     const [isEditing, setIsEditing] = useState(false);
-    //     const [editedValue, setEditedValue] = useState(initialValue);
-    //     const handleEditClick = useCallback(() => {
-    //         setIsEditing(true);
-    //     }, []);
-    //     const handleSaveClick = useCallback(async () => {
-    //         try {
-    //             const updatedValues = {
-    //                 ...user,
-    //                 [field]: editedValue,
-    //             };
-    //             const userDTO = {
-    //                 id: currentUser.id,
-    //                 ...updatedValues,
-    //             };
-    //             const updatedUser = await updateUser(userDTO);
-    //             console.log('Updated user:', updatedUser);
-    //             setUser(updatedValues);
-    //             setIsEditing(false);
-    //         } catch (error) {
-    //             console.error('Update user error:', error.message);
-    //         }
-    //     }, [currentUser.id, field, editedValue, user]);
-    //     const handleCancelClick = useCallback(() => {
-    //         setIsEditing(false);
-    //         setEditedValue(initialValue);
-    //     }, [initialValue]);
-    //     const renderField = () => {
-    //         if (field === 'dateOfBirth') {
-    //             return (
-    //                 <Form.Control
-    //                     type="date"
-    //                     value={editedValue}
-    //                     onChange={(e) => setEditedValue(e.target.value)}
-    //                     autoFocus  // Add autoFocus to focus the input field
-    //                     style={{ border: 'none', outline: 'none' }} // Remove border and outline
-    //                 />
-    //             );
-    //         }
-    //         // Mặc định sử dụng trường nhập văn bản
-    //         return (
-    //             <Form.Control
-    //                 type="text"
-    //                 value={editedValue}
-    //                 onChange={(e) => setEditedValue(e.target.value)}
-    //                 autoFocus  // Add autoFocus to focus the input field
-    //                 style={{ border: 'none', outline: 'none' }} // Remove border and outline
-    //             />
-    //         );
-    //     };
-    //     return (
-    //         <Form.Group as={Row} className="mb-3">
-    //             <Form.Label column sm={3} className=" d-flex align-items-center">{label}</Form.Label>
-    //             <Col sm={6} className="d-flex align-items-center">
-    //                 {!isEditing ? (
-    //                     <div className="d-flex align-items-center">
-    //                         <span
-    //                             onClick={handleEditClick}
-    //                             className="hover-effect"
-    //                             data-toggle="tooltip"
-    //                             title="Click to edit"
-    //                         >
-    //                             {editedValue}
-    //                         </span>
-    //                     </div>
-    //                 ) : (
-    //                     <div className="d-flex align-items-center">
-    //                         {renderField()}
-    //                         <ButtonGroup style={{ margin: '10px' }}>
-    //                             <Button
-    //                                 onClick={handleSaveClick}
-    //                                 className="btn-success d-flex align-items-center"
-    //                             >
-    //                                 <FaSave size={20} className="mr-2" /> Save
-    //                             </Button>
-    //                             <Button
-    //                                 onClick={handleCancelClick}
-    //                                 className="btn-danger d-flex align-items-center"
-    //                             >
-    //                                 <FaTimes size={20} className="mr-2" /> Cancel
-    //                             </Button>
-    //                         </ButtonGroup>
-    //                     </div>
-    //                 )}
-    //             </Col>
-    //         </Form.Group>
-    //     );
-    // };
+    //#region UPDATE AVATAR 
+    // UPDATE AVATAR 
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    //click vào đổi ảnh
+    const handleImageClick = () => {
+        document.getElementById('imageInput').click();
+    };
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        const imageUrl = URL.createObjectURL(file);
+        setSelectedImage(imageUrl);
+        if (file) {
+            setEditedUser({
+                ...editedUser,
+                avatar: file,
+            });
+            console.log("lấy dc form data")
+        }
+
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        const imageUrl = URL.createObjectURL(file);
+        setSelectedImage(imageUrl);
+        if (file) {
+            setEditedUser({
+                ...editedUser,
+                avatar: file,
+            });
+        }
+    };
+
+    const allowDrop = (event) => {
+        event.preventDefault();
+    };
+
+    // END UPDATE AVATAR 
+    //#endregion
 
 
+    //#region HANDLE UPDATE FORM
+    // 
+    const [editedUser, setEditedUser] = useState({
+        fullName: user.fullName,
+        gender: gender,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
+        address: user.address,
+        avatar: null,
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedUser({
+            ...user,
+            [name]: value,
+        });
+    };
+
+    const handleGenderChange = (value) => {
+        setEditedUser({
+            ...editedUser,
+            gender: value,
+        });
+    };
+    console.log(editedUser.fullName)
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log(editedUser.avatar)
+        const updatedValues = {
+            ...user,
+            ...(editedUser.avatar ? { formFile: editedUser.avatar } : {}),
+            fullName: editedUser.fullName,
+            gender: editedUser.gender === "Male",
+            phone: editedUser.phone,
+            dateOfBirth: editedUser.dateOfBirth,
+            address: editedUser.address,
+        };
+        console.log(updatedValues.formFile)
+        const userDTO = {
+            id: currentUser.id,
+            ...updatedValues,
+
+        };
+
+        console.log("inavatar", userDTO.formFile)
+        try {
+            // Gọi hàm updateUser để cập nhật thông tin người dùng
+            await updateUser(userDTO);
+
+            // Nếu cập nhật thành công, bạn có thể thực hiện các hành động khác ở đây
+            console.log("Thông tin cập nhật thành công:", editedUser);
+        } catch (error) {
+            // Xử lý lỗi nếu có
+            console.error("Lỗi khi cập nhật thông tin:", error);
+        }
+    };
+    //#endregion
+
+    //#region date, month , years format function
+
+    //date, month , years format function
+    function formatDateToISO(dateString) {
+        if (!dateString) {
+            return null;
+        }
+
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+    // call formatDateToISO 
+    const formattedDate = formatDateToISO(editedUser.dateOfBirth);
+
+    //#endregion
+
+
+
+    //#region HANDEL UPDATE PASSWORD
     const handleNavToggle = () => {
         setExpanded(!expanded);
     };
@@ -135,7 +174,6 @@ export const Infos = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
-
 
     // Change Password
     function ChangePasswordModal({ isOpen, onClose }) {
@@ -219,63 +257,110 @@ export const Infos = () => {
             </Modal>
         );
     }
+    //#endregion
+
+    // const EditableField = ({ label, field, initialValue }) => {
+    //     const [isEditing, setIsEditing] = useState(false);
+    //     const [editedValue, setEditedValue] = useState(initialValue);
+    //     const handleEditClick = useCallback(() => {
+    //         setIsEditing(true);
+    //     }, []);
+
+
+    //     const handleSaveClick = useCallback(async () => {
+    //         try {
+    //             const updatedValues = {
+    //                 ...user,
+    //                 [field]: editedValue,
+    //             };
+    //             const userDTO = {
+    //                 id: currentUser.id,
+    //                 ...updatedValues,
+    //             };
+    //             const updatedUser = await updateUser(userDTO);
+    //             console.log('Updated user:', updatedUser);
+    //             setUser(updatedValues);
+    //             setIsEditing(false);
+    //         } catch (error) {
+    //             console.error('Update user error:', error.message);
+    //         }
+    //     }, [currentUser.id, field, editedValue, user]);
+
+    //     const handleCancelClick = useCallback(() => {
+    //         setIsEditing(false);
+    //         setEditedValue(initialValue);
+    //     }, [initialValue]);
+
+
+    //     const renderField = () => {
+    //         if (field === 'dateOfBirth') {
+    //             return (
+    //                 <Form.Control
+    //                     type="date"
+    //                     value={editedValue}
+    //                     onChange={(e) => setEditedValue(e.target.value)}
+    //                     autoFocus  // Add autoFocus to focus the input field
+    //                     style={{ border: 'none', outline: 'none' }} // Remove border and outline
+    //                 />
+    //             );
+    //         }
+    //         // Mặc định sử dụng trường nhập văn bản
+    //         return (
+    //             <Form.Control
+    //                 type="text"
+    //                 value={editedValue}
+    //                 onChange={(e) => setEditedValue(e.target.value)}
+    //                 autoFocus  // Add autoFocus to focus the input field
+    //                 style={{ border: 'none', outline: 'none' }} // Remove border and outline
+    //             />
+    //         );
+    //     };
+    //     return (
+    //         <Form.Group as={Row} className="mb-3">
+    //             <Form.Label column sm={3} className=" d-flex align-items-center">{label}</Form.Label>
+    //             <Col sm={6} className="d-flex align-items-center">
+    //                 {!isEditing ? (
+    //                     <div className="d-flex align-items-center">
+    //                         <span
+    //                             onClick={handleEditClick}
+    //                             className="hover-effect"
+    //                             data-toggle="tooltip"
+    //                             title="Click to edit"
+    //                         >
+    //                             {editedValue}
+    //                         </span>
+    //                     </div>
+    //                 ) : (
+    //                     <div className="d-flex align-items-center">
+    //                         {renderField()}
+    //                         <ButtonGroup style={{ margin: '10px' }}>
+    //                             <Button
+    //                                 onClick={handleSaveClick}
+    //                                 className="btn-success d-flex align-items-center"
+    //                             >
+    //                                 <FaSave size={20} className="mr-2" /> Save
+    //                             </Button>
+    //                             <Button
+    //                                 onClick={handleCancelClick}
+    //                                 className="btn-danger d-flex align-items-center"
+    //                             >
+    //                                 <FaTimes size={20} className="mr-2" /> Cancel
+    //                             </Button>
+    //                         </ButtonGroup>
+    //                     </div>
+    //                 )}
+    //             </Col>
+    //         </Form.Group>
+    //     );
+    // };
+
+
+
 
     return (
         <Box>
-            {/* <Text p={5} textAlign='center' fontSize={30} fontWeight={300} color='facebook.500' >My Informations</Text> */}
-            {/* <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
-      
-              <Box width='100%' display='flex' flexDirection='column' alignItems='center'  >
-                <Text p={5} textAlign='center' fontSize={22} fontWeight={500} color='facebook.500' >Address{address}</Text>
-                <Textarea mb={5} height={150} maxWidth={500} resize='none' placeholder='Please write your address...' value={address} onInput={onInputAddress} ></Textarea>
-                <Button colorScheme='facebook' onClick={onClickSave} >Save</Button>
-              </Box>
-      
-              <Center height={300} mt={5} mx={3} display={{ base: 'none', md: 'block' }} >
-                <Divider orientation='vertical' />
-              </Center>
-              <Box width='100%' display='flex' flexDirection='column' alignItems='center' >
-                <Text p={5} textAlign='center' fontSize={22} fontWeight={500} color='facebook.500' >Phone: </Text>
-                <InputGroup maxWidth={300} marginX='auto' >
-                  <InputLeftElement
-                    pointerEvents='none'
-                    children={<Phone color='gray.300' />}
-                  />
-                  <Input maxLength={11} type='tel' placeholder='Phone number' value={phone} onInput={onInputPhone} />
-                </InputGroup>
-                <Button mt={5} colorScheme='facebook' onClick={onClickSave} >Save</Button>
-              </Box>
-            </Box> */}
-
-            {/* <Form className='formDetail'>
-              <Row>
-                <Col>
-                  <EditableField label="FullName" field="fullName" initialValue={user?.fullName} />
-                </Col>
-      
-                <Col>
-                  <EditableField label="Address" field="address" initialValue={user?.address} />
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <EditableField label="Phone" field="phone" initialValue={user?.phone} />
-                </Col>
-      
-                <Col>
-                  <EditableField label="Birth Day" field="dateOfBirth" initialValue={user?.dateOfBirth} />
-                </Col>
-              </Row>
-              <div className="App">
-                <Button variant="primary" onClick={handleOpenModal}>
-                  Thay đổi mật khẩu
-                </Button>
-                <ChangePasswordModal isOpen={isModalOpen} onClose={handleCloseModal} />
-              </div>
-            </Form> */}
-
-
             <Row>
+                {/* NAVBAR */}
                 <Col sm={3}>
                     <Navbar bg="" variant="" expand="lg" className="navbar  flex-column">
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={handleNavToggle} />
@@ -294,11 +379,14 @@ export const Infos = () => {
                 </Col>
 
                 <Col sm={8}>
+
+                    {/* USER CARD */}
                     <Row responsive className='custom-table' >
                         <Col sm={3}>
                             <div >
-                                <img src={`https://localhost:5000/${user.avatar}`} alt="" className="avatar-image" />
+                                {/* <img src={`https://localhost:5000/${user.avatar}`} alt="" className="avatar-image" /> */}
                                 {/* <Avatar alt="User Avatar" src={`https://localhost:5000/${user.avatar}`} /> */}
+                                <Avatar size='2xl' name='' src='https://localhost:5000/ ${user.avatar}' />{' '}
                             </div>
                             {console.log(user.avatar)}
                         </Col>
@@ -323,134 +411,141 @@ export const Infos = () => {
                         </Col>
                     </Row>
 
-                    <Container>
-                        <h1 className="mb-4">Update Basic Information</h1>
-                        <Form>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="fullName">
-                                    <Form.Label>Full Name:</Form.Label>
-                                    <InputGroup>
-                                        <FormControl
-                                            type="text"
-                                            name="fullName"
-                                            value={user.fullName}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="gender">
-                                    <Form.Label>Gender:</Form.Label>
-                                    <InputGroup>
-                                        <FormControl
-                                            type="text"
-                                            name="gender"
-                                            value={gender}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="phone">
-                                    <Form.Label>Phone:</Form.Label>
-                                    <InputGroup>
-                                        <FormControl
-                                            type="text"
-                                            name="phone"
-                                            value={user.phone}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="birthday">
-                                    <Form.Label>BirthDay:</Form.Label>
-                                    <InputGroup>
-                                        <FormControl
-                                            type="text"
-                                            name="birthday"
-                                            value={user.dateOfBirth}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="address">
-                                    <Form.Label>Address:</Form.Label>
-                                    <InputGroup>
-                                        <FormControl
-                                            type="text"
-                                            name="address"
-                                            value={user.address}
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
-                            </Row>
-                            <Button variant="primary" type="submit">
-                                Submit
-                            </Button>
-                        </Form>
+                    {/* // UPDATE INFORMATION */}
+                    <Container borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg">
+                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                            Update Basic Information
+                        </Heading>
+                        <Box as="form" onSubmit={handleSubmit}>
+
+
+                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
+                                onDragOver={allowDrop}>
+                                <Avatar
+                                    size="2xl"
+                                    name=""
+                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
+                                    onClick={handleImageClick}
+                                    cursor="pointer"
+                                    draggable="true"
+                                />
+                                <input
+                                    id="imageInput"
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={handleImageChange}
+                                />
+                            </InputGroup>
+
+
+                            <InputGroup mb={3}>
+                                <InputLeftAddon>Full Name:</InputLeftAddon>
+                                <Input
+                                    type="text"
+                                    name="fullName"
+                                    value={editedUser.fullName}
+                                    onChange={handleInputChange}
+                                />
+                            </InputGroup>
+
+                            <InputGroup mb={3} display="flex" alignItems="center">
+                                <FormControl as="fieldset" className='table-content'>
+                                    <FormLabel as="legend" >Gender:</FormLabel>
+                                    <RadioGroup
+                                        name="gender"
+                                        value={editedUser.gender}
+                                        onChange={handleGenderChange}
+                                    >
+                                        <Radio value="male" pr={5}>Male</Radio>
+                                        <Radio value="female" pr={2}>Female</Radio>
+                                    </RadioGroup>
+                                </FormControl>
+                            </InputGroup>
+
+
+                            <InputGroup mb={3}>
+                                <InputLeftAddon>Phone:</InputLeftAddon>
+                                <Input
+                                    type="text"
+                                    name="phone"
+                                    value={editedUser.phone}
+                                    onChange={handleInputChange}
+                                />
+                            </InputGroup>
+
+                            <InputGroup mb={3}>
+                                <InputLeftAddon>BirthDay:</InputLeftAddon>
+                                <Input
+                                    type="date"
+                                    name="dateOfBirth"
+                                    value={formattedDate}
+                                    onChange={handleInputChange}
+                                />
+
+                            </InputGroup>
+                            <InputGroup mb={3}>
+                                <InputLeftAddon>Address:</InputLeftAddon>
+                                <Input
+                                    type="text"
+                                    name="address"
+                                    value={editedUser.address}
+                                    onChange={handleInputChange}
+                                />
+                            </InputGroup>
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <Button colorScheme="blue" type="submit">
+                                    Save
+                                </Button>
+                            </div>
+
+                        </Box>
                     </Container>
 
-                    <div className="custom-table">
-                        <div className="section-header">
-                            <h1 className="section-title">Basic Information</h1>
 
-                        </div>
-                        <div className="table-content">
-                            <div className="info-row">
-                                <span className="bold">Full Name:</span>
-                                <span className="info-value">{user.fullName}</span>
-                                {/* <p size={20} className="" /> */}
-                            </div>
-                            <div className="info-row">
-                                <span className="bold">Gender   :</span>
-                                <span className="info-value">{gender}</span>
-                                {/* <p size={20} className="" /> */}
-                            </div>
-                            <div className="info-row">
-                                <span className="bold">Email    :</span>
-                                <span className="info-value">{user.email}</span>
-                                <p size={20} className="" />
+                    {/* // BASIC INFORMATION */}
+                    <Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg">
+                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                            Basic Information
+                        </Heading>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                Full Name:
+                            </Text>
+                            <Text flex="3">{user.fullName}</Text>
+                        </Flex>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                Gender:
+                            </Text>
+                            <Text flex="3">{gender}</Text>
+                        </Flex>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                Email:
+                            </Text>
+                            <Text flex="3">{user.email}</Text>
+                        </Flex>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                Phone:
+                            </Text>
+                            <Text flex="3">{user.phone}</Text>
+                        </Flex>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                BirthDay:
+                            </Text>
+                            <Text flex="3">{formattedDate}</Text>
+                        </Flex>
+                        <Flex alignItems="center" mb={2}>
+                            <Text fontWeight="bold" flex="1">
+                                Address:
+                            </Text>
+                            <Text flex="3">{user.address}</Text>
+                        </Flex>
+                    </Box>
 
-                            </div>
-                            <div className="info-row">
-                                <span className="bold">Phone    :</span>
-                                <span className="info-value">{user.phone}</span>
-                                <p size={20} className="" />
-
-                            </div>
-                            <div className="info-row">
-                                <span className="bold">BirthDay :</span>
-                                <span className="info-value">{user.dateOfBirth}</span>
-                                <p size={20} className="" />
-
-                            </div>
-                            <div className="info-row">
-                                <span className="bold">Address  :</span>
-                                <span className="info-value">{user.address}</span>
-                                <p size={20} className="" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="section-header">
-                        <h2 className="section-title">Delivery Address</h2>
-                    </div>
-                    <Table hover responsive className='custom-table'>
-                        <tbody>
-                            <tr>
-                                <td className="bold">Address</td>
-                                <td>{user.address}</td>
-                                <td className="arrow-left"> <FaEdit size={20} className="mr-2" /> </td>
-                            </tr>
-                            <tr>
-                                <td className="bold">Address</td>
-                                <td>{user.address}</td>
-                                <td className="arrow-left"> <FaEdit size={20} className="mr-2" /> </td>
-                            </tr>
-                        </tbody>
-                    </Table>
                 </Col>
             </Row>
         </Box>
