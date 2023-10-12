@@ -1,6 +1,18 @@
 import axios from "axios";
 import baseRequest from "../contexts/AxiosContext";
 
+
+
+export const Register = async (userDTO) => {
+
+  return await baseRequest.post(
+    `/User/Create`, userDTO
+  );
+
+};
+
+
+
 //GETALL
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
@@ -30,25 +42,19 @@ export const getUserById = async (id) => {
 };
 
 //EDIT USER
-export const updateUser = async (userDTO) => {
+export const updateUser = async (formData) => {
   try {
-    const response = await baseRequest.put(
-      `/User/Edit`,
-      userDTO // Truyền dữ liệu cần cập nhật từ userDTO
-    );
-
+    const response = await baseRequest.put(`/User/Edit`, formData);
     if (response.status === 200) {
-      // Xử lý nếu API trả về mã 200 OK
       return response;
     } else {
-      // Xử lý nếu có lỗi
       throw new Error("Failed to update user");
     }
   } catch (error) {
-    // Xử lý nếu có lỗi mạng hoặc lỗi từ server
     throw new Error(error.message);
   }
 };
+
 
 //CHANGE PASSWORD
 export const changePassword = async (userDTO) => {

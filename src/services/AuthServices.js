@@ -1,14 +1,10 @@
 import axios from "axios";
 
-export const Register = async (firstName, lastName, email, password, phone) => {
+export const Register = async (userDTO) => {
   return await axios.post(
-    `${process.env.REACT_APP_API_BASE_URL}/users/register`,
+    `${process.env.REACT_APP_API_BASE_URL}/User/Create`,
     {
-      firstName,
-      lastName,
-      email,
-      password,
-      phone,
+      userDTO
     }
   );
 };

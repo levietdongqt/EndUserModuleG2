@@ -1,44 +1,70 @@
 import React, { useEffect, useState } from 'react';
 import {
     Box, FormLabel, FormErrorMessage, Input, Text, InputRightElement, useToast, Avatar, AvatarBadge, AvatarGroup, Heading, Flex, Container,
-    InputGroup, InputLeftAddon, Button, Radio, RadioGroup, Grid, GridItem, Stack, HStack, VStack, useRadio, useRadioGroup,
+    InputGroup, InputLeftAddon, Button, Radio, RadioGroup, Grid, GridItem, Stack, HStack, VStack, SimpleGrid, Icon,
 } from '@chakra-ui/react';
+import { ViewOffIcon, ViewIcon } from '@chakra-ui/icons';
 import { useUserContext } from '../../contexts/UserContext';
 import { getUserById, changePassword, updateUser } from '../../services/UserServices';
 import { Form, Row, Col, Modal, Navbar, Nav, Table, FormControl } from 'react-bootstrap';
-import { FaEdit, FaPhone, FaEnvelope, FaDollarSign } from 'react-icons/fa';
+import { FaEdit, FaPhone, FaEnvelope, FaDollarSign, } from 'react-icons/fa';
+import { useFormik } from 'formik';
+import RegisterValidations from '../../validations/RegisterValidations';
 import '../Info/Style.css';
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 
 
 
 
 
 
-
-export const Infos = () => {
+const Infos = () => {
     const { currentUser } = useUserContext(); //Lấy user đã đăng nhập ở đây
     const [user, setUser] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const gender = user.gender ? "Female" : "Male";
+    const gender = currentUser.gender ? "Female" : "Male";
+    const [editedUser, setEditedUser] = useState({
+        fullName: currentUser.fullName,
+        gender: gender,
+        phone: currentUser.phone,
+        dateOfBirth: currentUser.dateOfBirth,
+        address: currentUser.address,
+        avatar: null,
+    });
+    const [isEditing, setIsEditing] = useState(true);
+    const toast = useToast();
+    const [activeTab, setActiveTab] = useState('PERSONAL');
 
-
-
+    //CALL GET USER BY ID
     useEffect(() => {
-        // Lấy thông tin user bằng cách gọi API getUserById(currentUser.id)
-        getUserByIdAsync(currentUser.id);
-    }, []);
+        const getUserByIdAsync = async (id) => {
+            const res = await getUserById(id);
+            setUser(res.result);
+        };
 
+        // Kiểm tra currentUser trước khi gọi API
+        if (currentUser) {
+            getUserByIdAsync(currentUser.id);
+        }
+    }, [currentUser]);
 
-    //GET BY ID
-    const getUserByIdAsync = async (id) => {
-        var res = await getUserById(id);
-        console.log(res);
-        setUser(res.result);
+    //#region  SET NAV TAB
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
     };
+    //#endregion
+
+    //#region SHOW UPDATE FORM
+    const handleEditClick = () => {
+        setIsEditing(false);
+    };
+    const handleCancel = () => {
+        setIsEditing(true); // Đặt biến trạng thái để ẩn biểu mẫu chỉnh sửa và hiển thị bảng thông tin
+    };
+    //#endregion 
 
     //#region UPDATE AVATAR 
-    // UPDATE AVATAR 
     const [selectedImage, setSelectedImage] = useState(null);
 
     //click vào đổi ảnh
@@ -76,26 +102,13 @@ export const Infos = () => {
     const allowDrop = (event) => {
         event.preventDefault();
     };
-
-    // END UPDATE AVATAR 
     //#endregion
 
-
     //#region HANDLE UPDATE FORM
-    // 
-    const [editedUser, setEditedUser] = useState({
-        fullName: user.fullName,
-        gender: gender,
-        phone: user.phone,
-        dateOfBirth: user.dateOfBirth,
-        address: user.address,
-        avatar: null,
-    });
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedUser({
-            ...user,
+            ...editedUser,
             [name]: value,
         });
     };
@@ -106,48 +119,62 @@ export const Infos = () => {
             gender: value,
         });
     };
-    console.log(editedUser.fullName)
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(editedUser.avatar)
-        const updatedValues = {
-            ...user,
-            ...(editedUser.avatar ? { formFile: editedUser.avatar } : {}),
-            fullName: editedUser.fullName,
-            gender: editedUser.gender === "Male",
-            phone: editedUser.phone,
-            dateOfBirth: editedUser.dateOfBirth,
-            address: editedUser.address,
-        };
-        console.log(updatedValues.formFile)
-        const userDTO = {
-            id: currentUser.id,
-            ...updatedValues,
+        const formData = new FormData();
+        console.log(currentUser.role)
+        // Thêm các trường dữ liệu vào FormData
+        console.log("Before append:", currentUser.id);
+        formData.append("id", currentUser.id);
+        console.log("After id:", formData);
+        formData.append("fullName", editedUser.fullName);
+        formData.append("gender", editedUser.gender);
+        formData.append("phone", editedUser.phone);
+        formData.append("dateOfBirth", editedUser.dateOfBirth);
+        formData.append("address", editedUser.address);
+        formData.append("role", currentUser.role);
+        formData.append("status", editedUser.status);
 
-        };
 
-        console.log("inavatar", userDTO.formFile)
+        // Kiểm tra xem có hình ảnh mới được chọn không và thêm nó vào FormData nếu có
+        if (editedUser.avatar) {
+            formData.append("formFile", editedUser.avatar);
+        }
+
         try {
-            // Gọi hàm updateUser để cập nhật thông tin người dùng
-            await updateUser(userDTO);
+            // Gọi hàm updateUser để cập nhật thông tin người dùng sử dụng FormData
+            await updateUser(formData);
+            toast({
+                title: 'SUCCESSFULLY',
+                description: 'You have successfully updatted your information.',
+                status: 'success',
+                duration: 2000,
+                isClosable: true
+            });
+            setIsEditing(true);
 
-            // Nếu cập nhật thành công, bạn có thể thực hiện các hành động khác ở đây
             console.log("Thông tin cập nhật thành công:", editedUser);
         } catch (error) {
-            // Xử lý lỗi nếu có
+            toast({
+                title: 'Error!',
+                description: 'Error updatted your information.',
+                status: 'error',
+                duration: 2000,
+                isClosable: true
+            });
+
             console.error("Lỗi khi cập nhật thông tin:", error);
         }
     };
+
     //#endregion
 
     //#region date, month , years format function
-
-    //date, month , years format function
     function formatDateToISO(dateString) {
         if (!dateString) {
             return null;
         }
-
         const date = new Date(dateString);
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -157,10 +184,8 @@ export const Infos = () => {
     }
     // call formatDateToISO 
     const formattedDate = formatDateToISO(editedUser.dateOfBirth);
-
+    const fmDateInfo = formatDateToISO(user.dateOfBirth);
     //#endregion
-
-
 
     //#region HANDEL UPDATE PASSWORD
     const handleNavToggle = () => {
@@ -181,6 +206,9 @@ export const Infos = () => {
         const [newPassword, setNewPassword] = useState('');
         const [confirmPassword, setConfirmPassword] = useState('');
         const [error, setError] = useState(null);
+        const [showOldPassword, setShowOldPassword] = useState(false);
+        const [showNewPassword, setShowNewPassword] = useState(false);
+        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
         const handleSave = async () => {
             if (newPassword !== confirmPassword) {
@@ -194,361 +222,619 @@ export const Infos = () => {
                 console.log(user.id, user.oldPassword, user.newPassword);
 
                 const result = await changePassword(user);
-                console.log(result);
+                toast({
+                    title: 'SUCCESSFULLY',
+                    description: 'You have successfully change your password.',
+                    status: 'success',
+                    duration: 2000,
+                    isClosable: true
+                });
                 // Xử lý kết quả thành công
-                alert('Mật khẩu đã được thay đổi thành công.');
+                // alert('Mật khẩu đã được thay đổi thành công.');
             } catch (error) {
                 // Xử lý lỗi
-                alert('Thay đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu cũ.');
+                toast({
+                    title: 'Error!',
+                    description: 'Error change your password.',
+                    status: 'error',
+                    duration: 2000,
+                    isClosable: true
+                });
+                // alert('Thay đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu cũ.');
             }
 
             // Đặt lại các trường nhập liệu và đóng modal
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
+            setError(null);
             onClose();
         };
         return (
             <Modal show={isOpen} onHide={onClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Thay đổi mật khẩu</Modal.Title>
+                    <Modal.Title color={'facebook.500'}>   CHANGE PASSWORD</Modal.Title>
                 </Modal.Header>
                 <section className="modal-card-body">
                     {/* Hiển thị thông báo lỗi nếu có */}
                     {error && <div className="notification is-danger">{error}</div>}
-                    {/* Các trường nhập liệu và nút Save */}
+                    {/* Các trường nhập liệu và nút Lưu */}
                 </section>
                 <Modal.Body>
                     <Form>
                         <Form.Group controlId="oldPassword">
-                            <Form.Label>Mật khẩu cũ</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Nhập mật khẩu cũ"
-                                value={oldPassword}
-                                onChange={(e) => setOldPassword(e.target.value)} />
+                            <Form.Label style={{ fontWeight: "bold", color: "blue" }}>Old Password</Form.Label>
+                            <InputGroup size="md">
+                                <Input
+                                    type={showOldPassword ? "text" : "password"}
+                                    placeholder="Enter Old Password"
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                />
+                                <InputRightElement width="4.5rem">
+                                    <Button
+                                        h="1.75rem"
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => setShowOldPassword(!showOldPassword)}
+                                        _hover={{ color: "blue.500" }}
+                                    >
+                                        {showOldPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                    </Button>
+                                </InputRightElement>
+                            </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="newPassword">
-                            <Form.Label>Mật khẩu mới</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Nhập mật khẩu mới"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)} />
+                            <Form.Label style={{ fontWeight: "bold", color: "blue" }}>New Password</Form.Label>
+                            <InputGroup size="md">
+                                <Input
+                                    type={showNewPassword ? "text" : "password"}
+                                    placeholder="Enter New Password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                                <InputRightElement width="4.5rem">
+                                    <Button
+                                        h="1.75rem"
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        _hover={{ color: "blue.500" }}
+                                    >
+                                        {showNewPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                    </Button>
+                                </InputRightElement>
+                            </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="confirmPassword">
-                            <Form.Label>Xác nhận mật khẩu mới</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Nhập lại mật khẩu mới"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)} />
+                            <Form.Label style={{ fontWeight: "bold", color: "blue" }}>Confirm new Password</Form.Label>
+                            <InputGroup size="md">
+                                <Input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    placeholder="Enter Confirm New Password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                                <InputRightElement width="4.5rem">
+                                    <Button
+                                        h="1.75rem"
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        _hover={{ color: "blue.500" }}
+                                    >
+                                        {showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                    </Button>
+                                </InputRightElement>
+                            </InputGroup>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={onClose}>
-                        Đóng
+                    <Button
+                        variant="secondary"
+                        onClick={onClose}
+                        background="red" // Màu nền tùy chỉnh
+                        color="white" // Màu chữ tùy chỉnh
+                        _hover={{ background: "blue.500" }} // Hiệu ứng màu khi hover
+                    >
+                        Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleSave}>
-                        Lưu thay đổi
+                    <Button
+                        variant="primary"
+                        onClick={handleSave}
+                        background="green" // Màu nền tùy chỉnh
+                        color="white" // Màu chữ tùy chỉnh
+                        _hover={{ background: "blue.500" }} // Hiệu ứng màu khi hover
+                    >
+
+                        Save
                     </Button>
                 </Modal.Footer>
+
+
             </Modal>
+
+
         );
     }
     //#endregion
 
-    // const EditableField = ({ label, field, initialValue }) => {
-    //     const [isEditing, setIsEditing] = useState(false);
-    //     const [editedValue, setEditedValue] = useState(initialValue);
-    //     const handleEditClick = useCallback(() => {
-    //         setIsEditing(true);
-    //     }, []);
+    //#region FORMIK VALIDATION
+    const { handleChange, handleBlur, touched, isInvalid, errors } = useFormik({
+        initialValues: {
+            // Khai báo các giá trị mặc định cho các trường dữ liệu ở đây
+            fullName: '',
+            gender: '',
+            phone: '',
+            address: '',
+            dateOfBirth: '',
+        },
+        validationSchema: RegisterValidations
 
+    });
+    //#endregion
 
-    //     const handleSaveClick = useCallback(async () => {
-    //         try {
-    //             const updatedValues = {
-    //                 ...user,
-    //                 [field]: editedValue,
-    //             };
-    //             const userDTO = {
-    //                 id: currentUser.id,
-    //                 ...updatedValues,
-    //             };
-    //             const updatedUser = await updateUser(userDTO);
-    //             console.log('Updated user:', updatedUser);
-    //             setUser(updatedValues);
-    //             setIsEditing(false);
-    //         } catch (error) {
-    //             console.error('Update user error:', error.message);
-    //         }
-    //     }, [currentUser.id, field, editedValue, user]);
+    /* JavaScript */
+    const customLinks = document.querySelectorAll('.custom-link');
 
-    //     const handleCancelClick = useCallback(() => {
-    //         setIsEditing(false);
-    //         setEditedValue(initialValue);
-    //     }, [initialValue]);
-
-
-    //     const renderField = () => {
-    //         if (field === 'dateOfBirth') {
-    //             return (
-    //                 <Form.Control
-    //                     type="date"
-    //                     value={editedValue}
-    //                     onChange={(e) => setEditedValue(e.target.value)}
-    //                     autoFocus  // Add autoFocus to focus the input field
-    //                     style={{ border: 'none', outline: 'none' }} // Remove border and outline
-    //                 />
-    //             );
-    //         }
-    //         // Mặc định sử dụng trường nhập văn bản
-    //         return (
-    //             <Form.Control
-    //                 type="text"
-    //                 value={editedValue}
-    //                 onChange={(e) => setEditedValue(e.target.value)}
-    //                 autoFocus  // Add autoFocus to focus the input field
-    //                 style={{ border: 'none', outline: 'none' }} // Remove border and outline
-    //             />
-    //         );
-    //     };
-    //     return (
-    //         <Form.Group as={Row} className="mb-3">
-    //             <Form.Label column sm={3} className=" d-flex align-items-center">{label}</Form.Label>
-    //             <Col sm={6} className="d-flex align-items-center">
-    //                 {!isEditing ? (
-    //                     <div className="d-flex align-items-center">
-    //                         <span
-    //                             onClick={handleEditClick}
-    //                             className="hover-effect"
-    //                             data-toggle="tooltip"
-    //                             title="Click to edit"
-    //                         >
-    //                             {editedValue}
-    //                         </span>
-    //                     </div>
-    //                 ) : (
-    //                     <div className="d-flex align-items-center">
-    //                         {renderField()}
-    //                         <ButtonGroup style={{ margin: '10px' }}>
-    //                             <Button
-    //                                 onClick={handleSaveClick}
-    //                                 className="btn-success d-flex align-items-center"
-    //                             >
-    //                                 <FaSave size={20} className="mr-2" /> Save
-    //                             </Button>
-    //                             <Button
-    //                                 onClick={handleCancelClick}
-    //                                 className="btn-danger d-flex align-items-center"
-    //                             >
-    //                                 <FaTimes size={20} className="mr-2" /> Cancel
-    //                             </Button>
-    //                         </ButtonGroup>
-    //                     </div>
-    //                 )}
-    //             </Col>
-    //         </Form.Group>
-    //     );
-    // };
-
-
-
-
+    customLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            link.blur();
+        });
+    });
     return (
         <Box>
-            <Row>
+            {/* <Row> */}
+            <Flex>
                 {/* NAVBAR */}
-                <Col sm={3}>
-                    <Navbar bg="" variant="" expand="lg" className="navbar  flex-column">
+                <Box flex="0 0 auto" width="20%" overflowY="auto" pt={8}>
+                    <Navbar bg="" variant="" expand="lg" className="navbar flex-column">
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={handleNavToggle} />
                         <Navbar.Collapse id="responsive-navbar-nav" className={expanded ? 'show' : ''}>
                             <Nav className="flex-column">
-                                <Nav.Link href="#inbox">PERSONAL INFORMATION</Nav.Link>
-                                <div className="App">
-                                    <Nav.Link href="" onClick={handleOpenModal}>CHANGE PASSWORD</Nav.Link>
-                                    <ChangePasswordModal isOpen={isModalOpen} onClose={handleCloseModal} />
-                                </div>
-                                <Nav.Link href="#send-email">TRANSACTION HISTORY</Nav.Link>
-                                <Nav.Link href="#drafts">MY IMAGES</Nav.Link>
+                                <Nav.Link
+                                    href=""
+                                    className={`custom-link ${activeTab === 'PERSONAL' ? 'focused' : ''}`}
+                                    onClick={() => handleTabChange('PERSONAL')}
+                                >
+                                    PERSONAL INFORMATION
+                                </Nav.Link>
+                                <Nav.Link
+                                    onClick={handleOpenModal}
+                                    className="custom-link-pass"
+                                >
+                                    CHANGE PASSWORD
+                                </Nav.Link>
+                                <ChangePasswordModal isOpen={isModalOpen} onClose={handleCloseModal} />
+                                <Nav.Link
+                                    href=""
+                                    className={`custom-link ${activeTab === 'TRANSACTION' ? 'focused' : ''}`}
+                                    onClick={() => handleTabChange('TRANSACTION')}
+                                >
+                                    TRANSACTION HISTORY
+                                </Nav.Link>
+                                <Nav.Link
+                                    href=""
+                                    className={`custom-link ${activeTab === 'IMAGES' ? 'focused' : ''}`}
+                                    onClick={() => handleTabChange('IMAGES')}
+                                >
+                                    MY IMAGES
+                                </Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
-                </Col>
+                </Box>
 
-                <Col sm={8}>
+                <Box flex="1" width="60% " overflowY="auto" >
 
                     {/* USER CARD */}
-                    <Row responsive className='custom-table' >
-                        <Col sm={3}>
-                            <div >
-                                {/* <img src={`https://localhost:5000/${user.avatar}`} alt="" className="avatar-image" /> */}
-                                {/* <Avatar alt="User Avatar" src={`https://localhost:5000/${user.avatar}`} /> */}
-                                <Avatar size='2xl' name='' src='https://localhost:5000/ ${user.avatar}' />{' '}
+                    <Container
+                        borderWidth="1px"
+                        borderRadius="lg"
+                        p={4}
+                        maxW="100%"
+                        mx="auto"
+                        boxShadow="lg"
+                        width={{ base: '100%', sm: '90%' }}
+                        display="flex"
+                        flexDirection={{ base: 'column', sm: 'row' }}
+                        alignItems="center"
+                        marginTop="3"
+                    >
+                        <Box
+                            width={{ base: '100%', sm: '30%' }}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                        >
+                            <Avatar size="2xl" src={`https://localhost:5000/${user.avatar}`} />
+                        </Box>
+                        <Box
+                            width={{ base: '100%', sm: '70%' }}
+                            marginLeft={{ sm: '4' }}
+                        >
+                            <div className="container">
+                                <Text fontSize="2xl" fontWeight="bold" mb={2} textAlign={{ base: 'center', sm: 'left' }}>
+                                    {user.fullName}
+                                </Text>
+                                <Flex >
+                                    <Icon as={FaPhone} boxSize={6} color={'facebook.500'} />
+                                    <Text fontSize="lg" marginLeft="1">{user.phone}</Text>
+                                    <Icon as={FaEnvelope} boxSize={6} color={'facebook.500'} marginLeft={4} />
+                                    <Text fontSize="lg" marginLeft="1">{user.email}</Text>
+                                </Flex>
+                                <Flex width="100%" justifyContent="flex-start">
+                                    <Icon as={FaDollarSign} boxSize={6} color={'facebook.500'} />
+                                    <Text fontSize="xl" fontWeight="bold" >
+                                        Total Transaction:
+                                    </Text>
+                                    <Text fontSize="xl" fontWeight="bold" marginLeft="1" color="red">9</Text>
+                                </Flex>
                             </div>
-                            {console.log(user.avatar)}
-                        </Col>
-                        <Col sm={9}>
-                            <div className='container' >
-                                <span className="card-title">{user.fullName}</span>
-                                {/* Thêm dữ liệu cột khác ở đây tương ứng với tiêu đề cột */}
-                            </div>
-
-                            <div responsive className="card-row">
-                                <FaPhone size={20} className="icon" />
-                                <span className='card-value'>{user.phone}</span>
-                                <FaEnvelope size={20} className="icon" />
-                                <span className='card-value'>{user.email}</span>
-                            </div>
-
-                            <div className="card-infoTran custom-table" >
-                                <FaDollarSign size={20} className="icon" />
-                                <span className="card-bold">Total Transaction: </span>
-                                <span className=''>9</span>
-                            </div>
-                        </Col>
-                    </Row>
-
-                    {/* // UPDATE INFORMATION */}
-                    <Container borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg">
-                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                            Update Basic Information
-                        </Heading>
-                        <Box as="form" onSubmit={handleSubmit}>
-
-
-                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
-                                onDragOver={allowDrop}>
-                                <Avatar
-                                    size="2xl"
-                                    name=""
-                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
-                                    onClick={handleImageClick}
-                                    cursor="pointer"
-                                    draggable="true"
-                                />
-                                <input
-                                    id="imageInput"
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: 'none' }}
-                                    onChange={handleImageChange}
-                                />
-                            </InputGroup>
-
-
-                            <InputGroup mb={3}>
-                                <InputLeftAddon>Full Name:</InputLeftAddon>
-                                <Input
-                                    type="text"
-                                    name="fullName"
-                                    value={editedUser.fullName}
-                                    onChange={handleInputChange}
-                                />
-                            </InputGroup>
-
-                            <InputGroup mb={3} display="flex" alignItems="center">
-                                <FormControl as="fieldset" className='table-content'>
-                                    <FormLabel as="legend" >Gender:</FormLabel>
-                                    <RadioGroup
-                                        name="gender"
-                                        value={editedUser.gender}
-                                        onChange={handleGenderChange}
-                                    >
-                                        <Radio value="male" pr={5}>Male</Radio>
-                                        <Radio value="female" pr={2}>Female</Radio>
-                                    </RadioGroup>
-                                </FormControl>
-                            </InputGroup>
-
-
-                            <InputGroup mb={3}>
-                                <InputLeftAddon>Phone:</InputLeftAddon>
-                                <Input
-                                    type="text"
-                                    name="phone"
-                                    value={editedUser.phone}
-                                    onChange={handleInputChange}
-                                />
-                            </InputGroup>
-
-                            <InputGroup mb={3}>
-                                <InputLeftAddon>BirthDay:</InputLeftAddon>
-                                <Input
-                                    type="date"
-                                    name="dateOfBirth"
-                                    value={formattedDate}
-                                    onChange={handleInputChange}
-                                />
-
-                            </InputGroup>
-                            <InputGroup mb={3}>
-                                <InputLeftAddon>Address:</InputLeftAddon>
-                                <Input
-                                    type="text"
-                                    name="address"
-                                    value={editedUser.address}
-                                    onChange={handleInputChange}
-                                />
-                            </InputGroup>
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <Button colorScheme="blue" type="submit">
-                                    Save
-                                </Button>
-                            </div>
-
                         </Box>
                     </Container>
+                    {activeTab === 'PERSONAL' && (
+                        <Box>
+                            {isEditing ?
+                                (
+                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                        <Flex alignItems="center" justifyContent="flex-end" mb={2}>
+                                            <FaEdit size={20} cursor="pointer" onClick={handleEditClick} />
+                                        </Flex>
+                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                            Basic Information
+                                        </Heading>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Full Name:
+                                            </Text>
+                                            <Text flex="3">{user.fullName}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Gender:
+                                            </Text>
+                                            <Text flex="3">{gender}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Email:
+                                            </Text>
+                                            <Text flex="3">{user.email}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Phone:
+                                            </Text>
+                                            <Text flex="3">{user.phone}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                BirthDay:
+                                            </Text>
+                                            <Text flex="3">{fmDateInfo}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Address:
+                                            </Text>
+                                            <Text flex="3">{user.address}</Text>
+                                        </Flex>
+                                    </Box>
+
+                                ) : (
+
+                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                            Update Basic Information
+                                        </Heading>
+                                        <Box as="form" onSubmit={handleSubmit}>
+
+                                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
+                                                onDragOver={allowDrop}>
+                                                <Avatar
+                                                    size="2xl"
+                                                    name=""
+                                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
+                                                    onClick={handleImageClick}
+                                                    cursor="pointer"
+                                                    draggable="true"
+                                                />
+                                                <input
+                                                    id="imageInput"
+                                                    type="file"
+                                                    style={{ display: 'none' }}
+                                                    onChange={handleImageChange}
+                                                />
+                                            </InputGroup>
 
 
-                    {/* // BASIC INFORMATION */}
-                    <Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg">
-                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                            Basic Information
-                        </Heading>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                Full Name:
-                            </Text>
-                            <Text flex="3">{user.fullName}</Text>
-                        </Flex>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                Gender:
-                            </Text>
-                            <Text flex="3">{gender}</Text>
-                        </Flex>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                Email:
-                            </Text>
-                            <Text flex="3">{user.email}</Text>
-                        </Flex>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                Phone:
-                            </Text>
-                            <Text flex="3">{user.phone}</Text>
-                        </Flex>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                BirthDay:
-                            </Text>
-                            <Text flex="3">{formattedDate}</Text>
-                        </Flex>
-                        <Flex alignItems="center" mb={2}>
-                            <Text fontWeight="bold" flex="1">
-                                Address:
-                            </Text>
-                            <Text flex="3">{user.address}</Text>
-                        </Flex>
-                    </Box>
+                                            <InputGroup mb={3} isInvalid={touched.fullName && errors.fullName}>
+                                                <InputLeftAddon w="120px">Full Name:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="fullName"
+                                                    value={editedUser.fullName}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.fullName && errors.fullName && (
+                                                <div style={{ color: 'red' }}>{errors.fullName}</div>
+                                            )}
 
-                </Col>
-            </Row>
-        </Box>
+                                            <InputGroup mb={3} isInvalid={touched.gender && errors.gender}>
+                                                <InputLeftAddon w="120px">Gender:</InputLeftAddon>
+                                                <RadioGroup
+                                                    name="gender"
+                                                    value={editedUser.gender}
+                                                    onChange={handleGenderChange}
+                                                    pt={2}
+                                                >
+                                                    <Radio value="Male" pr={5} pl={5}>Male</Radio>
+                                                    <Radio value="Female" pr={2}>Female</Radio>
+                                                </RadioGroup>
+                                            </InputGroup>
+                                            {touched.gender && errors.gender && (
+                                                <div style={{ color: 'red' }}>{errors.gender}</div>
+                                            )}
+
+                                            <InputGroup mb={3} isInvalid={touched.phone && errors.phone}>
+                                                <InputLeftAddon w="120px">Phone:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="phone"
+                                                    value={editedUser.phone}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.phone && errors.phone && (
+                                                <div style={{ color: 'red' }}>{errors.phone}</div>
+                                            )}
+
+
+                                            <InputGroup mb={3} isInvalid={touched.dateOfBirth && errors.dateOfBirth}>
+                                                <InputLeftAddon w="120px">BirthDay:</InputLeftAddon>
+                                                <Input
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    value={formattedDate}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+
+                                                />
+                                            </InputGroup>
+                                            {touched.dateOfBirth && errors.dateOfBirth && (
+                                                <div style={{ color: 'red' }}>{errors.dateOfBirth}</div>
+                                            )}
+
+
+                                            <InputGroup mb={3} isInvalid={touched.address && errors.address}>
+                                                <InputLeftAddon w="120px">Address:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="address"
+                                                    value={editedUser.address}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.address && errors.address && (
+                                                <div style={{ color: 'red' }}>{errors.address}</div>
+                                            )}
+
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <Button colorScheme="blue" type="submit">
+                                                    Save
+                                                </Button>
+                                                <Button colorScheme="gray" ml={3} onClick={handleCancel}>
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </Box>
+
+                                )}
+                        </Box>
+                    )}
+                    {activeTab === 'TRANSACTION' && (
+                        <Box>
+                            {isEditing ?
+                                (
+                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                        <Flex alignItems="center" justifyContent="flex-end" mb={2}>
+                                            <FaEdit size={20} cursor="pointer" onClick={handleEditClick} />
+                                        </Flex>
+                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                            TRANSACTION HISTORY
+                                        </Heading>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Full Name:
+                                            </Text>
+                                            <Text flex="3">{user.fullName}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Gender:
+                                            </Text>
+                                            <Text flex="3">{gender}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Email:
+                                            </Text>
+                                            <Text flex="3">{user.email}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Phone:
+                                            </Text>
+                                            <Text flex="3">{user.phone}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                BirthDay:
+                                            </Text>
+                                            <Text flex="3">{fmDateInfo}</Text>
+                                        </Flex>
+                                        <Flex alignItems="center" mb={2}>
+                                            <Text fontWeight="bold" flex="1">
+                                                Address:
+                                            </Text>
+                                            <Text flex="3">{user.address}</Text>
+                                        </Flex>
+                                    </Box>
+
+                                ) : (
+
+                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                            Update TRANSACTION HISTORY
+                                        </Heading>
+                                        <Box as="form" onSubmit={handleSubmit}>
+
+                                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
+                                                onDragOver={allowDrop}>
+                                                <Avatar
+                                                    size="2xl"
+                                                    name=""
+                                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
+                                                    onClick={handleImageClick}
+                                                    cursor="pointer"
+                                                    draggable="true"
+                                                />
+                                                <input
+                                                    id="imageInput"
+                                                    type="file"
+                                                    style={{ display: 'none' }}
+                                                    onChange={handleImageChange}
+                                                />
+                                            </InputGroup>
+
+
+                                            <InputGroup mb={3} isInvalid={touched.fullName && errors.fullName}>
+                                                <InputLeftAddon w="120px">Full Name:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="fullName"
+                                                    value={editedUser.fullName}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.fullName && errors.fullName && (
+                                                <div style={{ color: 'red' }}>{errors.fullName}</div>
+                                            )}
+
+                                            <InputGroup mb={3} isInvalid={touched.gender && errors.gender}>
+                                                <InputLeftAddon w="120px">Gender:</InputLeftAddon>
+                                                <RadioGroup
+                                                    name="gender"
+                                                    value={editedUser.gender}
+                                                    onChange={handleGenderChange}
+                                                    pt={2}
+                                                >
+                                                    <Radio value="Male" pr={5} pl={5}>Male</Radio>
+                                                    <Radio value="Female" pr={2}>Female</Radio>
+                                                </RadioGroup>
+                                            </InputGroup>
+                                            {touched.gender && errors.gender && (
+                                                <div style={{ color: 'red' }}>{errors.gender}</div>
+                                            )}
+
+                                            <InputGroup mb={3} isInvalid={touched.phone && errors.phone}>
+                                                <InputLeftAddon w="120px">Phone:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="phone"
+                                                    value={editedUser.phone}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.phone && errors.phone && (
+                                                <div style={{ color: 'red' }}>{errors.phone}</div>
+                                            )}
+
+
+                                            <InputGroup mb={3} isInvalid={touched.dateOfBirth && errors.dateOfBirth}>
+                                                <InputLeftAddon w="120px">BirthDay:</InputLeftAddon>
+                                                <Input
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    value={formattedDate}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+
+                                                />
+                                            </InputGroup>
+                                            {touched.dateOfBirth && errors.dateOfBirth && (
+                                                <div style={{ color: 'red' }}>{errors.dateOfBirth}</div>
+                                            )}
+
+
+                                            <InputGroup mb={3} isInvalid={touched.address && errors.address}>
+                                                <InputLeftAddon w="120px">Address:</InputLeftAddon>
+                                                <Input
+                                                    type="text"
+                                                    name="address"
+                                                    value={editedUser.address}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        handleInputChange(e);
+                                                    }}
+                                                    onBlur={handleBlur}
+                                                />
+                                            </InputGroup>
+                                            {touched.address && errors.address && (
+                                                <div style={{ color: 'red' }}>{errors.address}</div>
+                                            )}
+
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <Button colorScheme="blue" type="submit">
+                                                    Save
+                                                </Button>
+                                                <Button colorScheme="gray" ml={3} onClick={handleCancel}>
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        </Box>
+                                    </Box>
+
+                                )}
+                        </Box>
+                    )}
+                    {activeTab === 'IMAGES' && (
+                        <div>MY IMAGES</div>
+                    )}
+
+                </Box>
+            </Flex >
+        </Box >
 
     );
 
