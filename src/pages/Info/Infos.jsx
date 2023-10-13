@@ -18,7 +18,6 @@ import { forwardRef } from 'react';
 
 
 
-
 const Infos = () => {
     const { currentUser } = useUserContext(); //Lấy user đã đăng nhập ở đây
     const [user, setUser] = useState({});
@@ -468,7 +467,7 @@ const Infos = () => {
                             alignItems="center"
                             justifyContent="center"
                         >
-                            <Avatar size="2xl" src={`https://localhost:5000/${user.avatar}`} />
+                            <Avatar size="2xl" src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`} />
                         </Box>
                         <Box
                             width={{ base: '100%', sm: '70%' }}
@@ -556,7 +555,7 @@ const Infos = () => {
                                                 <Avatar
                                                     size="2xl"
                                                     name=""
-                                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
+                                                    src={selectedImage || `${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`}
                                                     onClick={handleImageClick}
                                                     cursor="pointer"
                                                     draggable="true"

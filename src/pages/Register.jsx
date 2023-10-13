@@ -42,7 +42,7 @@ const Register = () => {
 
         const response = await Signup(userDTO);
 
-        if (response.data.newUser) {
+        if (response.data) {
           navigate('/login');
           toast({
             title: 'Welcome to CLOTHIFY!',
