@@ -4,7 +4,7 @@ import { Cancel, Error } from '@mui/icons-material';
 import moment from 'moment';
 
 import { getOrderById, updateOrderStatus } from '../services/OrderServices';
-import ClothesCard from './ClothesCard';
+import CollectionCard from './CollectionCard';
 import ReportModal from './ReportModal';
 
 const OrderCard = ({ orderId }) => {
@@ -93,7 +93,7 @@ const OrderCard = ({ orderId }) => {
                 <SimpleGrid my={3} columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={3} >
                     {
                         products.map((product, index) => {
-                            return product !==null && <ClothesCard key={index} productId={product} isDelivered={orderStatus === "Order has been delivered."} />
+                            return product !==null && <CollectionCard key={index} collectionId={product} isDelivered={orderStatus === "Order has been delivered."} />
                         })
                     }
                 </SimpleGrid>

@@ -16,17 +16,15 @@ const Home = () => {
   const [collections, setCollection] = useState([]);
   const [best, setBest] = useState([]);
   useEffect(() => {
-    getAllCategories()
-        .then((result) => {
-          setCategory(result.result);
-        });
-    getAllCollection()
-        .then((result) => {
-          setCollection(result.result)
-        });
-    getTemplateBestller()
-        .then((result) => {
-            setBest(result.result);
+    Promise.all([
+      getAllCategories(),
+      getAllCollection(),
+      getTemplateBestller()
+    ])
+        .then(([categoriesResult, collectionResult, bestResult]) => {
+          setCategory(categoriesResult.result);
+          setCollection(collectionResult.result);
+          setBest(bestResult.result);
         });
   }, []);
 
@@ -37,7 +35,7 @@ const Home = () => {
   const desiredCollections = ['Book 1', 'Gift 1', 'Calendar 2', 'Card 2'];
   return (
       <>
-        <Container maxW='1200px'>
+        <Container maxW='1140px' mx="auto">
           <Box display='flex' justifyContent='center' >
             <Carousel />
           </Box>
@@ -50,7 +48,7 @@ const Home = () => {
               <SimpleGrid columns={[3, null, 4]} spacing='35px'>
                 {
                     best && best.map((bested) => {
-                      if(bested.status == true){
+                      if(bested.status === true){
                         return (
                             <Box key={bested.id}>
                               <Box>

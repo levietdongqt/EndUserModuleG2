@@ -21,7 +21,7 @@ const Dropdown = ({ title, TemplateId }) => {
     }, [TemplateId]);
 
     const handleClick = (categoryId) => {
-        navigate('/search', { state: { categoryId: categoryId } });
+        navigate(`/collections/${category.name}/${categoryId}`, { state: { categoryId: categoryId } });
     };
 
     return (
