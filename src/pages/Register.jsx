@@ -22,7 +22,7 @@ const Register = () => {
       password: '',
       repassword: '',
       phone: '0',
-      gender: 'true',
+      gender: true,
       terms: false,
     },
     onSubmit: async (values) => {
@@ -160,13 +160,14 @@ const Register = () => {
               // onChange={handleChange}
               pt={2}
             >
-              <Radio value="true"
+              <Radio value={true}
                 isChecked={values.gender === true}
                 onChange={() => setFieldValue("gender", true)} pr={5} pl={5}>Male</Radio>
-              <Radio value="false"
-                isChecked={values.gender === "false"}
-                onChange={() => setFieldValue("gender", "false")} pr={2}>Female</Radio>
+              <Radio value={false}
+                isChecked={values.gender === false}
+                onChange={() => setFieldValue("gender", false)} pr={2}>Female</Radio>
             </RadioGroup>
+
           </InputGroup>
           {touched.gender && <FormErrorMessage>{errors.gender}</FormErrorMessage>}
         </FormControl>

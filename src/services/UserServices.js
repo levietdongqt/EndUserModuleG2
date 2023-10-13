@@ -1,17 +1,9 @@
 import axios from "axios";
 import baseRequest from "../contexts/AxiosContext";
 
-
-
 export const Register = async (userDTO) => {
-
-  return await baseRequest.post(
-    `/User/Create`, userDTO
-  );
-
+  return await baseRequest.post(`/User/Create`, userDTO);
 };
-
-
 
 //GETALL
 export const getAllUsers = async (search, st, page, pageSize) => {
@@ -43,18 +35,18 @@ export const getUserById = async (id) => {
 
 //EDIT USER
 export const updateUser = async (formData) => {
-  try {
-    const response = await baseRequest.put(`/User/Edit`, formData);
-    if (response.status === 200) {
-      return response;
-    } else {
-      throw new Error("Failed to update user");
-    }
-  } catch (error) {
-    throw new Error(error.message);
+  const response = await baseRequest.put(`/User/Edit`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  console.log(response);
+  if (response.status === 200) {
+    return response;
+  } else {
+    throw new Error("Failed to update user");
   }
 };
-
 
 //CHANGE PASSWORD
 export const changePassword = async (userDTO) => {

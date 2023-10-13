@@ -12,6 +12,7 @@ import { useFormik } from 'formik';
 import RegisterValidations from '../../validations/RegisterValidations';
 import '../Info/Style.css';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { forwardRef } from 'react';
 
 
 
@@ -49,6 +50,9 @@ const Infos = () => {
         }
     }, [currentUser]);
 
+
+
+
     //#region  SET NAV TAB
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -60,7 +64,7 @@ const Infos = () => {
         setIsEditing(false);
     };
     const handleCancel = () => {
-        setIsEditing(true); // Đặt biến trạng thái để ẩn biểu mẫu chỉnh sửa và hiển thị bảng thông tin
+        setIsEditing(true);
     };
     //#endregion 
 
@@ -129,22 +133,25 @@ const Infos = () => {
         formData.append("id", currentUser.id);
         console.log("After id:", formData);
         formData.append("fullName", editedUser.fullName);
-        formData.append("gender", editedUser.gender);
+        formData.append("gender", editedUser.gender === "Male" ? true : false);
         formData.append("phone", editedUser.phone);
         formData.append("dateOfBirth", editedUser.dateOfBirth);
         formData.append("address", editedUser.address);
         formData.append("role", currentUser.role);
-        formData.append("status", editedUser.status);
+        formData.append("status", currentUser.status);
 
 
         // Kiểm tra xem có hình ảnh mới được chọn không và thêm nó vào FormData nếu có
         if (editedUser.avatar) {
             formData.append("formFile", editedUser.avatar);
+            console.log("avatar", editedUser);
         }
+
 
         try {
             // Gọi hàm updateUser để cập nhật thông tin người dùng sử dụng FormData
-            await updateUser(formData);
+            const update = await updateUser(formData);
+            console.log(update);
             toast({
                 title: 'SUCCESSFULLY',
                 description: 'You have successfully updatted your information.',
@@ -375,13 +382,15 @@ const Infos = () => {
     });
     //#endregion
 
-    /* JavaScript */
+
     const customLinks = document.querySelectorAll('.custom-link');
 
     customLinks.forEach(link => {
         link.addEventListener('click', () => {
             link.blur();
         });
+
+
     });
     return (
         <Box>
@@ -407,6 +416,15 @@ const Infos = () => {
                                     CHANGE PASSWORD
                                 </Nav.Link>
                                 <ChangePasswordModal isOpen={isModalOpen} onClose={handleCloseModal} />
+
+                                <Nav.Link
+                                    href=""
+                                    className={`custom-link ${activeTab === 'DELIVRERY' ? 'focused' : ''}`}
+                                    onClick={() => handleTabChange('DELIVRERY')}
+                                >
+                                    DELIVRERY ADDRESS
+                                </Nav.Link>
+
                                 <Nav.Link
                                     href=""
                                     className={`custom-link ${activeTab === 'TRANSACTION' ? 'focused' : ''}`}
@@ -414,6 +432,7 @@ const Infos = () => {
                                 >
                                     TRANSACTION HISTORY
                                 </Nav.Link>
+
                                 <Nav.Link
                                     href=""
                                     className={`custom-link ${activeTab === 'IMAGES' ? 'focused' : ''}`}
@@ -421,6 +440,7 @@ const Infos = () => {
                                 >
                                     MY IMAGES
                                 </Nav.Link>
+
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
