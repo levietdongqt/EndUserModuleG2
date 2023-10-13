@@ -62,6 +62,7 @@ const Login = () => {
     onSubmit: values => {
       LogIn(values.email, values.password)
         .then((result) => {
+          console.log(result.data);
           handldeResponse(result,remember);
         });
     },
