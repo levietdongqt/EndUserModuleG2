@@ -10,14 +10,14 @@ import ReviewModal from '../components/ReviewModal';
 import { useCartContext } from '../contexts/CartContext';
 import { useUserContext } from '../contexts/UserContext';
 import useGetFavoriteStatus from '../hooks/useGetFavoriteStatus';
-import { getProductById } from '../services/ProductServices';
+import { getTemplateById } from '../services/TemplateServices';
 import { addFavorite, deleteFavorite } from '../services/UserServices';
 import { getCommentByProductId } from '../services/CommentServices';
 import { getRatingByProductId } from '../services/RatingServices';
 import useGetUserHaveThis from '../hooks/useGetUserHaveThis';
 
 
-const Product = () => {
+const Template = () => {
 
   const toast = useToast();
   const location = useLocation();
@@ -29,7 +29,7 @@ const Product = () => {
   const [ratings, setRatings] = useState(0);
   const [ratingCount, setRatingCount] = useState(0);
   const [comments, setComments] = useState([]);
-  const [product, setProduct] = useState("");
+  const [template, setTemplate] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [selectedSize, setSelectedSize] = useState("");
   const [inCart, setInCart] = useState(false);
@@ -39,11 +39,12 @@ const Product = () => {
 
   useEffect(() => {
     setIsFavorite(status);
-
-    getProductById(location.state.productId)
+    console.log("id", location.state.productId);
+    getTemplateById(location.state.productId)
       .then((result) => {
-        setProduct(result.product);
-        setSizes(result.product.sizes);
+        setTemplate(result.result);
+        console.log("test", result.result);
+        setSizes(result.result.sizes);
       });
 
     getRatingByProductId(location.state.productId)
@@ -56,13 +57,13 @@ const Product = () => {
         setRatingCount(result.ratings.length);
       });
 
-    getCommentByProductId(location.state.productId)
+    getCommentByProductId(location.state.Id)
       .then((result) => {
         setComments(result.comment);
       });
 
     cart.forEach((item) => {
-      if (item.id === location.state.productId) {
+      if (item.id === location.state.Id) {
         setInCart(true);
         setAmount(item.amount);
       }
@@ -84,14 +85,14 @@ const Product = () => {
       const currentIndex = cart.findIndex(item => item.id === location.state.productId);
       if (currentIndex >= 0) {
         cart[currentIndex].amount += 1;
-        cart[currentIndex].price = product.price * cart[currentIndex].amount;
+        cart[currentIndex].price = template.price * cart[currentIndex].amount;
         setAmount(amount + 1);
         setCookies('cart', cart, { path: '/' });
       } else {
         setCart([...cart, {
           id: location.state.productId,
           amount: 1,
-          price: product.price
+          price: template.price
         }]);
         setCookies('cart', cart, { path: '/' });
       }
@@ -152,10 +153,14 @@ const Product = () => {
       <Box p={{ base: 3, md: 10 }}  >
         <Box display='flex' justifyContent='center'>
           <SimpleGrid width={1200} columns={{ base: 1, md: 2 }} >
-            <Image src={product.imageUrl} />
+            {
+              template.map((item) => {
+                  const first = item.templateImages[0];
+                  return <Image src={first.imageUrl} />
+                })
+            }
             <Box p={3} maxWidth={600} >
-              <Text fontWeight={200} >Product Id: {location.state.productId}</Text>
-              <Text fontSize={30} >{product.name}</Text>
+              <Text fontSize={30} >{template[0]?.name}</Text>
               <Box
                 display='flex'
                 alignItems='center'
@@ -169,11 +174,11 @@ const Product = () => {
                   name='rating' />
                 <Text fontSize={16} fontWeight={500} > | {ratingCount} reviews</Text>
               </Box>
-              <Text mt={5} mb={3} fontSize={28} fontWeight={400} color='facebook.500' >Price : <b> {product.price}$ </b> </Text>
+              <Text mt={5} mb={3} fontSize={28} fontWeight={400} color='facebook.500' >Price : <b> {template.price}$ </b> </Text>
               <Divider />
               <Text mt={3} fontSize={20} fontWeight={500} >Sizes</Text>
               <Box mt={3} display='flex' >
-                {
+                {/*{
                   sizes.map((size, index) => {
                     return <Button
                       key={index}
@@ -185,7 +190,7 @@ const Product = () => {
                       height={{ base: '30px', sm: '40px', lg: '50px' }}
                     >{size}</Button>
                   })
-                }
+                }*/}
               </Box>
               <Box
                 mt={10} mb={5}
@@ -234,7 +239,7 @@ const Product = () => {
                 mt={3}>
                 <Text fontSize={24} fontWeight={500} >Description</Text>
                 <Box mt={3}>
-                  {product.description}
+                  {template.description}
                 </Box>
               </Box>
             </Box>
@@ -270,11 +275,11 @@ const Product = () => {
               Write a Review
             </Button>
           </Box>
-          {
+          {/*{
             comments.map((comment) => {
               return <Comment key={comment._id} authorId={comment.author} commentText={comment.comment} createdAt={comment.createdAt} />
             })
-          }
+          }*/}
         </Box>
       </Box>
       <ReviewModal isOpen={isOpen} onClose={onClose} productId={location.state.productId} />
@@ -282,4 +287,4 @@ const Product = () => {
   )
 }
 
-export default Product;
+export default Template;

@@ -5,7 +5,7 @@ import { Favorite } from '@mui/icons-material';
 
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
-import ClothesCard from '../components/ClothesCard';
+import CollectionCard from '../components/CollectionCard';
 
 const Favorites = () => {
 
@@ -27,7 +27,7 @@ const Favorites = () => {
           <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={3} >
             {
               favorites.map((favorite) => {
-                return <ClothesCard key={favorite} productId={favorite} />
+                return <CollectionCard key={favorite} productId={favorite} />
               })
             }
           </SimpleGrid>

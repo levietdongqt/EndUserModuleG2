@@ -7,7 +7,7 @@ import { ShoppingCart } from '@mui/icons-material';
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
-import ClothesCard from '../components/ClothesCard';
+import CollectionCard from '../components/CollectionCard';
 
 const Cart = () => {
 
@@ -77,7 +77,7 @@ const Cart = () => {
         <SimpleGrid width='100%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 3, md: 5 }} >
           {
             cart && cart.map((product, index) => {
-              return product.id && <ClothesCard key={index} productId={product.id} />
+              return product.id && <CollectionCard key={index} productId={product.id} />
             })
           }
         </SimpleGrid>

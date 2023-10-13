@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MenuItem } from '@chakra-ui/react';
 
-import { getCategoryByGenre } from '../services/CategoryServices';
+import { getCategoryById } from '../services/CategoryServices';
 
 const CategoryMenuItems = ({ genreId }) => {
 
@@ -10,21 +10,21 @@ const CategoryMenuItems = ({ genreId }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        getCategoryByGenre(genreId)
+        getCategoryById(genreId)
             .then((result) => {
-                setCategories(result.category);
+                setCategories(result.result);
             });
     },[genreId]);
 
-    const handleClick = (id) => {
-        navigate('/search', { state: { categoryId: id } });
+    const handleClick = (categoryId) => {
+        navigate('/search', { state: { categoryId: categoryId } });
     };
 
     return (
         <>
             {
-                categories.length > 0 && categories.map((category) => {
-                    return category.status && <MenuItem key={category._id} onClick={() => handleClick(category._id)} >{category.name}</MenuItem>
+                categories && categories.map((category) => {
+                    return category.status && <MenuItem key={category.id} onClick={() => handleClick(category.id)} >{category.name}</MenuItem>
                 })
             }
         </>

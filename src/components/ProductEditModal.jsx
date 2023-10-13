@@ -4,8 +4,8 @@ import { useFormik } from 'formik';
 
 import ProductValidations from '../validations/ProductValidations';
 import { getProductById, addProduct, updateProduct } from '../services/ProductServices';
-import { getCategoryByGenre } from '../services/CategoryServices';
-import { getAllGenres } from '../services/GenreServices';
+import { getCategoryById } from '../services/CategoryServices';
+import { getAllTemplate } from '../services/TemplateServices';
 import { uploadImageToCloudinary } from '../services/ImageServices';
 
 const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
@@ -45,7 +45,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
                         resetForm();
                         toast({
                             title: 'Added!',
-                            description: 'Product successfully added.',
+                            description: 'Template successfully added.',
                             status: 'success',
                             duration: 2000,
                             isClosable: true
@@ -65,7 +65,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
             });
 
 
-        getAllGenres()
+        getAllTemplate()
             .then((result) => {
                 setAllGenres(result.allGenres);
             });
@@ -87,7 +87,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
                     onClose(true);
                     toast({
                         title: 'Edited!',
-                        description: 'Product successfully edited.',
+                        description: 'Template successfully edited.',
                         status: 'success',
                         duration: 2000,
                         isClosable: true
@@ -103,7 +103,7 @@ const ProductEditModal = ({ isOpen, onClose, isEdit, currentId }) => {
 
     const onChangeGenre = (e) => {
         setSelectedGenre(e.target.value);
-        getCategoryByGenre(e.target.value)
+        getCategoryById(e.target.value)
             .then((result) => {
                 setAllCategories(result.category);
             });
