@@ -1,8 +1,13 @@
 import React from 'react';
 import { Box, Text, IconButton, Container } from '@chakra-ui/react';
 import { Apple, Facebook, Google, Instagram, Twitter, YouTube } from '@mui/icons-material';
+import {useNavigate} from "react-router-dom";
 
 const Footer = () => {
+    const navigate=useNavigate();
+    const getLink = (path)=>{
+        navigate(path);
+    }
   return (
     <Box mt={5} className='footer' >
       <Box
@@ -15,12 +20,22 @@ const Footer = () => {
           <Box py={5}>
             <Text mb={1} textAlign='center' color='blackAlpha.700' fontSize={20} fontWeight={600} >Follow Us</Text>
             <Box display='flex' justifyContent='center' >
-              <IconButton mr={3} colorScheme='blackAlpha' variant='ghost' _hover={{ color: '#C13584' }} as={Instagram} />
+              <IconButton mr={3} colorScheme='blackAlpha' variant='ghost' _hover={{ color: '#C13584' }} as={Instagram} onClick={() => getLink("https://www.instagram.com/")}  />
               <IconButton mr={3} colorScheme='blackAlpha' variant='ghost' _hover={{ color: 'facebook.500' }} as={Facebook} />
               <IconButton mr={3} colorScheme='blackAlpha' variant='ghost' _hover={{ color: 'red' }} as={YouTube} />
               <IconButton colorScheme='blackAlpha' variant='ghost' _hover={{ color: 'twitter.500' }} as={Twitter} />
             </Box>
           </Box>
+            <Box py={5}>
+                <Text
+                    fontSize={40}
+                    fontWeight={700}
+                    color={'#323264'}
+                    letterSpacing={-2}
+                    cursor='pointer'
+                    onClick={() => navigate('/')}
+                >MyImages</Text>
+            </Box>
           <Box py={5}>
             <Text mb={1} textAlign='center' color='blackAlpha.700' fontSize={20} fontWeight={600} >Download App</Text>
             <Box display='flex' justifyContent='center' >
@@ -50,10 +65,6 @@ const Footer = () => {
               <Text mt={2} _hover={{ textDecoration: 'underline' }} >Return Policies</Text>
             </Box>
       </Container>
-      <Box bg='whitesmoke' display='flex' justifyContent='center'
-      >
-        <Text colorScheme='blackAlpha' fontSize={20} p={5} >Made by <a href='https://github.com/AhmedSemih' rel='noreferrer' target='_blank' ><i>Ahmed Semih Erkan</i></a></Text>
-      </Box>
     </Box>
   )
 }
