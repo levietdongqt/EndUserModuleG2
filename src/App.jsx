@@ -8,8 +8,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Favorites from './pages/Favorites';
+import Infos from './pages/Info/Infos';
 import Template from './pages/Template';
-import Infos from './pages/Infos';
 import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
@@ -39,6 +39,7 @@ const App = () => {
         <Route path='/search/:name/:id' element={<Search />} />
         <Route path='/collections/:name/:id' element={<Collections />} />
         <Route path='/payment' element={<Payment />} />
+
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>
       <Footer />

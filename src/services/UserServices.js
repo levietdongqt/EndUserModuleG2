@@ -1,5 +1,11 @@
 import axios from "axios";
+import baseRequest from "../contexts/AxiosContext";
 
+export const Register = async (userDTO) => {
+  return await baseRequest.post(`/User/Create`, userDTO);
+};
+
+//GETALL
 export const getAllUsers = async (search, st, page, pageSize) => {
   try {
     const response = await axios.get(
@@ -21,36 +27,31 @@ export const getAllUsers = async (search, st, page, pageSize) => {
   }
 };
 
+//GETUSER BYID
 export const getUserById = async (id) => {
-  const { data } = await axios.get(
-    `${process.env.REACT_APP_API_BASE_URL}/User/${id}`
-  );
+  const { data } = await baseRequest.get(`/User/${id}`);
   return data;
 };
 
-export const updateUser = async (userDTO) => {
-  try {
-    const response = await axios.put(
-      `${process.env.REACT_APP_API_BASE_URL}/User/Edit`,
-      userDTO // Truyền dữ liệu cần cập nhật từ userDTO
-    );
-
-    if (response.status === 200) {
-      // Xử lý nếu API trả về mã 200 OK
-      return response;
-    } else {
-      // Xử lý nếu có lỗi
-      throw new Error("Failed to update user");
-    }
-  } catch (error) {
-    // Xử lý nếu có lỗi mạng hoặc lỗi từ server
-    throw new Error(error.message);
+//EDIT USER
+export const updateUser = async (formData) => {
+  const response = await baseRequest.put(`/User/Edit`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  console.log(response);
+  if (response.status === 200) {
+    return response;
+  } else {
+    throw new Error("Failed to update user");
   }
 };
 
+//CHANGE PASSWORD
 export const changePassword = async (userDTO) => {
-  const response = await axios.put(
-    `${process.env.REACT_APP_API_BASE_URL}/User/ChangePass`,
+  const response = await baseRequest.put(
+    `/User/ChangePass`,
     userDTO // Truyền requestData chứa cả userDTO, oldPassword, và newPassword
   );
 
@@ -58,16 +59,12 @@ export const changePassword = async (userDTO) => {
 };
 
 export const deleteUser = async (id) => {
-  const { data } = await axios.delete(
-    `${process.env.REACT_APP_API_BASE_URL}/users/${id}`
-  );
+  const { data } = await baseRequest.delete(`/users/${id}`);
   return data;
 };
 
 export const addFavorite = async (id, productId) => {
-  const { data } = await axios.post(
-    `${process.env.REACT_APP_API_BASE_URL}/users/${id}/favorite/${productId}`
-  );
+  const { data } = await baseRequest.post(`/users/${id}/favorite/${productId}`);
   return data;
 };
 
