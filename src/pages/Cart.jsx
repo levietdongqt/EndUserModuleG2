@@ -7,7 +7,10 @@ import { ShoppingCart } from '@mui/icons-material';
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
+import ProductCart from '../components/ProductCart';
+import { getCartInfo } from '../services/CartService';
 import CollectionCard from '../components/CollectionCard';
+
 
 const Cart = () => {
 
@@ -19,7 +22,16 @@ const Cart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
-
+  
+  useEffect(() => {
+    if(currentUser){
+      console.log("User ID",currentUser.id)
+      const {productCart} =  getCartInfo(currentUser.id).then(response =>{
+        console.log(response.data);
+          setCookie("cart",response.data.result)
+      });
+    }
+  }, []);
   useEffect(() => {
     var price = 0
     var amount = 0;
@@ -71,7 +83,7 @@ const Cart = () => {
     removeCookie('cart', { path: '/' });
   };
 
-  if (cart.length >= 1 && totalAmount > 0) {
+  if (currentUser && cart.length >= 1 && totalAmount > 0) {
     return (
       <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
         <SimpleGrid width='100%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 3, md: 5 }} >
@@ -97,7 +109,7 @@ const Cart = () => {
         </Box>
       </Box>
     )
-  } else {
+  } else if(currentUser) {
     return (
       <Box
         display='flex'
@@ -117,6 +129,29 @@ const Cart = () => {
           colorScheme='facebook'
           onClick={() => navigate('/')}>
           Start Shopping
+        </Button>
+      </Box>
+    )
+  }
+  else{
+    return (
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        flexDirection='column'
+        my={10}
+        p={5}
+      >
+        <Icon color='#314E89' fontSize={100} as={ShoppingCart} />
+        <Heading textAlign='center' fontSize={30} mt={8}  >You have to login first!</Heading>
+        <Button
+          variant='solid'
+          fontSize={20}
+          px={10} mt={10}
+          colorScheme='facebook'
+          onClick={() => navigate('/login')}>
+          Login Now
         </Button>
       </Box>
     )

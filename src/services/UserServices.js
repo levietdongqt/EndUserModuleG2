@@ -58,10 +58,6 @@ export const changePassword = async (userDTO) => {
   return response;
 };
 
-export const deleteUser = async (id) => {
-  const { data } = await baseRequest.delete(`/users/${id}`);
-  return data;
-};
 
 export const addFavorite = async (id, productId) => {
   const { data } = await baseRequest.post(`/users/${id}/favorite/${productId}`);
