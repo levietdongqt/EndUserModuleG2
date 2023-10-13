@@ -8,20 +8,20 @@ import { useFormik } from 'formik';
 
 import { useUserContext } from '../contexts/UserContext';
 import LoginValidations from '../validations/LoginValidations';
-import { Login as LogIn,OAuth2Request } from '../services/AuthServices';
-import { useGoogleLogin  } from '@react-oauth/google';
+import { Login as LogIn, OAuth2Request } from '../services/AuthServices';
+import { useGoogleLogin } from '@react-oauth/google';
 import { testRequest } from '../services/TestService';
 
 const Login = () => {
 
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(false);
-  const { setCurrentUser,setToken } = useUserContext();
+  const { setCurrentUser, setToken } = useUserContext();
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
   const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['access_token']);
   const navigate = useNavigate();
   const toast = useToast();
-  const handldeResponse = (result,remember) => {
+  const handldeResponse = (result, remember) => {
     if (result.data.status === 200) {
       console.log(result.data)
       setCurrentUser(result.data.result);
@@ -36,10 +36,10 @@ const Login = () => {
       navigate('/');
       if (remember) {
         setCookie('currentUser', result.data.result, { path: '/' });
-        setTokenCookie('access_token',result.data.token,{ path: '/' })
+        setTokenCookie('access_token', result.data.token, { path: '/' })
       } else {
         removeCookie('currentUser', { path: '/' });
-        removeTokenCookie('access_token',result.data.token,{ path: '/' })
+        removeTokenCookie('access_token', result.data.token, { path: '/' })
       };
     } else {
       resetForm();
@@ -62,8 +62,7 @@ const Login = () => {
     onSubmit: values => {
       LogIn(values.email, values.password)
         .then((result) => {
-          console.log(result.data);
-          handldeResponse(result,remember);
+          handldeResponse(result, remember);
         });
     },
     validationSchema: LoginValidations
@@ -72,16 +71,16 @@ const Login = () => {
     onSuccess: (response) => {
       OAuth2Request(response.access_token).then((result) => {
         console.log(result)
-        handldeResponse(result,true);
+        handldeResponse(result, true);
         console.log("Login thanh cong");
-        
+
         testRequest().then((result) => {
           console.log(result)
         })
       })
     },
     onError: (error) => console.log('Login Failed:', error)
-});
+  });
   return (
     <Box
       display='flex'

@@ -1,0 +1,48 @@
+/* CSS */
+.custom-link {
+  color: blue;
+  font-weight: bold;
+  background-color: transparent;
+  border-radius: 10px;
+  transition: all 0.3s;
+
+  &:hover {
+    color: white;
+    font-size: 110%;
+    background-color: #1877f2;
+  }
+
+  &:focus {
+    color: #1877f2;
+    background-color: rgba(0, 0, 0, 0.2);
+    outline: 2px solid transparent;
+  }
+}
+
+
+
+
+
+.custom-link-pass {
+  color: blue;
+  /* Màu mặc định cho chữ */
+  font-weight: bold;
+  /* In đậm chữ */
+  background-color: transparent;
+  /* Màu nền trong suốt */
+  border-radius: 10px;
+  /* Bo tròn góc */
+  transition: all 0.3s;
+  /* Hiệu ứng mượt mà trong 0.3 giây */
+
+  /* Khi hover */
+  &:hover {
+    color: white;
+    /* Chữ màu trắng */
+    font-size: 110%;
+    /* Phóng to chữ lên 110% */
+    background-color: #1877f2;
+    /* Màu xanh Facebook */
+  }
+
+}

@@ -7,9 +7,11 @@ import { ShoppingCart } from '@mui/icons-material';
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
-import ClothesCard from '../components/ClothesCard';
 import ProductCart from '../components/ProductCart';
 import { getCartInfo } from '../services/CartService';
+import CollectionCard from '../components/CollectionCard';
+
+
 const Cart = () => {
 
   const toast = useToast();
@@ -20,13 +22,16 @@ const Cart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
-  if(currentUser){
-    console.log("User ID",currentUser.id)
-    const {productCart} =  getCartInfo(currentUser.id).then(response =>{
-      console.log(response.data);
-        setCookie("cart",response.data.result)
-    });
-  }
+  
+  useEffect(() => {
+    if(currentUser){
+      console.log("User ID",currentUser.id)
+      const {productCart} =  getCartInfo(currentUser.id).then(response =>{
+        console.log(response.data);
+          setCookie("cart",response.data.result)
+      });
+    }
+  }, []);
   useEffect(() => {
     var price = 0
     var amount = 0;
@@ -84,7 +89,7 @@ const Cart = () => {
         <SimpleGrid width='100%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 3, md: 5 }} >
           {
             cart && cart.map((product, index) => {
-              return product.id && <ClothesCard key={index} productId={product.id} />
+              return product.id && <CollectionCard key={index} productId={product.id} />
             })
           }
         </SimpleGrid>

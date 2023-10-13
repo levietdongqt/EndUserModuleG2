@@ -8,20 +8,15 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Favorites from './pages/Favorites';
-import Product from './pages/Product';
-import Infos from './pages/Infos';
+import Infos from './pages/Info/Infos';
+import Template from './pages/Template';
 import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
-import OrdersforAdmin from './pages/OrdersforAdmin';
-import CategoriesforAdmin from './pages/CategoriesforAdmin';
-import ProductsforAdmin from './pages/ProductsforAdmin';
-import ReportsforAdmin from './pages/ReportsforAdmin';
-import ImagesforAdmin from './pages/ImagesforAdmin';
 import { useUserContext } from './contexts/UserContext';
 import useGetUserRole from './hooks/useGetUserRole';
-
+import Collections from "./pages/Collections";
 const App = () => {
 
   const { currentUser } = useUserContext();
@@ -36,26 +31,15 @@ const App = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/favorites' element={<Favorites />} />
-        <Route path='/product' element={<Product />} />
-        <Route path='/product/:id' element={<Product />} />
+        <Route path='/template' element={<Template />} />
+        <Route path='/template/:id' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
         <Route path='/purchase' element={<Purchase />} />
-        <Route path='/search' element={<Search />} />
+        <Route path='/search/:name/:id' element={<Search />} />
+        <Route path='/collections/:name/:id' element={<Collections />} />
         <Route path='/payment' element={<Payment />} />
-        {
-            admin
-            ?
-            <>
-              <Route path='/admin/products' element={<ProductsforAdmin />} />
-              <Route path='/admin/categories' element={<CategoriesforAdmin />} />
-              <Route path='/admin/orders' element={<OrdersforAdmin />} />
-              <Route path='/admin/images' element={<ImagesforAdmin />} />
-              <Route path='/admin/reports' element={<ReportsforAdmin />} />
-            </>
-            :
-            <Route path='/admin/*' element={<Navigate to='/' />} />
-        }
+
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>
       <Footer />

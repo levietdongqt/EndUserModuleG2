@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, Input, Button, Select, useToast } from '@chakra-ui/react';
 
-import { getCategoryByGenre, addCategory, updateCategory, deleteCategory } from '../services/CategoryServices';
-import { getAllGenres } from '../services/GenreServices';
+import { getCategoryById, addCategory, updateCategory, deleteCategory } from '../services/CategoryServices';
+import { getAllTemplate } from '../services/TemplateServices';
 
 const CategoryEdit = ({ isEdit }) => {
 
@@ -16,11 +16,11 @@ const CategoryEdit = ({ isEdit }) => {
     const toast = useToast();
 
     useEffect(() => {
-        getAllGenres()
+        getAllTemplate()
             .then((result) => {
                 setAllGenres(result.allGenres);
             });
-        getCategoryByGenre(selectedGenre)
+        getCategoryById(selectedGenre)
             .then((result) => {
                 setAllCategories(result.category);
             });
