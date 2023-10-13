@@ -56,7 +56,7 @@ const CollectionCard = ({ collectionId}) => {
                     display="inline"
                     textAlign={'left'}
                 >
-                  {collections.name} >
+                  {collections.name} 
                 </Text>
               </Box>
             </Box>
