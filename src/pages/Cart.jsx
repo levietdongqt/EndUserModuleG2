@@ -26,10 +26,11 @@ const Cart = () => {
   useEffect(() => {
     if(currentUser){
       console.log("User ID",currentUser.id)
-      const {productCart} =  getCartInfo(currentUser.id).then(response =>{
-        console.log(response.data);
+     getCartInfo(currentUser.id).then(response =>{
           setCookie("cart",response.data.result)
+          setCart(response.data.result)
       });
+      console.log("CookieCart: ",cart)
     }
   }, []);
   useEffect(() => {
@@ -83,13 +84,13 @@ const Cart = () => {
     removeCookie('cart', { path: '/' });
   };
 
-  if (currentUser && cart.length >= 1 && totalAmount > 0) {
+  if (currentUser && cart.length >= 1 ) {
     return (
       <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
         <SimpleGrid width='100%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 3, md: 5 }} >
           {
             cart && cart.map((product, index) => {
-              return product.id && <CollectionCard key={index} productId={product.id} />
+              return product.id && <ProductCart key={index} productId={product.id} />
             })
           }
         </SimpleGrid>
