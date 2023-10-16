@@ -26,8 +26,8 @@ const Register = () => {
       terms: false,
     },
     onSubmit: async (values) => {
+      let errorMessage = '';
       try {
-        console.log(values.email);
         const userDTO = {
           fullName: values.fullName,
           gender: values.gender,
@@ -38,8 +38,6 @@ const Register = () => {
           gender: values.gender,
           password: values.password,
         };
-        console.log(userDTO)
-
         const response = await Signup(userDTO);
 
         if (response.data) {
@@ -52,10 +50,10 @@ const Register = () => {
             isClosable: true,
           });
         } else {
-          resetForm();
+          errorMessage = response.data.message; // Gán giá trị cho errorMessage
           toast({
             title: 'Error!',
-            description: 'This email is already in use.',
+            description: errorMessage,
             status: 'error',
             duration: 2000,
             isClosable: true,
@@ -63,7 +61,14 @@ const Register = () => {
         }
       } catch (error) {
         console.error(error);
-        console.log("dk thất bại")
+        errorMessage = error.response.data.message; // Gán giá trị cho errorMessage
+        toast({
+          title: 'Error!',
+          description: errorMessage,
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        });
         // Xử lý lỗi ở đây nếu cần
       }
     },
@@ -71,6 +76,11 @@ const Register = () => {
 
     validationSchema: RegisterValidations
   });
+
+  const test = (event) => {
+    console.log("submit")
+  };
+
 
   return (
     <Box as="form"
@@ -157,7 +167,7 @@ const Register = () => {
             <RadioGroup
               name="gender"
               value={values.gender}
-              // onChange={handleChange}
+              onChange={handleChange}
               pt={2}
             >
               <Radio value={true}
@@ -215,7 +225,7 @@ const Register = () => {
         </FormControl>
 
         <Checkbox name='terms' isChecked={values.terms} onChange={handleChange} mt={5} >I agree the <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>.</Checkbox>
-        <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} type='submit'  >Register</Button>
+        <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} type='submit' onClick={test} >Register</Button>
         <br />
         <Text my={3} width='100%' textAlign='center' >or</Text>
         <Button width='100%' variant='outline' colorScheme='facebook' onClick={() => navigate('/login')} >Login</Button>
