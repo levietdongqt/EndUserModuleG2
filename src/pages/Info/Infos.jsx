@@ -35,6 +35,7 @@ const Infos = () => {
     const [isEditing, setIsEditing] = useState(true);
     const toast = useToast();
     const [activeTab, setActiveTab] = useState('PERSONAL');
+    const [checkUpdate, setCheckUpdate] = useState(0);
 
     //CALL GET USER BY ID
     useEffect(() => {
@@ -47,10 +48,8 @@ const Infos = () => {
         if (currentUser) {
             getUserByIdAsync(currentUser.id);
         }
-    }, [currentUser]);
-
-
-
+    }, [checkUpdate]);
+    console.log("pass", user.password)
 
     //#region  SET NAV TAB
     const handleTabChange = (tab) => {
@@ -143,14 +142,12 @@ const Infos = () => {
         // Kiểm tra xem có hình ảnh mới được chọn không và thêm nó vào FormData nếu có
         if (editedUser.avatar) {
             formData.append("formFile", editedUser.avatar);
-            console.log("avatar", editedUser);
         }
 
 
         try {
             // Gọi hàm updateUser để cập nhật thông tin người dùng sử dụng FormData
             const update = await updateUser(formData);
-            console.log(update);
             toast({
                 title: 'SUCCESSFULLY',
                 description: 'You have successfully updatted your information.',
@@ -158,6 +155,7 @@ const Infos = () => {
                 duration: 2000,
                 isClosable: true
             });
+            setCheckUpdate(checkUpdate + 1);
             setIsEditing(true);
 
             console.log("Thông tin cập nhật thành công:", editedUser);

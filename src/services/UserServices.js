@@ -58,6 +58,17 @@ export const changePassword = async (userDTO) => {
   return response;
 };
 
+//CONFIRM
+export const confirm = async (userId, code) => {
+  const response = await baseRequest.get(
+    `/User/ConfirmEmail?userId=${userId}&code=${code}`,
+    userId, code
+  );
+
+  return response;
+};
+
+
 
 export const addFavorite = async (id, productId) => {
   const { data } = await baseRequest.post(`/users/${id}/favorite/${productId}`);
