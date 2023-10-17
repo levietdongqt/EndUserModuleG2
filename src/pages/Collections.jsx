@@ -26,10 +26,10 @@ const Collections = () => {
       <Container maxW='1140px'>
         <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} backgroundColor='whitesmoke' >
           <Box textAlign={'center'} mb={3}>
-            <Heading as='h2' size='3xl' >{products.length > 0 ? products[0].name : ''}</Heading>
+            <Heading as='h2' size='3xl' >{products.length > 0 ? products.name : ''}</Heading>
           </Box>
           <Box key={products.id} mt={10}>
-            <Image  maxW={'100%'} height={350} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${products[0]?.imageUrl}`}/>
+            <Image  maxW={'100%'} height={350} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${products.imageUrl}`}/>
           </Box>
           <Box
               width='100%'
@@ -45,15 +45,17 @@ const Collections = () => {
           <Box display='flex' flexDirection={{ base: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row' }}>
             <div style={{ display: 'inline-block', flex: '3' }}>
               <SimpleGrid columns={[1, 1, 1, 3]} spacing='40px' gap={10}>
-                {products.map((product) => (
-                    product.collections.map((collection) => (
-                        <div key={collection.id}>
+                {
+                    products.collections && products.collections.map((item) => {
+                    return (
+                        <div key={item.id}>
                           <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '16px', alignItems: 'center' }}>
-                            <CollectionCard collectionId={collection.id} />
+                            <CollectionCard collectionId={item.id} />
                           </div>
                         </div>
-                    ))
-                ))}
+                    )
+                  })
+                }
                 {products.length === 0 && (
                     <Box display='flex' justifyContent='start'>
                       <Box

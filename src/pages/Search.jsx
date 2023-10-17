@@ -1,39 +1,75 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate,useParams  } from 'react-router-dom';
 import {Box, SimpleGrid, Button, Select, Text, Icon, Heading, Container} from '@chakra-ui/react';
-
+import queryString from 'query-string';
 import TemplateCard from '../components/templateCard';
 import FilterMenu from '../components/FilterMenu';
 import {getTemplateByCollection } from '../services/CollectionServices';
+import {getTemplateByName } from '../services/TemplateServices'
 import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
-
+import Pagination  from '../components/Pagination';
 const Search = () => {
 
   const navigate = useNavigate();
   const { state } = useLocation();
   const { search, canSearch } = useSearchContext();
-  const [openFilter, setOpenFilter] = useState(true);
   const [template, setTemplates] = useState([]);
   const [sortBy, setSortBy] = useState("recommended");
-
+  const [total, setTotal] = useState(0);
+  const [show, setShow] = useState([]);
+  const { name } = useParams();
+  const [pagination, setPagination] = useState({
+    result: {
+      page: 1,
+      limit: 20,
+      totalRows: 1,
+    },
+  });
+  const [filters , setFilters] = useState({
+    limit: 20,
+    page: 1,
+  })
   useEffect(() => {
     if (state !== null) {
       getTemplateByCollection(state.collectionsId)
         .then((result) => {
-          setTemplates(result.result);
-          console.log("Hello",result.result);
+          setShow(result.result);
+          setTemplates(result.result.templateNames);
+          setTotal(result.result.templateNames.length);
         });
       setSortBy("recommended");
     }
-   /* if (search !== "" && search !== " " && search !== null && search !== undefined && canSearch) {
-      getProductBySearch(search)
+
+    if (search !== "" && search !== " " && search !== null && search !== undefined && canSearch) {
+      let paramsString = queryString.stringify(filters);
+      if(search !== filters.name){
+        console.log("sdsd",filters.name);
+        setFilters({
+          ...filters,
+          name: search,
+          page: 1,
+        });
+      }
+      getTemplateByName(search,paramsString)
         .then((result) => {
-          setTemplates(result.products);
+          setTemplates(result.result.items);
+          setPagination({
+            totalRows: result.result.totalRows,
+            limit: result.result.limit,
+          });
+          setTotal(search.length - 1);
         });
       setSortBy("recommended");
-    }*/
-  }, [state, search, canSearch]);
+    }
+  }, [state, search, canSearch,filters]);
+
+  const handlePageChange = (newPage) => {
+    setFilters({
+      ...filters,
+      page: newPage,
+    });
+  }
 
   const handleChange = (e) => {
     setSortBy(e.target.value);
@@ -45,41 +81,50 @@ const Search = () => {
   };
 
   const sortByPriceAsc = () => {
-    setTemplates(template.sort((a, b) => (a.price - b.price)));
+    setTemplates(template.sort((a, b) => (a.pricePlusPerOne - b.pricePlusPerOne)));
   };
 
   const sortByPriceDesc = () => {
-    setTemplates(template.sort((a, b) => (b.price - a.price)));
+    setTemplates(template.sort((a, b) => (b.pricePlusPerOne - a.pricePlusPerOne)));
   };
 
   return (
       <Container maxW='1140px'>
-        <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} backgroundColor='whitesmoke' >
-          <Box textAlign={'center'} mb={3}>
-            <Heading as='h2' size='3xl' >{template.name}</Heading>
+        <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} >
+        <Box textAlign={'center'} mb={3}>
+          <Heading as='h2' size='3xl'>
+            {name}
+          </Heading>
           </Box>
           <Box
-              width='100%'
-              height='auto'
-              display='flex'
-              justifyContent={'space-between'}
-              py={5} >
-            <FilterMenu  openFilter={openFilter} columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }} setProducts={template} setSortBy={setSortBy} />
-            <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px' >
-              <option value='recommended'>Best Sellers</option>
-              <option value='lowest'>Lowest Price</option>
-              <option value='highest'>Highest Price</option>
-            </Select>
+              display="flex"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              py={5}
+          >
+            <FilterMenu
+                columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
+                setProducts={template}
+                setSortBy={setSortBy}
+            />
+            <Box display={'flex'} m={3} alignItems={'center'}>
+              <Text fontSize={16} fontWeight={500} mb={0} float={'right'}>&nbsp;{total} Results</Text>
+              <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px'>
+                <option value='recommended'>Best Sellers</option>
+                <option value='lowest'>Lowest Price</option>
+                <option value='highest'>Highest Price</option>
+              </Select>
+            </Box>
           </Box>
           <SimpleGrid minChildWidth={280} gap={3} spacingX={5} >
             {
-                template.templateNames && template.templateNames.map((items, index) =>{
-                  return <TemplateCard key={index} collectionId={items.id} />
+                template && template.map((items, index) =>{
+                  return <TemplateCard key={index} templateId={items.id} />
                 })
             }
             {
                 template.length === 0 &&
-                <Box display='flex' justifyContent='start'>
+                <Box display='flex' justifyContent='center'>
                   <Box
                       display='flex'
                       justifyContent='center'
@@ -103,6 +148,8 @@ const Search = () => {
                 </Box>
             }
           </SimpleGrid>
+          <Pagination
+          pagination={pagination} onPageChange={handlePageChange}/>
         </Box>
       </Container>
   )

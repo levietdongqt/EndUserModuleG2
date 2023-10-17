@@ -41,13 +41,13 @@ const Navbar = () => {
           setCategories(result.result);
         });
     var count = 0;
-    if(cart.length){
-      cart.forEach((item) => {
-        if(item.amount){
-          count += item.amount;
-        }
-      });
-    }
+  /*if(cart.length){
+    cart.forEach((item) => {
+      if(item.amount){
+        count += item.amount;
+      }
+    });
+  }*/
     setItemCount(count);
   },[refresh,cart,cookies.cart]);
 

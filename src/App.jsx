@@ -32,12 +32,12 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/favorites' element={<Favorites />} />
         <Route path='/template' element={<Template />} />
-        <Route path='/template/:id' element={<Template />} />
+        <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
         <Route path='/purchase' element={<Purchase />} />
-        <Route path='/search/:name/:id' element={<Search />} />
-        <Route path='/collections/:name/:id' element={<Collections />} />
+        <Route path='/search/:name' element={<Search />} />
+        <Route path='/collections/:name' element={<Collections />} />
         <Route path='/payment' element={<Payment />} />
 
         <Route path='*' element={<Navigate to='/' />} />

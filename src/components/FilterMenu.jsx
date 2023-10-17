@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { getProductByColor, getProductByGender, getProductByPrice, getProductsByQueries } from '../services/ProductServices';
 import { useSearchContext } from '../contexts/SearchContext';
 
-const FilterMenu = ({ openFilter, setProducts, setSortBy }) => {
+const FilterMenu = ({ setProducts, setSortBy }) => {
     const { canSearch, setCanSearch } = useSearchContext();
 
     const [minPrice, setMinPrice] = useState(30);
@@ -63,9 +63,9 @@ const FilterMenu = ({ openFilter, setProducts, setSortBy }) => {
 
     return (
         <Box
-            display={openFilter ? 'flex' : 'none'}
+            display={'flex'}
             minHeight={200}
-            maxHeight={300}
+            maxHeight={200}
             p={3}
             backgroundColor='#fff'
             maxWidth={600}

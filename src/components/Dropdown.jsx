@@ -13,7 +13,7 @@ const Dropdown = ({ title, TemplateId }) => {
         try {
             getCategoryById(TemplateId)
                 .then((result) => {
-                    setCategory(result.result[0]);
+                    setCategory(result.result);
                 });
         } catch (error) {
             console.log(error);
@@ -21,7 +21,7 @@ const Dropdown = ({ title, TemplateId }) => {
     }, [TemplateId]);
 
     const handleClick = (categoryId) => {
-        navigate(`/collections/${category.name}/${categoryId}`, { state: { categoryId: categoryId } });
+        navigate(`/collections/${category.name}`, { state: { categoryId: categoryId } });
     };
 
     return (
@@ -71,10 +71,14 @@ const Dropdown = ({ title, TemplateId }) => {
                                                             {collection.name}
                                                         </Heading>
                                                     </MenuItem>
-                                                    {collection.templateDTO.map((template) => {
+                                                    {collection.templateDTO.slice(0,6).map((template) => {
                                                         return (
                                                             <MenuItem key={template.id}>
-                                                                <Link>{template.name}</Link>
+                                                                <Link onClick={() =>
+                                                                    navigate(`/template/${template.name}`, {
+                                                                        state: {productId: template.id},
+                                                                    })
+                                                                }>{template.name}</Link>
                                                             </MenuItem>
                                                         );
                                                     })}

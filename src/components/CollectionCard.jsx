@@ -23,7 +23,7 @@ const CollectionCard = ({ collectionId}) => {
 
 
     const handleClick = (id) => {
-        navigate(`/search/${collections.name}/${collections.id}`, { state: { collectionsId: id } });
+        navigate(`/search/${collections.name}/`, { state: { collectionsId: id } });
     };
   return (
       <>

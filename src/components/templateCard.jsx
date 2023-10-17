@@ -18,52 +18,51 @@ const settings = {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    autoplay: true,
+    arrows: true,
+
 };
 
-const TemplateCard = ({ collectionId, isDelivered}) => {
+const TemplateCard = ({ templateId, isDelivered}) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [cookies, setCookies, removeCookie] = useCookies(['cart']);
     const { cart, setCart, refresh, setRefresh } = useCartContext();
     const { currentUser } = useUserContext();
-    const [status] = useGetFavoriteStatus(currentUser, collectionId);
+    const [status] = useGetFavoriteStatus(currentUser, templateId);
     const navigate = useNavigate();
-    const [sizes,setSizes] = useState([]);
     const [template, setTemplate] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [inCart, setInCart] = useState(false);
     const [amount, setAmount] = useState(0);
-    const [sizeSelected,setSizeSelected] = useState([]);
     useEffect(() => {
-        if (collectionId) {
+        if (templateId) {
             setIsFavorite(status);
-            getTemplateById(collectionId).then((result) => {
+            getTemplateById(templateId).then((result) => {
                 setTemplate(result.result);
             })
-            getAllize().then((result) => {
-                setSizes(result.result);
-            })
-            cart.forEach((item) => {
-                if (item.id === collectionId) {
+
+            /*cart.forEach((item) => {
+                if (item.id === templateId) {
                     setInCart(true);
                     setAmount(item.amount);
-                }})
+                }})*/
         }
-    }, [collectionId, status, cart, amount]);
+    }, [templateId]);
 
 
     const onClickFavorite = () => {
         if (!isFavorite) {
-            addFavorite(currentUser, collectionId);
+            addFavorite(currentUser, templateId);
             setIsFavorite(true);
         } else {
-            deleteFavorite(currentUser, collectionId);
+            deleteFavorite(currentUser, templateId);
             setIsFavorite(false);
         }
     };
 
     const onClickAddCart = () => {
-        const currentIndex = cart.findIndex(item => item.id === collectionId);
+        const currentIndex = cart.findIndex(item => item.id === templateId);
         if (currentIndex >= 0) {
             cart[currentIndex].amount += 1;
             cart[currentIndex].price = template.price * cart[currentIndex].amount;
@@ -71,7 +70,7 @@ const TemplateCard = ({ collectionId, isDelivered}) => {
             setCookies('cart', cart, { path: '/' });
         } else {
             setCart([...cart, {
-                id: collectionId,
+                id: templateId,
                 amount: 1,
                 price: template.price
             }]);
@@ -82,7 +81,6 @@ const TemplateCard = ({ collectionId, isDelivered}) => {
 
     return (
         <>
-            {template.length > 0 && (
                 <Box
                     width='100%'
                     display='flex'
@@ -92,117 +90,47 @@ const TemplateCard = ({ collectionId, isDelivered}) => {
                     mt={{ base: 3, sm: 0 }}
                     mx={{ base: 0, md: 2 }}
                 >
-                    {template.map((item) => (
-                        <Slider key={item.id} {...settings} style={{ width: '358px', margin: '0 auto' }}>
-                            {item.templateImages.map((image, index) => (
-                                <div key={image.id} style={{ height: '100%', width: '100%' }}>
-                                    <Image
-                                        key={`${index}`}
-                                        style={{ height: '200px', width: '340px' }}
-                                        objectFit='cover'
-                                        src={image.imageUrl} // Use the image URL from your data
-                                        onClick={() =>
-                                            navigate(`/template/${item.id}`, {
-                                                state: { productId: item.id },
-                                            })
-                                        }
-                                    />
-                                </div>
-                            ))}
+                        <Slider {...settings} style={{width: '358px', margin: '0 auto'}}>
+                            {template.templateImages && template.templateImages.map((image, index) =>
+                                 (
+                                    <div key={index} style={{height: '100%', width: '100%'}}>
+                                        <Image
+                                            key={image.id}
+                                            style={{height: '200px', width: '340px'}}
+                                            objectFit='cover'
+                                            src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`}
+                                            onClick={() =>
+                                                navigate(`/template/${template.name}`, {
+                                                    state: {productId: template.id},
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                )
+                            )}
                         </Slider>
-                    ))}
-                    <Box px={3} py={5} bg='#fff' position='relative' width='100%' height={200} maxWidth={500}>
+                    <Box
+                        px={3}
+                        py={5}
+                        alignItems="center"
+                    >
                         <Text
                             onClick={() =>
-                                navigate(`/template/${template[0].id}`, {
-                                    state: { productId: template[0].id },
+                                navigate(`/template/${template.name}`, {
+                                    state: { productId: template.id },
                                 })
                             }
+                            style={{ textDecoration: 'underline' }}
                             fontWeight={500}
                             fontSize={18}
+                            _hover={{ color:'blue.200' }}
                         >
-                            {template[0]?.name}
+                            {template.name}
                         </Text>
-                        {/*<Select
-                            multiple
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={sizeSelected}
-                            onChange={(event)=>{
-                                setSizeSelected(event.target.value);
-                            }}
-                        >
-                            {sizes.map((size,index) => (
-                                <MenuItem  key={index} value={size} >{`${size.width}x${size.length}`}</MenuItem>
-                            ))}
-                        </Select>*/}
-                        <Box
-                            mt={5}
-                            py={3}
-                            position='absolute'
-                            bottom='0px'
-                            display='flex'
-                            width='100%'
-                            justifyContent='space-between'
-                            pr={5}
-                            pl={2}
-                        >
-                            <Text
-                                onClick={() =>
-                                    navigate(`/template/${template[0].id}`, {
-                                        state: { productId: template[0].id },
-                                    })
-                                }
-                                fontSize={18}
-                                fontWeight={500}
-                            >
-                                {template[0]?.PricePlus} $
-                            </Text>
-                            <Box display='flex' alignItems='center' margin='right'>
-                                <>
-                                    <Icon
-                                        onClick={onClickFavorite}
-                                        as={Favorite}
-                                        fontSize={28}
-                                        transition={0.5}
-                                        color={!isFavorite ? 'blackAlpha.400' : 'red'}
-                                        _hover={{ color: 'red' }}
-                                    />
-                                    <Button
-                                        onClick={onClickAddCart}
-                                        fontSize={28}
-                                        transition={0.5}
-                                        backgroundColor={'#284b9b'}
-                                        borderRadius='45px'
-                                        boxShadow={'#fff 0px 3px 8px 0px'}
-                                        padding={'9px 20px 11px'}
-                                        textAlign={'center'}
-                                        color='#ffffff'
-                                        _hover={{ backgroundColor: '#0b53e6' }}
-                                        ms={{ base: 2, md: 5 }}
-                                    >
-                                        Make this Photo
-                                    </Button>
-                                </>
-                                {isDelivered && (
-                                    <Icon
-                                        onClick={onOpen}
-                                        as={RateReview}
-                                        fontSize={36}
-                                        transition={0.5}
-                                        color='blackAlpha.400'
-                                        _hover={{ color: 'facebook.500' }}
-                                        ms={{ base: 2, md: 5 }}
-                                    />
-                                )}
-                            </Box>
-                        </Box>
                     </Box>
                 </Box>
-            )}
             <ReviewModal isOpen={isOpen} onClose={onClose} />
         </>
-
     );
 }
 
