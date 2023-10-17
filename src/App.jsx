@@ -17,12 +17,11 @@ import Search from './pages/Search';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
 import { useUserContext } from './contexts/UserContext';
-import useGetUserRole from './hooks/useGetUserRole';
-import Collections from "./pages/Collections";
+import Collections from './pages/Collections';
+import Categories from "./pages/Categories";
 const App = () => {
 
   const { currentUser } = useUserContext();
-  const [admin] = useGetUserRole(currentUser);
 
   return (
     <>
@@ -42,12 +41,13 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/favorites' element={<Favorites />} />
         <Route path='/template' element={<Template />} />
-        <Route path='/template/:id' element={<Template />} />
+        <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
         <Route path='/purchase' element={<Purchase />} />
-        <Route path='/search/:name/:id' element={<Search />} />
-        <Route path='/collections/:name/:id' element={<Collections />} />
+        <Route path='/search/:name' element={<Search />} />
+        <Route path='/categories/:name' element={<Categories />} />
+        <Route path='/categories/:name/collection/:name' element={<Collections />} />
         <Route path='/payment' element={<Payment />} />
 
         <Route path='*' element={<Navigate to='/' />} />

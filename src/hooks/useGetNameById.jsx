@@ -8,7 +8,7 @@ const useGetNameById = (id) => {
     useEffect(() => {
         getUserById(id)
             .then((result) => {
-                setName(result.user.firstName + " " + result.user.lastName);
+                setName(result.result.fullName);
             });
     }, [id]);
 

@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Box, FormControl, Input, InputGroup, Button, InputRightElement } from '@chakra-ui/react';
 import { Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSearchContext } from '../contexts/SearchContext';
-
-
-const Searchbar = () => {
-
+const Searchbar = (props) => {
+    const { onSubmit } = props;
     const [searchText, setSearchText] = useState("");
     const { setSearch, setCanSearch } = useSearchContext();
     const navigate=useNavigate();
+
     const handleInput = (e) => {
         setSearchText(e.target.value);
     };
@@ -17,7 +16,7 @@ const Searchbar = () => {
     const handleSubmit = (e) => {
         setCanSearch(true);
         setSearch(searchText);
-        navigate(`/search`);
+        navigate(`/search/${searchText}`);
         e.preventDefault();
     };
 
@@ -29,7 +28,8 @@ const Searchbar = () => {
                         name='search'
                         pr='4.5rem'
                         backgroundColor='#fff'
-                        placeholder='Search for clothes...'
+                        placeholder='Search for Template'
+                        value={searchText}
                         onInput={handleInput}
                     />
                     <InputRightElement width='4rem'>

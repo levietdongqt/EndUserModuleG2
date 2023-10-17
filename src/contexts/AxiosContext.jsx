@@ -9,7 +9,6 @@ const  GetToken = () => {
     return acc;
   }, {});
   const accessToken = cookies.access_token;
-  console.log(accessToken)
   return accessToken;
 }
 const baseRequest = axios.create({
