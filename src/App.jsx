@@ -14,6 +14,7 @@ import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
+import Upload from './pages/Upload';
 import { useUserContext } from './contexts/UserContext';
 import useGetUserRole from './hooks/useGetUserRole';
 import Collections from "./pages/Collections";
@@ -30,6 +31,7 @@ const App = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
+        <Route path='/upload' element={<Upload />} />
         <Route path='/favorites' element={<Favorites />} />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:id' element={<Template />} />
