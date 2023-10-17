@@ -6,11 +6,11 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 //import GoogleIcon from '@mui/icons-material/Google';
 import { useFormik } from 'formik';
 
-import { useUserContext } from '../contexts/UserContext';
-import LoginValidations from '../validations/LoginValidations';
-import { Login as LogIn, OAuth2Request } from '../services/AuthServices';
+import { useUserContext } from '../../contexts/UserContext';
+import LoginValidations from '../../validations/LoginValidations';
+import { Login as LogIn, OAuth2Request } from '../../services/AuthServices';
 import { useGoogleLogin } from '@react-oauth/google';
-import { testRequest } from '../services/TestService';
+import { testRequest } from '../../services/TestService';
 
 const Login = () => {
 
@@ -67,6 +67,7 @@ const Login = () => {
     },
     validationSchema: LoginValidations
   });
+
   const login = useGoogleLogin({
     onSuccess: (response) => {
       OAuth2Request(response.access_token).then((result) => {
@@ -87,7 +88,7 @@ const Login = () => {
       justifyContent='center'
       alignItems='center'
       width='100vw'
-      height='75vh'
+      height='auto'
     >
       <Box width={{ base: '100vw', sm: '500px' }} p={2}>
         <Text textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10} >Login</Text>
