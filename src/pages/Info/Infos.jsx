@@ -18,24 +18,25 @@ import { forwardRef } from 'react';
 
 
 
-
 const Infos = () => {
     const { currentUser } = useUserContext(); //Lấy user đã đăng nhập ở đây
     const [user, setUser] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const gender = currentUser.gender ? "Female" : "Male";
     const [editedUser, setEditedUser] = useState({
-        fullName: currentUser.fullName,
-        gender: gender,
-        phone: currentUser.phone,
-        dateOfBirth: currentUser.dateOfBirth,
-        address: currentUser.address,
+        fullName: "", // Set an initial value to avoid undefined
+        gender: "",
+        phone: "",
+        dateOfBirth: "",
+        address: "",
         avatar: null,
     });
     const [isEditing, setIsEditing] = useState(true);
     const toast = useToast();
     const [activeTab, setActiveTab] = useState('PERSONAL');
+    const [checkUpdate, setCheckUpdate] = useState(0);
+    const gender = user.gender === null ? "" : user.gender ? "Male" : "Female";
+
 
     //CALL GET USER BY ID
     useEffect(() => {
@@ -48,8 +49,22 @@ const Infos = () => {
         if (currentUser) {
             getUserByIdAsync(currentUser.id);
         }
-    }, [currentUser]);
 
+        setEditedUser({
+            fullName: user.fullName || "", // Set fullName to an empty string if undefined
+            gender: user.gender || "",
+            phone: user.phone || "",
+            dateOfBirth: user.dateOfBirth || "",
+            address: user.address || "",
+            avatar: null,
+        });
+
+
+    }, [checkUpdate, isEditing]);
+    console.log(user.fullName)
+
+
+    console.log("editname:", editedUser.fullName)
 
 
 
@@ -120,20 +135,37 @@ const Infos = () => {
     const handleGenderChange = (value) => {
         setEditedUser({
             ...editedUser,
-            gender: value,
+            gender: value === true, // Convert value (boolean) to true/false
         });
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        if (!errors.fullName && !errors.phone && !errors.dateOfBirth && !errors.address) {
+            // Hết lỗi, tiến hành update
+        } else {
+            toast({
+                title: 'Error!',
+                description: 'There are validation errors in the form. Please check the fields.',
+                status: 'error',
+                duration: 2000,
+                isClosable: true
+            });
+            return;
+        }
+
+
+
+
+
         const formData = new FormData();
-        console.log(currentUser.role)
         // Thêm các trường dữ liệu vào FormData
-        console.log("Before append:", currentUser.id);
         formData.append("id", currentUser.id);
-        console.log("After id:", formData);
         formData.append("fullName", editedUser.fullName);
-        formData.append("gender", editedUser.gender === "Male" ? true : false);
+        formData.append("gender", values.gender);
         formData.append("phone", editedUser.phone);
         formData.append("dateOfBirth", editedUser.dateOfBirth);
         formData.append("address", editedUser.address);
@@ -144,14 +176,11 @@ const Infos = () => {
         // Kiểm tra xem có hình ảnh mới được chọn không và thêm nó vào FormData nếu có
         if (editedUser.avatar) {
             formData.append("formFile", editedUser.avatar);
-            console.log("avatar", editedUser);
         }
-
 
         try {
             // Gọi hàm updateUser để cập nhật thông tin người dùng sử dụng FormData
             const update = await updateUser(formData);
-            console.log(update);
             toast({
                 title: 'SUCCESSFULLY',
                 description: 'You have successfully updatted your information.',
@@ -159,6 +188,7 @@ const Infos = () => {
                 duration: 2000,
                 isClosable: true
             });
+            setCheckUpdate(checkUpdate + 1);
             setIsEditing(true);
 
             console.log("Thông tin cập nhật thành công:", editedUser);
@@ -187,10 +217,9 @@ const Infos = () => {
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
 
-        return `${year}-${month}-${day}`;
+        return `${day}-${month}-${year}`;
     }
     // call formatDateToISO 
-    const formattedDate = formatDateToISO(editedUser.dateOfBirth);
     const fmDateInfo = formatDateToISO(user.dateOfBirth);
     //#endregion
 
@@ -368,19 +397,20 @@ const Infos = () => {
     //#endregion
 
     //#region FORMIK VALIDATION
-    const { handleChange, handleBlur, touched, isInvalid, errors } = useFormik({
+    const { handleChange, handleBlur, touched, isValid, errors, values, setErrors, setFieldValue } = useFormik({
         initialValues: {
             // Khai báo các giá trị mặc định cho các trường dữ liệu ở đây
-            fullName: '',
-            gender: '',
-            phone: '',
-            address: '',
-            dateOfBirth: '',
+            fullName: editedUser.fullName || "Please update Full Name",
+            gender: editedUser.gender || true,
+            phone: editedUser.phone || "00000000000",
+            address: editedUser.address || "Please update Address",
+            dateOfBirth: editedUser.dateOfBirth || new Date(new Date().getFullYear() - 14, 0, 1).toISOString().split('T')[0],
         },
         validationSchema: RegisterValidations
 
     });
     //#endregion
+
 
 
     const customLinks = document.querySelectorAll('.custom-link');
@@ -392,6 +422,9 @@ const Infos = () => {
 
 
     });
+
+
+
     return (
         <Box>
             {/* <Row> */}
@@ -468,7 +501,7 @@ const Infos = () => {
                             alignItems="center"
                             justifyContent="center"
                         >
-                            <Avatar size="2xl" src={`https://localhost:5000/${user.avatar}`} />
+                            <Avatar size="2xl" src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`} />
                         </Box>
                         <Box
                             width={{ base: '100%', sm: '70%' }}
@@ -549,14 +582,14 @@ const Infos = () => {
                                         <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
                                             Update Basic Information
                                         </Heading>
-                                        <Box as="form" onSubmit={handleSubmit}>
+                                        <Box as="form" onSubmit={handleSubmit} >
 
                                             <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
                                                 onDragOver={allowDrop}>
                                                 <Avatar
                                                     size="2xl"
                                                     name=""
-                                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
+                                                    src={selectedImage || `${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`}
                                                     onClick={handleImageClick}
                                                     cursor="pointer"
                                                     draggable="true"
@@ -591,12 +624,16 @@ const Infos = () => {
                                                 <InputLeftAddon w="120px">Gender:</InputLeftAddon>
                                                 <RadioGroup
                                                     name="gender"
-                                                    value={editedUser.gender}
-                                                    onChange={handleGenderChange}
+                                                    value={values.gender}
+                                                    onChange={handleChange}
                                                     pt={2}
                                                 >
-                                                    <Radio value="Male" pr={5} pl={5}>Male</Radio>
-                                                    <Radio value="Female" pr={2}>Female</Radio>
+                                                    <Radio value={true}
+                                                        isChecked={values.gender === true}
+                                                        onChange={() => setFieldValue("gender", true)} pr={5} pl={5}>Male</Radio>
+                                                    <Radio value={false}
+                                                        isChecked={values.gender === false}
+                                                        onChange={() => setFieldValue("gender", false)} pr={2}>Female</Radio>
                                                 </RadioGroup>
                                             </InputGroup>
                                             {touched.gender && errors.gender && (
@@ -626,7 +663,7 @@ const Infos = () => {
                                                 <Input
                                                     type="date"
                                                     name="dateOfBirth"
-                                                    value={formattedDate}
+                                                    value={editedUser.dateOfBirth}
                                                     onChange={(e) => {
                                                         handleChange(e);
                                                         handleInputChange(e);
@@ -657,13 +694,19 @@ const Infos = () => {
                                                 <div style={{ color: 'red' }}>{errors.address}</div>
                                             )}
 
+
+                                            <Button colorScheme="blue" type="submit" >
+                                                Save
+                                            </Button>
+
+                                            <Button colorScheme="gray" ml={3} onClick={handleCancel}>
+                                                Cancel
+                                            </Button>
+
                                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                <Button colorScheme="blue" type="submit">
-                                                    Save
-                                                </Button>
-                                                <Button colorScheme="gray" ml={3} onClick={handleCancel}>
-                                                    Cancel
-                                                </Button>
+
+
+
                                             </div>
                                         </Box>
                                     </Box>
@@ -676,48 +719,7 @@ const Infos = () => {
                             {isEditing ?
                                 (
                                     < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
-                                        <Flex alignItems="center" justifyContent="flex-end" mb={2}>
-                                            <FaEdit size={20} cursor="pointer" onClick={handleEditClick} />
-                                        </Flex>
-                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                                            TRANSACTION HISTORY
-                                        </Heading>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Full Name:
-                                            </Text>
-                                            <Text flex="3">{user.fullName}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Gender:
-                                            </Text>
-                                            <Text flex="3">{gender}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Email:
-                                            </Text>
-                                            <Text flex="3">{user.email}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Phone:
-                                            </Text>
-                                            <Text flex="3">{user.phone}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                BirthDay:
-                                            </Text>
-                                            <Text flex="3">{fmDateInfo}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Address:
-                                            </Text>
-                                            <Text flex="3">{user.address}</Text>
-                                        </Flex>
+
                                     </Box>
 
                                 ) : (
@@ -726,123 +728,7 @@ const Infos = () => {
                                         <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
                                             Update TRANSACTION HISTORY
                                         </Heading>
-                                        <Box as="form" onSubmit={handleSubmit}>
 
-                                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
-                                                onDragOver={allowDrop}>
-                                                <Avatar
-                                                    size="2xl"
-                                                    name=""
-                                                    src={selectedImage || `https://localhost:5000/${user.avatar}`}
-                                                    onClick={handleImageClick}
-                                                    cursor="pointer"
-                                                    draggable="true"
-                                                />
-                                                <input
-                                                    id="imageInput"
-                                                    type="file"
-                                                    style={{ display: 'none' }}
-                                                    onChange={handleImageChange}
-                                                />
-                                            </InputGroup>
-
-
-                                            <InputGroup mb={3} isInvalid={touched.fullName && errors.fullName}>
-                                                <InputLeftAddon w="120px">Full Name:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="fullName"
-                                                    value={editedUser.fullName}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.fullName && errors.fullName && (
-                                                <div style={{ color: 'red' }}>{errors.fullName}</div>
-                                            )}
-
-                                            <InputGroup mb={3} isInvalid={touched.gender && errors.gender}>
-                                                <InputLeftAddon w="120px">Gender:</InputLeftAddon>
-                                                <RadioGroup
-                                                    name="gender"
-                                                    value={editedUser.gender}
-                                                    onChange={handleGenderChange}
-                                                    pt={2}
-                                                >
-                                                    <Radio value="Male" pr={5} pl={5}>Male</Radio>
-                                                    <Radio value="Female" pr={2}>Female</Radio>
-                                                </RadioGroup>
-                                            </InputGroup>
-                                            {touched.gender && errors.gender && (
-                                                <div style={{ color: 'red' }}>{errors.gender}</div>
-                                            )}
-
-                                            <InputGroup mb={3} isInvalid={touched.phone && errors.phone}>
-                                                <InputLeftAddon w="120px">Phone:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="phone"
-                                                    value={editedUser.phone}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.phone && errors.phone && (
-                                                <div style={{ color: 'red' }}>{errors.phone}</div>
-                                            )}
-
-
-                                            <InputGroup mb={3} isInvalid={touched.dateOfBirth && errors.dateOfBirth}>
-                                                <InputLeftAddon w="120px">BirthDay:</InputLeftAddon>
-                                                <Input
-                                                    type="date"
-                                                    name="dateOfBirth"
-                                                    value={formattedDate}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-
-                                                />
-                                            </InputGroup>
-                                            {touched.dateOfBirth && errors.dateOfBirth && (
-                                                <div style={{ color: 'red' }}>{errors.dateOfBirth}</div>
-                                            )}
-
-
-                                            <InputGroup mb={3} isInvalid={touched.address && errors.address}>
-                                                <InputLeftAddon w="120px">Address:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="address"
-                                                    value={editedUser.address}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.address && errors.address && (
-                                                <div style={{ color: 'red' }}>{errors.address}</div>
-                                            )}
-
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                <Button colorScheme="blue" type="submit">
-                                                    Save
-                                                </Button>
-                                                <Button colorScheme="gray" ml={3} onClick={handleCancel}>
-                                                    Cancel
-                                                </Button>
-                                            </div>
-                                        </Box>
                                     </Box>
 
                                 )}
