@@ -20,15 +20,9 @@ const CategoryMenuItems = ({ genreId }) => {
         navigate('/search', { state: { categoryId: categoryId } });
     };
 
-    return (
-        <>
-            {
-                categories && categories.map((category) => {
-                    return category.status && <MenuItem key={category.id} onClick={() => handleClick(category.id)} >{category.name}</MenuItem>
-                })
-            }
-        </>
-    )
+    return
+        <MenuItem key={categories.id} onClick={() => handleClick(categories.id)} >{categories.name}</MenuItem>
+
 }
 
 export default CategoryMenuItems;

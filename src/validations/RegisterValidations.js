@@ -1,4 +1,6 @@
 import * as yup from 'yup';
+import { differenceInYears } from 'date-fns';
+const today = new Date();
 
 const RegisterValidations = yup.object().shape({
     fullName: yup.string().required("Full name is required").min(1).max(30),
@@ -23,23 +25,11 @@ const RegisterValidations = yup.object().shape({
 
     dateOfBirth: yup
         .date()
-        .required("Date of birth is required")
-        .test(
-            "is-age-greater-than-14",
-            "You must be at least 14 years old",
-            (value) => {
-                const today = new Date();
-                const birthDate = new Date(value);
-                const age = today.getFullYear() - birthDate.getFullYear();
-                const monthDiff = today.getMonth() - birthDate.getMonth();
-
-                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-
-                return age >= 14;
-            }
-        ),
+        .max(today, 'Date of birth cannot be in the future')
+        .required('Date of birth is required')
+        .test('is-at-least-14-years-old', 'You must be at least 14 years old', (value) => {
+            return differenceInYears(today, value) >= 14;
+        }),
 
 
 });

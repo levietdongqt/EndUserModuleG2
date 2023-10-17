@@ -8,6 +8,17 @@ import { getAllCategories } from '../services/CategoryServices';
 import { useSearchContext } from '../contexts/SearchContext';
 import {getAllTemplate, getTemplateBestller} from "../services/TemplateServices";
 import {getAllCollection } from '../services/CollectionServices';
+import Slider from "react-slick";
+
+const settings = {
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  arrows: true,
+
+};
 const Home = () => {
 
   const navigate = useNavigate();
@@ -47,24 +58,40 @@ const Home = () => {
             <Box mt={7}>
               <SimpleGrid columns={[3, null, 4]} spacing='35px'>
                 {
-                    best && best.map((bested) => {
-                      if(bested.status === true){
-                        return (
-                            <Box key={bested.id}>
-                              <Box>
-                                {
-                                  bested.templateImages.map((item) =>{
-                                    return <Image w={260} h={260} maxW={'100%'} src={item.imageUrl} key={item.id} />
+                    best && best.map((bested) =>
+                        (
+                         <Box key={bested.id}>
+                          <Slider {...settings} style={{ width: '250px', margin: '0 auto',height: '250px' }}>
+                            {bested.templateImages && bested.templateImages.map((item,index) => (
+                                <div key={index} style={{height: '100%', width: '100%'}}>
+                                  <Image
+                                      key={item && item.id ? item.id : ''}
+                                      style={{ height: '250px', width: '250px' }}
+                                      objectFit='cover'
+                                      maxW={'100%'}
+                                      cursor='pointer'
+                                      src={item && item.imageUrl ? `${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.imageUrl}` : ''}
+                                      onClick={() =>
+                                          navigate(`/template/${bested.name}`, {
+                                            state: {productId: bested.id},
+                                          })
+                                      }
+                                  />
+                                </div>
+                            ))}
+                          </Slider>
+                          <Box>
+                            <Box mt={3}>
+                              <Link color={'#284b9b'} onClick={() =>
+                                  navigate(`/template/${bested.name}`, {
+                                    state: {productId: bested.id},
                                   })
-                                }
-                                <Box mt={3}>
-                                  <Link color={'#284b9b'} > {bested.name} ></Link>
-                                </Box>
-                              </Box>
+                              } > {bested.name} ></Link>
                             </Box>
+                          </Box>
+                        </Box>
                         )
-                      }
-                    })
+                    )
                 }
               </SimpleGrid>
             </Box>
@@ -82,9 +109,17 @@ const Home = () => {
                       if (collection) {
                         return (
                             <Box key={collection.name}>
-                              <Image w={570} h={270} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${collection.imageUrl}`} />
+                              <Image w={570} h={270} maxW={'100%'} cursor={'pointer'} onClick={() =>
+                                  navigate(`/search/${collection.name}`, {
+                                    state: {collectionsId: collection.id},
+                                  })
+                              } src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${collection.imageUrl}`} />
                               <Box mt={3}>
-                                <Link color={'#284b9b'} > {collection.name} ></Link>
+                                <Link color={'#284b9b'} onClick={() =>
+                                    navigate(`/search/${collection.name}`, {
+                                      state: {collectionsId: collection.id},
+                                    })
+                                } > {collection.name} ></Link>
                               </Box>
                             </Box>
                         );

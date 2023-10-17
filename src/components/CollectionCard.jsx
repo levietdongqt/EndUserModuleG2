@@ -4,26 +4,33 @@ import { useCookies } from 'react-cookie';
 import { Box, Image, Text, Icon, Button, useDisclosure } from '@chakra-ui/react';
 import { useUserContext } from '../contexts/UserContext';
 import { getCollectionById } from '../services/CollectionServices';
-
+import {getCategoryById} from "../services/CategoryServices";
 
 const CollectionCard = ({ collectionId}) => {
   const [cookies, setCookies, removeCookie] = useCookies(['cart']);
   const { currentUser } = useUserContext();
   const navigate = useNavigate();
   const [collections, setcollection] = useState([]);
+  const [category, setcategory] = useState([]);
   const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     if (collectionId) {
         getCollectionById(collectionId).then((result) => {
         setcollection(result.result);
+        let CategoryById = result.result.categoryId;
+        getCategoryById(CategoryById).then((result) => {
+            setcategory(result.result);
         })
+        })
+
+
     }
   }, [collectionId, amount]);
 
 
     const handleClick = (id) => {
-        navigate(`/search/${collections.name}/${collections.id}`, { state: { collectionsId: id } });
+        navigate(`/categories/${category.name}/collection/${collections.name}/`, { state: { collectionsId: id } });
     };
   return (
       <>

@@ -9,10 +9,15 @@ export const getTemplateById = async (id) => {
     const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/Template/${id}`);
     return data;
 };
-export const getTemplateBestller = async (id) => {
+export const getTemplateBestller = async () => {
     const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/Template/bestSeller`);
     return data;
 };
+export const getTemplateByName = async (name,query) => {
+    const encodedName = encodeURIComponent(name);
+    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/Template/GetTemplateByName?name=${encodedName}&${query}`);
+    return data;
+}
 
 export const addTemplate = async (name, status) => {
     const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/Template`, {
