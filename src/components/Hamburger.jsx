@@ -4,7 +4,6 @@ import { Menu, MenuButton, MenuList, MenuItem, IconButton, Box, MenuGroup, MenuD
 import { Edit, ExitToApp, Favorite, Inventory, MapsHomeWork, Menu as MenuIcon, Person, Report, ShoppingBag, ShoppingCart } from '@mui/icons-material';
 
 import { getAllTemplate } from '../services/TemplateServices';
-import useGetUserRole from '../hooks/useGetUserRole';
 import { useUserContext } from '../contexts/UserContext';
 import CategoryMenuItems from './CategoryMenuItems';
 
@@ -12,7 +11,6 @@ const Hamburger = ({ base, sm, md }) => {
 
     const navigate = useNavigate();
     const { currentUser } = useUserContext();
-    const [admin] = useGetUserRole(currentUser);
     const [templates, setTemplate] = useState([]);
 
     useEffect(() => {
@@ -42,7 +40,7 @@ const Hamburger = ({ base, sm, md }) => {
                     zIndex={200}
                 >
                     {
-                        !admin && currentUser &&
+                        currentUser &&
                         <MenuGroup title='Account'>
                             <MenuItem onClick={() => navigate('/infos')} ><Person sx={{ marginRight: 2 }} /> My Informations</MenuItem>
                             <MenuItem onClick={() => navigate('/orders')} ><ShoppingBag sx={{ marginRight: 2 }} /> Orders</MenuItem>

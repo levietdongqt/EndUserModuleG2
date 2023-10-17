@@ -1,98 +1,136 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, SimpleGrid, Button, Text, Icon, Heading,Container,Image } from '@chakra-ui/react';
-import CollectionCard from '../components/CollectionCard';
-import {getCategoryById}  from "../services/CategoryServices";
+import { useLocation, useNavigate,useParams  } from 'react-router-dom';
+import {Box, SimpleGrid, Button, Select, Text, Icon, Heading, Container} from '@chakra-ui/react';
+import queryString from 'query-string';
+import TemplateCard from '../components/templateCard';
+import FilterMenu from '../components/FilterMenu';
+import {getTemplateByCollection } from '../services/CollectionServices';
+import {getTemplateByName } from '../services/TemplateServices'
 import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
-
-const Collections = () => {
+import Pagination  from '../components/Pagination';
+const Search = () => {
 
   const navigate = useNavigate();
   const { state } = useLocation();
   const { search, canSearch } = useSearchContext();
-  const [products, setProducts] = useState([]);
-
+  const [template, setTemplates] = useState([]);
+  const [sortBy, setSortBy] = useState("recommended");
+  const [total, setTotal] = useState(0);
+  const [show, setShow] = useState([]);
+  const { name } = useParams();
+  const [pagination, setPagination] = useState({
+    result: {
+      page: 1,
+      limit: 20,
+      totalRows: 1,
+    },
+  });
+  const [filters , setFilters] = useState({
+    limit: 20,
+    page: 1,
+  })
   useEffect(() => {
     if (state !== null) {
-      getCategoryById(state.categoryId)
+      getTemplateByCollection(state.collectionsId)
         .then((result) => {
-          setProducts(result.result);
+          setShow(result.result);
+          setTemplates(result.result.templateNames);
+          setTotal(result.result.templateNames.length);
         });
+      setSortBy("recommended");
     }
-  }, [state, search, canSearch]);
+  }, [state, search, canSearch,filters]);
+
+  const handlePageChange = (newPage) => {
+    setFilters({
+      ...filters,
+      page: newPage,
+    });
+  }
+
+  const handleChange = (e) => {
+    setSortBy(e.target.value);
+    if (e.target.value === "lowest") {
+      sortByPriceAsc();
+    } else if (e.target.value === "highest") {
+      sortByPriceDesc();
+    }
+  };
+
+  const sortByPriceAsc = () => {
+    setTemplates(template.sort((a, b) => (a.pricePlusPerOne - b.pricePlusPerOne)));
+  };
+
+  const sortByPriceDesc = () => {
+    setTemplates(template.sort((a, b) => (b.pricePlusPerOne - a.pricePlusPerOne)));
+  };
 
   return (
       <Container maxW='1140px'>
-        <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} backgroundColor='whitesmoke' >
-          <Box textAlign={'center'} mb={3}>
-            <Heading as='h2' size='3xl' >{products.length > 0 ? products.name : ''}</Heading>
-          </Box>
-          <Box key={products.id} mt={10}>
-            <Image  maxW={'100%'} height={350} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${products.imageUrl}`}/>
+        <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} >
+        <Box textAlign={'center'} mb={3}>
+          <Heading as='h2' size='3xl'>
+            {name}
+          </Heading>
           </Box>
           <Box
-              width='100%'
-              height='auto'
+              display="flex"
+              justifyContent="space-between"
+              alignItems="flex-start"
               py={5}
-              display={'flex'}
-              justifyContent={'right'}
           >
+            <FilterMenu
+                columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
+                setProducts={template}
+                setSortBy={setSortBy}
+            />
+            <Box display={'flex'} m={3} alignItems={'center'}>
+              <Text fontSize={16} fontWeight={500} mb={0} float={'right'}>&nbsp;{total} Results</Text>
+              <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px'>
+                <option value='recommended'>Best Sellers</option>
+                <option value='lowest'>Lowest Price</option>
+                <option value='highest'>Highest Price</option>
+              </Select>
+            </Box>
           </Box>
-          <Heading textAlign={'center'} mb={10} mt={5}>
-            Cover options to start your page-turner
-          </Heading>
-          <Box display='flex' flexDirection={{ base: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row' }}>
-            <div style={{ display: 'inline-block', flex: '3' }}>
-              <SimpleGrid columns={[1, 1, 1, 3]} spacing='40px' gap={10}>
-                {
-                    products.collections && products.collections.map((item) => {
-                    return (
-                        <div key={item.id}>
-                          <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '16px', alignItems: 'center' }}>
-                            <CollectionCard collectionId={item.id} />
-                          </div>
-                        </div>
-                    )
-                  })
-                }
-                {products.length === 0 && (
-                    <Box display='flex' justifyContent='start'>
-                      <Box
-                          display='flex'
-                          justifyContent='center'
-                          alignItems='center'
-                          flexDirection='column'
-                          mt={10}
-                          p={3}
-                      >
-                        <Icon color='#314E89' fontSize={100} as={SearchOff} />
-                        <Heading textAlign='center' fontSize={30} mt={8}>
-                          Sorry, we couldn't find what you were looking for.
-                        </Heading>
-                        <Text textAlign='center' fontSize={24} mt={2} fontWeight={300}>
-                          But never give up! Check out our best-selling products and find what's right for you!
-                        </Text>
-                        <Button
-                            variant='solid'
-                            fontSize={20}
-                            px={10}
-                            mt={10}
-                            colorScheme='facebook'
-                            onClick={() => navigate('/')}
-                        >
-                          Start shopping
-                        </Button>
-                      </Box>
-                    </Box>
-                )}
-              </SimpleGrid>
-            </div>
-          </Box>
-
+          <SimpleGrid minChildWidth={280} gap={3} spacingX={5} >
+            {
+                template && template.map((items, index) =>{
+                  return <TemplateCard key={index} templateId={items.id} />
+                })
+            }
+            {
+                template.length === 0 &&
+                <Box display='flex' justifyContent='center'>
+                  <Box
+                      display='flex'
+                      justifyContent='center'
+                      alignItems='center'
+                      flexDirection='column'
+                      mt={10}
+                      p={3}
+                  >
+                    <Icon color='#314E89' fontSize={100} as={SearchOff} />
+                    <Heading textAlign='center' fontSize={30} mt={8}  >Sorry, we couldn't find what you are looking for.</Heading>
+                    <Text textAlign='center' fontSize={24} mt={2} fontWeight={300} >But don’t give up! Check out our bestsellers and find something for you!</Text>
+                    <Button
+                        variant='solid'
+                        fontSize={20}
+                        px={10} mt={10}
+                        colorScheme='facebook'
+                        onClick={() => navigate('/')}>
+                      Start Shopping
+                    </Button>
+                  </Box>
+                </Box>
+            }
+          </SimpleGrid>
+          <Pagination
+          pagination={pagination} onPageChange={handlePageChange}/>
         </Box>
       </Container>
   )
 }
 
-export default Collections;
+export default Search;

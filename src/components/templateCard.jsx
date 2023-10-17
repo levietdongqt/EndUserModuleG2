@@ -129,7 +129,7 @@ const TemplateCard = ({ templateId, isDelivered}) => {
                         </Text>
                     </Box>
                 </Box>
-            <ReviewModal isOpen={isOpen} onClose={onClose} />
+            <ReviewModal isOpen={isOpen} onClose={onClose} productId={template.id} />
         </>
     );
 }

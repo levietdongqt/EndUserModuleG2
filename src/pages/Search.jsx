@@ -17,8 +17,8 @@ const Search = () => {
   const [template, setTemplates] = useState([]);
   const [sortBy, setSortBy] = useState("recommended");
   const [total, setTotal] = useState(0);
-  const [show, setShow] = useState([]);
   const { name } = useParams();
+  let {paramsString} = useState("");
   const [pagination, setPagination] = useState({
     result: {
       page: 1,
@@ -31,18 +31,8 @@ const Search = () => {
     page: 1,
   })
   useEffect(() => {
-    if (state !== null) {
-      getTemplateByCollection(state.collectionsId)
-        .then((result) => {
-          setShow(result.result);
-          setTemplates(result.result.templateNames);
-          setTotal(result.result.templateNames.length);
-        });
-      setSortBy("recommended");
-    }
-
     if (search !== "" && search !== " " && search !== null && search !== undefined && canSearch) {
-      let paramsString = queryString.stringify(filters);
+      paramsString = queryString.stringify(filters);
       if(search !== filters.name){
         console.log("sdsd",filters.name);
         setFilters({
@@ -62,7 +52,7 @@ const Search = () => {
         });
       setSortBy("recommended");
     }
-  }, [state, search, canSearch,filters]);
+  }, [paramsString,state, search, canSearch,filters]);
 
   const handlePageChange = (newPage) => {
     setFilters({

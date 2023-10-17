@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getCommentByAuthorId } from '../services/CommentServices';
-import { getRatingByOwnerId } from '../services/RatingServices';
+import { getUserById } from '../services/UserServices';
 
 const useGetReviewId = (userId, productId) => {
 
@@ -8,16 +7,16 @@ const useGetReviewId = (userId, productId) => {
     const [commentId, setCommentId] = useState("");
 
     useEffect(() => {
-        getRatingByOwnerId(userId)
+        getUserById(userId)
             .then((result) => {
-                result.ratings.forEach((rating) => {
-                    if (rating.for === productId) { setRatingId(rating._id); }
+                result.result.reviews.forEach((rating) => {
+                    if (rating.templateId === productId) { setRatingId(rating.id); }
                 });
             });
-        getCommentByAuthorId(userId)
+        getUserById(userId)
             .then((result) => {
-                result.comment.forEach((comment) => {
-                    if (comment.for === productId) { setCommentId(comment._id); }
+                result.result.reviews.forEach((comment) => {
+                    if (comment.templateId === productId) { setCommentId(comment.id); }
                 });
             });
 

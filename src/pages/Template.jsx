@@ -77,6 +77,7 @@
           setTemplate(result.result);
           setSizes(result.result.sizesDTO);
           setDescription(result.result.descriptionTemplates);
+          setComments(result.result.reviews);
           //star
           var star = 0;
           result.result.reviews.forEach((r)=>{
@@ -85,11 +86,6 @@
 
           setRatings(star / result.result.reviews.length || 0);
           setRatingCount(result.result.reviews.length);
-        });
-
-      getCommentByProductId(location.state.Id)
-        .then((result) => {
-          setComments(result.comment);
         });
 
       /*cart.forEach((item) => {
@@ -313,7 +309,7 @@
             </Box>
             {
               comments.map((comment) => {
-                return <Comment key={comment._id} authorId={comment.author} commentText={comment.comment} createdAt={comment.createdAt} />
+                return <Comment key={comment.id} authorId={comment.userId} commentText={comment.content} createdAt={comment.reviewDate} />
               })
             }
           </Box>
