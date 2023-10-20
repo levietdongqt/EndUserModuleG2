@@ -9,13 +9,14 @@ import Confirm from './pages/Login/Confirm'
 import PasswordRecovery from './pages/Login/PasswordRecovery';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
-import Favorites from './pages/Favorites';
+import MyImages from './pages/MyImages';
 import Infos from './pages/Info/Infos';
 import Template from './pages/Template';
 import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
 import Payment from './pages/Payment';
+import Upload from './pages/Upload';
 import { useUserContext } from './contexts/UserContext';
 import Collections from './pages/Collections';
 import Categories from "./pages/Categories";
@@ -39,7 +40,8 @@ const App = () => {
         />
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
-        <Route path='/favorites' element={<Favorites />} />
+        <Route path='/upload' element={<Upload />} />
+        <Route path='/myimages' element={<MyImages />} />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />

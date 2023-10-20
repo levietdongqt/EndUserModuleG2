@@ -55,7 +55,7 @@ const Home = () => {
               <Heading as='h3' size='lg' display={'inline'}>Featured Products</Heading>
               <Link float="right" textColor={'facebook.500'} display={'inline-block'} lineHeight={'36px'} textDecoration={'auto'}>Shop all product</Link>
             </Box>
-            <Box mt={7}>
+            <Box  mt={7}>
               <SimpleGrid columns={[3, null, 4]} spacing='35px'>
                 {
                     best && best.map((bested) =>
