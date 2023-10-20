@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, FormControl, FormLabel, InputGroup, Input, Text, InputRightElement, Button, Checkbox, useToast } from '@chakra-ui/react';
+import {
+  Box, FormControl, FormLabel, InputGroup, Input, Text, InputRightElement, Button, Checkbox, useToast,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton
+} from '@chakra-ui/react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 //import GoogleIcon from '@mui/icons-material/Google';
 import { useFormik } from 'formik';
-
+import { sendmail } from '../../services/UserServices';
 import { useUserContext } from '../../contexts/UserContext';
 import LoginValidations from '../../validations/LoginValidations';
 import { Login as LogIn, OAuth2Request } from '../../services/AuthServices';
@@ -21,6 +24,10 @@ const Login = () => {
   const [tokenCookie, setTokenCookie, removeTokenCookie] = useCookies(['access_token']);
   const navigate = useNavigate();
   const toast = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
+
+  //#region HANDLE LOGIN
   const handldeResponse = (result, remember) => {
     if (result.data.status === 200) {
       console.log(result.data)
@@ -51,9 +58,12 @@ const Login = () => {
         isClosable: true
       });
     }
-
-
   }
+  //#endregion
+
+
+
+  //#region FORMIK CHEKC ERROR AND SUBMIT LOGIN
   const { values, handleSubmit, handleChange, isValid, resetForm } = useFormik({
     initialValues: {
       email: '',
@@ -67,14 +77,14 @@ const Login = () => {
     },
     validationSchema: LoginValidations
   });
+  //#endregion
 
+
+  //#region LOGIN WITH GOOGLE
   const login = useGoogleLogin({
     onSuccess: (response) => {
       OAuth2Request(response.access_token).then((result) => {
-        console.log(result)
         handldeResponse(result, true);
-        console.log("Login thanh cong");
-
         testRequest().then((result) => {
           console.log(result)
         })
@@ -82,6 +92,53 @@ const Login = () => {
     },
     onError: (error) => console.log('Login Failed:', error)
   });
+  //#endregion
+
+  //#region MODAL PASSWORD RECOVERY
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmitpr = async (event) => {
+    event.preventDefault();
+    let errorMessage = '';
+
+    try {
+      const senmail = await sendmail(email);
+
+      if (senmail) {
+        // Gửi toast thông báo thành công
+        closeModal();
+        toast({
+          title: "Please check your email and reset your password",
+          status: "success",
+          duration: 3000, // Độ lâu hiển thị thông báo (miligiây)
+          isClosable: true,
+        });
+
+      }
+    } catch (error) {
+
+      toast({
+        title: "Error",
+        description: "This email address does not exist in the system. Please check again",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+
+
+  };
+
+
+
+
+
   return (
     <Box
       display='flex'
@@ -120,13 +177,52 @@ const Login = () => {
           </InputGroup>
         </FormControl>
         <Checkbox value={remember} onChange={() => setRemember(!remember)} mt={5} >Remember me</Checkbox>
+
         <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} onClick={handleSubmit} >Login</Button>
         <br />
         <Text my={3} width='100%' textAlign='center' >or</Text>
         <Button width='100%' variant='outline' colorScheme='facebook' onClick={() => login()} >Google</Button>
         <Text my={3} width='100%' textAlign='center' >or</Text>
+        <Button width='100%' variant='outline' colorScheme='facebook' onClick={openModal} >Forgot password ?</Button>
+        <Text my={3} width='100%' textAlign='center' >or</Text>
         <Button width='100%' variant='outline' colorScheme='facebook' onClick={() => navigate('/register')} >Register</Button>
       </Box>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} size="sm">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader fontSize="2xl" fontWeight="bold" p={4}>
+            Forgot Password ?
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <form onSubmit={handleSubmitpr}>
+              <div>
+                <FormLabel>Email</FormLabel>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  size="lg"
+                />
+              </div>
+              <Button
+                type="submit"
+                colorScheme="blue"
+                size="lg"
+                width="100%"
+                mt={4}
+              >
+                Submit
+              </Button>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+
+
     </Box>
   )
 }

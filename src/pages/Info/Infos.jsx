@@ -157,10 +157,6 @@ const Infos = () => {
             return;
         }
 
-
-
-
-
         const formData = new FormData();
         // Thêm các trường dữ liệu vào FormData
         formData.append("id", currentUser.id);
@@ -248,7 +244,7 @@ const Infos = () => {
 
         const handleSave = async () => {
             if (newPassword !== confirmPassword) {
-                setError('Mật khẩu xác nhận không khớp.');
+                setError('Confirmation password does not match.');
                 return;
             }
             user.oldPassword = oldPassword;

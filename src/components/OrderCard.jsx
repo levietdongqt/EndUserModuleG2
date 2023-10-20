@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text, Button, Divider, SimpleGrid, useToast, useDisclosure } from '@chakra-ui/react';
 import { Cancel, Error } from '@mui/icons-material';
 import moment from 'moment';
-
 import { getOrderById, updateOrderStatus } from '../services/OrderServices';
 import CollectionCard from './CollectionCard';
 import ReportModal from './ReportModal';
@@ -18,61 +17,78 @@ const OrderCard = ({ orderId }) => {
     useEffect(() => {
         getOrderById(orderId)
             .then((result) => {
-                setProducts(result.order.products);
-                setDate(result.order.orderDate);
-                if (result.order.prepare) {
+                setDate(result.result.createDate);
+                console.log(date)
+                if (result.result.status == "Order Paid") {
                     setOrderStatus("Order is preparing.");
-                } else if (result.order.onWay) {
+                } else if (result.result.status == "ToShip") {
                     setOrderStatus("Order is on way.");
-                } else if (result.order.delivered) {
+                } else if (result.result.status == "Received") {
                     setOrderStatus("Order has been delivered.");
-                } else {
+                } else if (result.result.status == "Order Placed") {
+                    setOrderStatus("Order placed.");
+                } else if (result.result.status == "Canceled") {
                     setOrderStatus("Order canceled.");
                 }
             });
-    }, [orderId]);
+    }, [orderStatus]);
 
     const onClickCancel = () => {
-        if (orderStatus === "Order is preparing.") {
-            updateOrderStatus(orderId, false, false, false, false, true)
-                .then((result) => {
-                    if (result.status) {
-                        toast({
-                            title: 'Error!',
-                            description: 'Somethings went wrong.',
-                            status: 'error',
-                            duration: 2000,
-                            isClosable: true
-                        });
-                    } else {
-                        setOrderStatus("Order canceled.");
-                        toast({
-                            title: 'Succesful',
-                            description: 'Your order has been successfully canceled.',
-                            status: 'success',
-                            duration: 2000,
-                            isClosable: true
-                        });
-                    }
-                });
-        } else if (orderStatus === "Order canceled.") {
+        if (orderStatus === "Order placed.") {
+            const purDTO = {
+                id: orderId,
+                status: "Canceled"
+            };
+
+            // Hiển thị toast xác nhận
             toast({
-                title: 'Error!',
-                description: 'Order has already been canceled.',
-                status: 'error',
-                duration: 2000,
-                isClosable: true
-            });
-        } else {
-            toast({
-                title: 'Sorry, your order is already on its way.',
-                description: 'You can only cancel the order during preparation.',
-                status: 'error',
-                duration: 2000,
-                isClosable: true
+                title: 'Cancel Order',
+                description: 'Are you sure you want to cancel this order?',
+                status: 'info',
+                position: 'top',
+                duration: null,
+                isClosable: false,
+                render: ({ onClose }) => (
+                    <>
+                        <Button
+                            onClick={() => {
+                                // Xử lý hủy đơn hàng ở đây
+                                updateOrderStatus(purDTO)
+                                    .then((result) => {
+                                        onClose('ok');
+                                        if (!result) {
+                                            toast({
+                                                title: 'Failed to cancel the order.',
+                                                description: 'Please try again later.',
+                                                status: 'error',
+                                            });
+                                        } else {
+                                            setOrderStatus("Order canceled.");
+                                            toast({
+                                                title: 'Order Canceled',
+                                                description: 'Your order has been successfully canceled.',
+                                                status: 'success',
+                                            });
+                                        }
+                                    });
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            onClick={() => {
+                                onClose('cancel');
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                    </>
+                ),
             });
         }
-    };
+    }
+
 
     return (
         <>
@@ -86,14 +102,14 @@ const OrderCard = ({ orderId }) => {
                             ?
                             <Button onClick={onOpen} my={2} colorScheme='facebook' >Report Order <Error sx={{ ml: 2 }} /></Button>
                             :
-                            orderStatus !== "Order canceled." && <Button onClick={onClickCancel} my={2} colorScheme='facebook' >Cancel Order<Cancel sx={{ ml: 2 }} /></Button>
+                            orderStatus == "Order placed." && <Button onClick={onClickCancel} my={2} colorScheme='facebook' >Cancel Order<Cancel sx={{ ml: 2 }} /></Button>
                     }
                 </Box>
                 <Divider />
                 <SimpleGrid my={3} columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={3} >
                     {
                         products.map((product, index) => {
-                            return product !==null && <CollectionCard key={index} collectionId={product} isDelivered={orderStatus === "Order has been delivered."} />
+                            return product !== null && <CollectionCard key={index} collectionId={product} isDelivered={orderStatus === "Order has been delivered."} />
                         })
                     }
                 </SimpleGrid>

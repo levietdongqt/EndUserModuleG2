@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Text, Button, Icon, Heading } from '@chakra-ui/react';
+import { Box, Text, Button, Icon, Heading, createLocalStorageManager } from '@chakra-ui/react';
 import { ShoppingCart } from '@mui/icons-material';
 
 import { useUserContext } from '../contexts/UserContext';
-import { getOrdersByUserId } from '../services/OrderServices';
+import { getOrderById, getOrdersByStatus, updateOrderStatus } from '../services/OrderServices';
 import OrderCard from '../components/OrderCard';
 
 
@@ -14,21 +14,47 @@ const Orders = () => {
   const { currentUser } = useUserContext();
   const [currentOrders, setCurrentOrders] = useState("active");
   const [orders, setOrders] = useState([]);
-  const [isEmpty, setIsEmpty] = useState(true);
+  const [puschaseActives, setPurchaseActives] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
+
+
+
+  // useEffect(() => {
+  //   getOrdersByStatus(currentUser)
+  //     .then((result) => {
+  //       var orderArray = result.orders;
+  //       setOrders(orderArray.sort((a, b) => (Number(a.orderDate) - Number(b.orderDate))).reverse());
+
+  //       result.orders.forEach((order) => {
+  //         if (currentOrders === "active" && order.status) { setIsEmpty(false) };
+  //       });
+
+  //     });
+  //   if (currentOrders === "all") {
+  //     setIsEmpty(false);
+  //   }
+  // }, [currentUser, currentOrders, setOrders]);
 
   useEffect(() => {
-    getOrdersByUserId(currentUser)
-      .then((result) => {
-        var orderArray=result.orders;
-        setOrders(orderArray.sort((a, b) => (Number(a.orderDate) - Number(b.orderDate))).reverse());
-        result.orders.forEach((order) => {
-          if (currentOrders === "active" && order.status){ setIsEmpty(false)};
-        });
-      });
-    if (currentOrders === "all") {
-      setIsEmpty(false);
-    }      
-  }, [currentUser, currentOrders, setOrders]);
+    const activePurchase = async () => {
+      try {
+        const statuses = ['Order Placed', 'Order Paid', 'ToShip', 'Received', 'Canceled'];
+        const response = await getOrdersByStatus(currentUser.id, statuses);
+        console.log(response)
+        var purchaseArray = response.result;
+        console.log(purchaseArray)
+        setPurchaseActives(purchaseArray.sort((a, b) => (Number(a.createDate) - Number(b.createDate))).reverse());
+
+      } catch (error) {
+        console.error('error : ', error);
+      }
+
+    }
+    activePurchase();
+
+  }, []);
+
+
 
   return (
     <Box width='100%' my={10}>
@@ -54,11 +80,12 @@ const Orders = () => {
       </Box>
       <Box py={3} px={{ base: 3, md: 5, lg: 10 }} >
         {
-          orders.length>0 ? orders.map((order, index) => {
+          puschaseActives.length > 0 ? puschaseActives.map((pur) => {
             if (currentOrders === "active") {
-              return order.status && <OrderCard key={index} orderId={order._id} />
+              //showtable ở đây
+              return pur.status && <OrderCard key={pur.id} orderId={pur.id} />
             } else {
-              return <OrderCard key={index} orderId={order._id} />
+              return <OrderCard key={pur.id} orderId={pur.id} />
             }
           })
             :
