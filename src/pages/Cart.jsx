@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Heading, Button, SimpleGrid, useToast } from '@chakra-ui/react';
+import { Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Input, Image } from '@chakra-ui/react';
 import { ShoppingCart } from '@mui/icons-material';
-
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
-import ProductCart from '../components/ProductCart';
-import { getCartInfo } from '../services/CartService';
+import { getCartInfo, deleteAllCart } from '../services/CartService';
 import CollectionCard from '../components/CollectionCard';
-
+import ShowAlbum from '../components/ShowAlbum';
 
 const Cart = () => {
 
@@ -22,23 +20,29 @@ const Cart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
-  
+  const [updatedQuantities, setUpdatedQuantities] = useState(cart.map(item => item.quantity));
+  const handleQuantityChange = (event, index) => {
+    const newQuantities = [...updatedQuantities];
+    newQuantities[index] = parseInt(event.target.value, 10); // Chuyển đổi giá trị nhập thành số nguyên
+    setUpdatedQuantities(newQuantities);
+  };
   useEffect(() => {
-    if(currentUser){
-      console.log("User ID",currentUser.id)
-      const {productCart} =  getCartInfo(currentUser.id).then(response =>{
-        console.log(response.data);
-          setCookie("cart",response.data.result)
+    if (currentUser) {
+      console.log("User ID", currentUser.id)
+      getCartInfo(currentUser.id).then(response => {
+        setCookie("cart", response.data.result)
+        setCart(response.data.result)
       });
+      console.log("CookieCart: ", cart)
     }
-  }, []);
+  }, [ currentUser]);
   useEffect(() => {
     var price = 0
     var amount = 0;
     cart.forEach((item) => {
-      if (item.price && item.amount) {
-        price += item.price;
-        amount += item.amount;
+      if (item.price && item.quantity) {
+        price += item.price * item.quantity;
+        amount += item.quantity;
       }
     });
     setTotalPrice(price);
@@ -49,12 +53,14 @@ const Cart = () => {
         setUserAddress(result.user.address);
       });
   }, [cart, cookies.cart, refresh, currentUser]);
-
+  const handleChange = () => {
+    console.log("Hello");
+  }
   const onClickPurchase = () => {
     if (currentUser) {
       if (userAddress) {
 
-        navigate('/payment',{state:{price:totalPrice,address:userAddress}});
+        navigate('/payment', { state: { price: totalPrice, address: userAddress } });
 
       } else {
         navigate('/infos');
@@ -78,28 +84,77 @@ const Cart = () => {
     }
   };
 
-  const onClickRemove = () => {
+  const onClickRemove = async () => {
     setCart([]);
     removeCookie('cart', { path: '/' });
+    await deleteAllCart();
   };
 
-  if (currentUser && cart.length >= 1 && totalAmount > 0) {
+  if (currentUser && cart.length >= 1) {
     return (
+      <>
+       <Heading textAlign='center' fontSize={40} mt={8}  >Cart Information</Heading>
       <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
-        <SimpleGrid width='100%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 2, md: 3 }} spacing={{ base: 3, md: 5 }} >
-          {
-            cart && cart.map((product, index) => {
-              return product.id && <CollectionCard key={index} productId={product.id} />
+        <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
+          <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+            <TableContainer>
+              <Table variant='striped' colorScheme='gray'>
+                <Thead>
+                  <Tr>
+                    <Th>No.</Th>
+                    <Th>Template</Th>
+                    <Th>Image</Th>
+                    <Th>Size</Th>
+                    <Th>Material</Th>
+                    <Th>Amount</Th>
+                    <Th>Price</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {
+                    cart && cart.map((item, index) => {
+
+                      return (
+                        <>
+                          <Tr>
+                            <Td>{index + 1}</Td>
+                            <Td>{item.templateName}</Td>
+                            <Td>
+                              <ShowAlbum images = {item.images} />
+
+                              {/* <Image w={200} h={150} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.image}`} alt='Images' /> */}
+                            </Td>
+                            <Td >{`${item.width}X${item.length}`}</Td>
+                            <Td >{item.materialPage}</Td>
+                            <Td > <Input
+                              type="number"
+                              value={updatedQuantities[index]}
+                              onChange={(e) => handleQuantityChange(e, index)}
+                              width={20}
+                            /></Td>
+                            <Td>$ {item.price * item.quantity}</Td>
+                          </Tr>
+                        </>
+                      )
+                    })
+                  }
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </div>
+          {/* {
+            cart && cart.map((myImages, index) => {
+              return product.id && <ProductCart key={index} productId={product.id} />
             })
-          }
+          }  */}
         </SimpleGrid>
         <Box my={5} borderLeft={{ base: 'none', md: '2px solid whitesmoke' }} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%', md: '20%' }} px={5} >
-        {
-          userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
-            <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
-            <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
-          </Box>
-        }
+          {
+            userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
+              <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
+              <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
+            </Box>
+          }
           <Text fontSize={28} mt={10} fontWeight={600} color='facebook.500' >Order Details</Text>
           <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Product Amount: {totalAmount}</Text>
           <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Total Price: {totalPrice} $</Text>
@@ -108,8 +163,10 @@ const Cart = () => {
 
         </Box>
       </Box>
+      </>
+      
     )
-  } else if(currentUser) {
+  } else if (currentUser) {
     return (
       <Box
         display='flex'
@@ -133,7 +190,7 @@ const Cart = () => {
       </Box>
     )
   }
-  else{
+  else {
     return (
       <Box
         display='flex'
