@@ -20,7 +20,7 @@ const Cart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
-  const [updatedQuantities, setUpdatedQuantities] = useState(cart.map(item => item.quantity));
+  const [updatedQuantities, setUpdatedQuantities] = useState([]);
   const handleQuantityChange = (event, index) => {
     const newQuantities = [...updatedQuantities];
     newQuantities[index] = parseInt(event.target.value, 10); // Chuyển đổi giá trị nhập thành số nguyên
@@ -30,29 +30,38 @@ const Cart = () => {
     if (currentUser) {
       console.log("User ID", currentUser.id)
       getCartInfo(currentUser.id).then(response => {
-        setCookie("cart", response.data.result)
-        setCart(response.data.result)
+        if(response.data.status === 200){
+          setCookie("cart", response.data.result)
+          setCart(response.data.result)
+        }else{
+          setCookie("cart", []) 
+          setCart([])
+        }
       });
       console.log("CookieCart: ", cart)
     }
-  }, [ currentUser]);
+  }, []);
   useEffect(() => {
     var price = 0
     var amount = 0;
-    cart.forEach((item) => {
-      if (item.price && item.quantity) {
-        price += item.price * item.quantity;
-        amount += item.quantity;
-      }
-    });
-    setTotalPrice(price);
-    setTotalAmount(amount);
+    if(cart.length>0){
+      cart.forEach((item) => {
+        if (item.price && item.quantity) {
+          price += item.price * item.quantity;
+          amount += item.quantity;
+        }
+      });
+      setTotalPrice(price);
+      setTotalAmount(amount);
+    }
+   
 
     currentUser && getUserById(currentUser)
       .then((result) => {
         setUserAddress(result.user.address);
       });
   }, [cart, cookies.cart, refresh, currentUser]);
+  
   const handleChange = () => {
     console.log("Hello");
   }
@@ -90,7 +99,8 @@ const Cart = () => {
     await deleteAllCart();
   };
 
-  if (currentUser && cart.length >= 1) {
+  if (currentUser && cart  && cart.length >= 1 && totalAmount > 0) {
+    console.log("cart",cart)
     return (
       <>
        <Heading textAlign='center' fontSize={40} mt={8}  >Cart Information</Heading>
