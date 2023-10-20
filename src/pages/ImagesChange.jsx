@@ -21,8 +21,8 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
 
-export default function Upload({ openDialog, handleCloseDialog, template,oldImages }) {
-  const [images, setImages] = React.useState([]);
+export default function ImagesChange({ openDialog, handleCloseDialog, myImages }) {
+  const [images, setImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
   const toast = useToast();
@@ -35,15 +35,21 @@ export default function Upload({ openDialog, handleCloseDialog, template,oldImag
     padding: '30px',
     margin: '20px',
   });
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
   const submit = async () => {
     if (images.length > 0) {
       const formData = new FormData();
       formData.append('userID', currentUser.id);
-      if(template === 1){
-        formData.append('templateID', 1);
-      }else{
-        formData.append('templateID', template.id);
-      }
       images.forEach((image) => {
         formData.append(`files`, image.file);
       });
@@ -86,9 +92,6 @@ export default function Upload({ openDialog, handleCloseDialog, template,oldImag
           }}
         >
           <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
-            {
-              template === 1 ? "Simple upload with no template" : "Upload with template"
-            }
           </DialogTitle>
           <CustomDialogContent>
             <div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider } from '@chakra-ui/react';
+import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast } from '@chakra-ui/react';
 import {
   Person,
   Favorite,
@@ -29,6 +29,7 @@ const Navbar = () => {
   const [categories, setCategories] = useState([]);
   const [openUpload,setOpenUpload] = useState(false);
   const [open, setOpen] = useState(false);
+  const toast = useToast();
   const [itemCount, setItemCount] = useState(0);
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUserContext();
@@ -36,6 +37,21 @@ const Navbar = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
   const handleCloseDialogEdit = () => {
     setOpenUpload(false);
+  }
+  const handleUpload = () => {
+
+    if(!currentUser) {
+      toast({
+        title: 'Waring!',
+        description: 'Please login to upload images !',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position : 'top'
+    });
+    }else{
+      setOpenUpload(true)
+    }
   }
 
   useEffect(() => {
@@ -56,6 +72,8 @@ const Navbar = () => {
 
   const Logout = () => {
     removeCookie('currentUser', { path: '/' });
+    removeCookie('cart', { path: '/' });
+
     setCurrentUser('');
   };
 
@@ -141,7 +159,7 @@ const Navbar = () => {
               alignItems='center'
               transition={.5}
               _hover={{ color: '#D14905' }}
-              onClick={() => navigate('/favorites')}
+              onClick={() => navigate('/MyImages')}
             >
               <Icon fontSize={30} color='inherit' as={Collections} />
               <Text color='inherit' fontWeight={500} >MyImage</Text>
@@ -155,7 +173,7 @@ const Navbar = () => {
               alignItems='center'
               transition={.5}
               _hover={{ color: '#D14905' }}
-                onClick={() => setOpenUpload(true)}
+                onClick={() => { handleUpload()}}
             >
               <Icon fontSize={30} color='inherit' as={AttachFile} />
               <Text color='inherit' fontWeight={500} >UpLoad</Text>
@@ -189,7 +207,7 @@ const Navbar = () => {
           }
         </Box>
       </Box>
-      {/* <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} /> */}
+      <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template = {1} />
     </>
 
 

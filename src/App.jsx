@@ -9,7 +9,7 @@ import Confirm from './pages/Login/Confirm'
 import PasswordRecovery from './pages/Login/PasswordRecovery';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
-import Favorites from './pages/Favorites';
+import MyImages from './pages/MyImages';
 import Infos from './pages/Info/Infos';
 import Template from './pages/Template';
 import Purchase from './pages/Purchase';
@@ -41,7 +41,7 @@ const App = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/upload' element={<Upload />} />
-        <Route path='/favorites' element={<Favorites />} />
+        <Route path='/myimages' element={<MyImages />} />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />

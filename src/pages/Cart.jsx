@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody,Td,Image,Input } from '@chakra-ui/react';
+import { Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Input, Image } from '@chakra-ui/react';
 import { ShoppingCart } from '@mui/icons-material';
-
 import { getUserById } from '../services/UserServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
-import { getCartInfo,deleteAllCart } from '../services/CartService';
+import { getCartInfo, deleteAllCart } from '../services/CartService';
 import CollectionCard from '../components/CollectionCard';
-
+import ShowAlbum from '../components/ShowAlbum';
 
 const Cart = () => {
 
@@ -36,7 +35,7 @@ const Cart = () => {
       });
       console.log("CookieCart: ", cart)
     }
-  }, []);
+  }, [ currentUser]);
   useEffect(() => {
     var price = 0
     var amount = 0;
@@ -85,14 +84,16 @@ const Cart = () => {
     }
   };
 
-  const  onClickRemove = async () => {
+  const onClickRemove = async () => {
     setCart([]);
     removeCookie('cart', { path: '/' });
-     await deleteAllCart();
+    await deleteAllCart();
   };
 
   if (currentUser && cart.length >= 1) {
     return (
+      <>
+       <Heading textAlign='center' fontSize={40} mt={8}  >Cart Information</Heading>
       <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
         <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
           <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -100,7 +101,7 @@ const Cart = () => {
               <Table variant='striped' colorScheme='gray'>
                 <Thead>
                   <Tr>
-                  <Th>No.</Th>
+                    <Th>No.</Th>
                     <Th>Template</Th>
                     <Th>Image</Th>
                     <Th>Size</Th>
@@ -116,15 +117,19 @@ const Cart = () => {
                       return (
                         <>
                           <Tr>
-                            <Td>{index +1}</Td>
+                            <Td>{index + 1}</Td>
                             <Td>{item.templateName}</Td>
-                            <Td><Image w={200} h={150} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.image}`} alt='Images' /></Td>
+                            <Td>
+                              <ShowAlbum images = {item.images} />
+
+                              {/* <Image w={200} h={150} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.image}`} alt='Images' /> */}
+                            </Td>
                             <Td >{`${item.width}X${item.length}`}</Td>
                             <Td >{item.materialPage}</Td>
                             <Td > <Input
-                             type="number"
-                             value={updatedQuantities[index]}
-                             onChange={(e) => handleQuantityChange(e, index)}
+                              type="number"
+                              value={updatedQuantities[index]}
+                              onChange={(e) => handleQuantityChange(e, index)}
                               width={20}
                             /></Td>
                             <Td>$ {item.price * item.quantity}</Td>
@@ -158,6 +163,8 @@ const Cart = () => {
 
         </Box>
       </Box>
+      </>
+      
     )
   } else if (currentUser) {
     return (

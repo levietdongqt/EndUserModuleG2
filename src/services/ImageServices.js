@@ -1,60 +1,47 @@
-import axios from 'axios';
+import baseRequest from "../contexts/AxiosContext";
 
-export const getAllImages = async () => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/images`);
-    return data;
+export const getMyImages = async (userID) => {
+  try {
+    const response = await baseRequest.get(`/upload/LoadMyImages?userID=${userID}`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
 };
-
-export const getImageById = async (id) => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/images/${id}`);
-    return data;
+export const getMaterialPage = async () => {
+  try {
+    const response = await baseRequest.get(`/MaterialPage`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
 };
+export const uploadImages = async (formData) => {
+  try {
+    const templateID =  formData.get('templateID')
+    console.log('Filesssss:', formData.get('files[0]'));
+    if (templateID === 1) {
+      const response = await baseRequest.post(`/upload/WithNoTemplate`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Cần đặt Content-Type là 'multipart/form-data'
+        },
+      });
+      return response;
+    } else {
+      const response = await baseRequest.post(`/upload/WithTemplate`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Cần đặt Content-Type là 'multipart/form-data'
+        },
+      });
+      console.log(response)
+      return response;
+    }
 
-export const addImage = async (url) => {
-    const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/images`, {
-        url
-    });
-    return data;
-};
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
 
-export const deleteImage = async (id) => {
-    const { data } = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/images/${id}`);
-    return data;
-};
-
-export const getAllMiniImages = async () => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/minis`);
-    return data;
-};
-
-export const getMiniImageById = async (id) => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/minis/${id}`);
-    return data;
-};
-
-export const addMiniImage = async (url) => {
-    const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/minis`, {
-        url
-    });
-    return data;
-};
-
-export const deleteMiniImage = async (id) => {
-    const { data } = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/minis/${id}`);
-    return data;
-};
-
-// CLOUDINARY
-
-export const uploadImageToCloudinary = async (image) => {
-    const data = new FormData();
-    data.append("file", image);
-    data.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
-    data.append("cloud_name", process.env.REACT_APP_CLOUD_NAMEE);
-    const result = await fetch(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: data
-    })
-        .then(res => res.json());
-    return result;
 };
