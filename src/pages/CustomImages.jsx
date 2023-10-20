@@ -28,13 +28,13 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
   const [images, setImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
-  const dateTime = myImage.createDate;
-  const indexOfT = dateTime.indexOf('T');
+
   const toast = useToast();
   const [templateID, setTemplateID] = useState(myImage.printSizes[0].templateId);
   const [materialID, setMaterialID] = useState(myImage.printSizes[0].templateId);
   const [amount, setAmount] = useState(1);
   const [price, setPrice] = useState(0);
+  const [showDate, setShowDate] = useState("");
   const [materialPage, setMaterialPage] = useState([]);
   const handleSelectChange = (event) => {
     setTemplateID(event.target.value);
@@ -47,6 +47,9 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
   };
   console.log("Day ne",myImage)
   useEffect(() => {
+    const dateTime = myImage.createDate;
+    const indexOfT = dateTime.indexOf('T');
+    setShowDate(dateTime.substring(0, indexOfT))
       getMaterialPage().then(response => {
         console.log("Material: ", response.data)
         if(response.data.status === 200) {
@@ -90,7 +93,7 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                       <Box>
                         <ShowAlbum images={myImage.images} />
                         <Text textAlign='center' fontSize={20} mt={1} fontWeight={100} >
-                          {dateTime.substring(0, indexOfT)}
+                          {showDate}
                           <br></br>
                           {myImage.templateName}
                         </Text>
@@ -104,7 +107,7 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                         <Box>
                           <ShowAlbum images={myImage.images} />
                           <Text textAlign='center' fontSize={20} mt={1} fontWeight={100} >
-                            {dateTime.substring(0, indexOfT)}
+                            {showDate}
                             <br></br>
                             {myImage.templateName}
                           </Text>
