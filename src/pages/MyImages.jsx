@@ -52,7 +52,7 @@ const MyImages = () => {
                         <Box>
                           <ShowAlbum images={myImage.images} />
                           <Text textAlign='center' fontSize={20} mt={1} fontWeight={100} >
-                            {dateTime.substring(0, indexOfT)}
+                            {dateTime}
                             <br></br>
                             {myImage.templateName}
                           </Text>
