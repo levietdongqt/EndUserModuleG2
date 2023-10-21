@@ -2,27 +2,28 @@ import { useEffect, useState } from 'react';
 import { getUserById } from '../services/UserServices';
 
 const useGetReviewId = (userId, productId) => {
-
-    const [ratingId, setRatingId] = useState("");
-    const [commentId, setCommentId] = useState("");
+    const [Review, setReviewId] = useState(null);
 
     useEffect(() => {
-        getUserById(userId)
-            .then((result) => {
-                result.result.reviews.forEach((rating) => {
-                    if (rating.templateId === productId) { setRatingId(rating.id); }
+        if (userId && productId) {
+            getUserById(userId)
+                .then((result) => {
+                    if(result.result.status === 'Enabled'){
+                        result.result.reviews.forEach((item) => {
+                            if (item.templateId === productId) {
+                                setReviewId(item.id);
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('Lỗi khi tải dữ liệu người dùng:', error);
+                    // Xử lý lỗi ở đây
                 });
-            });
-        getUserById(userId)
-            .then((result) => {
-                result.result.reviews.forEach((comment) => {
-                    if (comment.templateId === productId) { setCommentId(comment.id); }
-                });
-            });
-
+        }
     }, [userId, productId]);
 
-    return [ratingId, commentId];
+    return [Review];
 }
 
 export default useGetReviewId;

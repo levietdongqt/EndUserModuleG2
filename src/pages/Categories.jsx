@@ -3,30 +3,33 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, SimpleGrid, Button, Text, Icon, Heading,Container,Image } from '@chakra-ui/react';
 import CollectionCard from '../components/CollectionCard';
 import {getCategoryById}  from "../services/CategoryServices";
-import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
 
 const Categories = () => {
 
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { search, canSearch } = useSearchContext();
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     if (state !== null) {
       getCategoryById(state.categoryId)
-        .then((result) => {
-          setProducts(result.result);
-        });
+          .then(result => {
+            setProducts(result.result);
+          })
+          .catch(error => {
+            console.error(error);
+          });
     }
-  }, [state, search, canSearch]);
+  }, [state]);
 
   return (
       <Container maxW='1140px'>
         <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} backgroundColor='whitesmoke' >
           <Box textAlign={'center'} mb={3}>
-            <Heading as='h2' size='3xl' >{products.length > 0 ? products.name : ''}</Heading>
+            <Heading as='h2' size='3xl'>
+              {products.length > 0 ? products.name : ''}
+            </Heading>
           </Box>
           <Box key={products.id} mt={10}>
             <Image  maxW={'100%'} height={350} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${products.imageUrl}`}/>
@@ -50,7 +53,7 @@ const Categories = () => {
                     return (
                         <div key={item.id}>
                           <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '16px', alignItems: 'center' }}>
-                            <CollectionCard collectionId={item.id} />
+                            <CollectionCard collectionId={item.id} categoryId={products.id} />
                           </div>
                         </div>
                     )

@@ -3,20 +3,30 @@ import { Box, FormControl, Input, InputGroup, Button, InputRightElement } from '
 import { Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSearchContext } from '../contexts/SearchContext';
-const Searchbar = (props) => {
-    const { onSubmit } = props;
+const Searchbar = () => {
     const [searchText, setSearchText] = useState("");
     const { setSearch, setCanSearch } = useSearchContext();
     const navigate=useNavigate();
 
+    useEffect(() => {
+        const savedSearch = localStorage.getItem('search');
+        if (savedSearch) {
+            setSearchText(savedSearch);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('search', searchText);
+    }, [searchText]);
+
     const handleInput = (e) => {
         setSearchText(e.target.value);
-    };
+    }
 
     const handleSubmit = (e) => {
         setCanSearch(true);
         setSearch(searchText);
-        navigate(`/search/${searchText}`);
+        navigate(`/search/${searchText}`, { replace: true });
         e.preventDefault();
     };
 

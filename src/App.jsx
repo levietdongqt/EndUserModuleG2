@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login/Login';
 import Confirm from './pages/Login/Confirm'
-import PasswordRecovery from './pages/Login/PasswordRecovery';
+/*import PasswordRecovery from './pages/Login/PasswordRecovery';*/
 import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Favorites from './pages/Favorites';
@@ -19,6 +19,7 @@ import Payment from './pages/Payment';
 import { useUserContext } from './contexts/UserContext';
 import Collections from './pages/Collections';
 import Categories from "./pages/Categories";
+import Contact from "./pages/Contact";
 const App = () => {
 
   const { currentUser } = useUserContext();
@@ -33,13 +34,14 @@ const App = () => {
           path="/login/confirm"
           element={<Confirm />}
         />
-        <Route
+        {/*<Route
           path="/login/passwordrecovery"
           element={<PasswordRecovery />}
-        />
+        />*/}
         <Route path='/register' element={<Register />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/favorites' element={<Favorites />} />
+        <Route path='/contact' element={<Contact />} />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
@@ -49,7 +51,6 @@ const App = () => {
         <Route path='/categories/:name' element={<Categories />} />
         <Route path='/categories/:name/collection/:name' element={<Collections />} />
         <Route path='/payment' element={<Payment />} />
-
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>
       <Footer />

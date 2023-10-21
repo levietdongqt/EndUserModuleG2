@@ -21,7 +21,7 @@ const CategoryMenuItems = ({ genreId }) => {
     };
 
     return
-        <MenuItem key={categories.id} onClick={() => handleClick(categories.id)} >{categories.name}</MenuItem>
+        <MenuItem onClick={() => handleClick(categories.id)} >{categories.name}</MenuItem>
 
 }
 
