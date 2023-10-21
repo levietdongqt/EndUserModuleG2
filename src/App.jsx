@@ -20,6 +20,7 @@ import Upload from './pages/Upload';
 import { useUserContext } from './contexts/UserContext';
 import Collections from './pages/Collections';
 import Categories from "./pages/Categories";
+import AddCartNoTemplate from './pages/AddCartNoTemplate';
 const App = () => {
 
   const { currentUser } = useUserContext();
@@ -42,6 +43,7 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/upload' element={<Upload />} />
         <Route path='/myimages' element={<MyImages />} />
+        <Route path='/myimages/noTemplate' element={<AddCartNoTemplate />} />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
