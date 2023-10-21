@@ -9,7 +9,15 @@ export const getCartInfo = async (userID) => {
     return error.response;
   }
 };
-
+export const addToCart = async (formData) => {
+  try {
+    const response = await baseRequest.post(`/upload/AddToCart`,formData);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const deleteAllCart = async (userID) => {
   try {
     const response = await baseRequest.get(`/upload/deleteAllCart?userID=${userID}`);

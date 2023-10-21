@@ -43,7 +43,7 @@ const Register = () => {
         if (response.data) {
           navigate('/login');
           toast({
-            title: 'Welcome to CLOTHIFY!',
+            title: 'Welcome to MyImages!',
             description: 'Please check your email and confirm.',
             status: 'success',
             duration: 2000,
