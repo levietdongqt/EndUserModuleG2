@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalOverlay, ModalBody, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, Text, Button, Textarea, useToast } from '@chakra-ui/react';
 import StarRatings from 'react-star-ratings';
+import Filter from 'bad-words';
 
-import { getReviewById, addReview, updateReview, deleteReview } from '../services/ReviewServices';
+import { getReviewById, addReview } from '../services/ReviewServices';
 
 import { useUserContext } from '../contexts/UserContext';
 import useGetReviewId from '../hooks/useGetReviewId';
@@ -27,7 +28,10 @@ const ReviewModal = ({ onClose, isOpen, productId }) => {
     }, [reviewId, comment,rating]);
 
     const onClickSend = () => {
-        addReview(productId, currentUser.id , comment, rating)
+        const filter = new Filter();
+        // Censor curse words in the comment
+        const censoredComment = filter.clean(comment);
+        addReview(productId, currentUser.id , censoredComment, rating)
             .then((result) => {
                 if (result.data.status !== 201) {
                     toast({
@@ -76,7 +80,7 @@ const ReviewModal = ({ onClose, isOpen, productId }) => {
                         resize='none'
                         placeholder='Please write your review.'
                         value={comment}
-                        onInput={(e) => setComment(e.target.value)}
+                        onChange={(e) => setComment(e.target.value)}
                         height={200}
                     ></Textarea>
                 </ModalBody>

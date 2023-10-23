@@ -87,7 +87,7 @@ export default function Upload({ openDialog, handleCloseDialog, template,oldImag
         >
           <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
             {
-              template === 1 ? "Simple upload with no template" : "Upload with template"
+              template === 1 ? "Simple upload with no template" : `Upload with ${template.name}`
             }
           </DialogTitle>
           <CustomDialogContent>

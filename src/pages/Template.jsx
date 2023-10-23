@@ -14,6 +14,7 @@
   import useGetUserHaveThis from '../hooks/useGetUserHaveThis';
   import {getOrdersByUserId} from "../services/OrderServices";
   import {getAllMaterialPage} from "../services/MaterialPage";
+  import Upload from "../pages/Upload";
   import '../style.css';
   function SampleNextArrow(props) {
     const { className, style, onClick } = props;
@@ -60,6 +61,7 @@
     const { currentUser } = useUserContext();
     const { isOpen, onOpen, onClose } = useDisclosure();
     /*const [status] = useGetFavoriteStatus(currentUser, location.state.productId);*/
+    const [openUpload,setOpenUpload] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [ratings, setRatings] = useState(0);
     const [ratingCount, setRatingCount] = useState(0);
@@ -67,9 +69,6 @@
     const [template, setTemplate] = useState([]);
     const [sizes, setSizes] = useState([]);
     const [description, setDescription] = useState([]);
-    const [inCart, setInCart] = useState(false);
-    const [amount, setAmount] = useState(0);
-    const [cookies, setCookies, removeCookie] = useCookies(['cart']);
     const [have] = useGetUserHaveThis(currentUser.id, location.state.productId);
     const [hasReview, setHasReview] = useState(false);
     const [meterial, setMeterial] = useState([]);
@@ -105,6 +104,24 @@
         });
       })
     }, [location.state.productId , cart]);
+    const handleCloseDialogEdit = () => {
+      setOpenUpload(false);
+    }
+    const handleUpload = () => {
+
+      if(!currentUser) {
+        toast({
+          title: 'Waring!',
+          description: 'Please login to upload images !',
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+          position : 'top'
+        });
+      }else{
+        setOpenUpload(true)
+      }
+    }
 
     const onClickFavorite = () => {
       if (isFavorite) {
@@ -220,25 +237,8 @@
                         width='100%'
                         borderRadius={50}
                         className="custom-button"
-                      >Make This Photo</Button>
-
-                  <IconButton
-                    icon={isFavorite ? <Favorite /> : <FavoriteBorder />}
-                    onClick={onClickFavorite}
-                    ml={1} my={1}
-                    colorScheme='facebook'
-                    variant='outline'
-                    height={10}
-                    width='50px'
-                    textAlign='center'
-                    display={{ base: 'none', sm: 'block' }} />
-                  <Button
-                    my={1}
-                    colorScheme='facebook'
-                    variant='outline'
-                    display={{ base: 'block', sm: 'none' }}
-                    height={10}
-                    width='100%'> ADD TO FAVORITE</Button>
+                        onClick={() => handleUpload()}
+                      >Make Your Photos</Button>
                 </Box>
                 <Divider />
                 <Box
@@ -312,6 +312,7 @@
           </Box>
         </Box>
         <ReviewModal isOpen={isOpen} onClose={onClose} productId={location.state.productId}  />
+        <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template ={template} />
       </ChakraProvider>
     )
   }

@@ -210,7 +210,7 @@ const AddCartNoTemplate = () => {
                                         flexDirection='column'
                                         mt={10}
                                         p={3}>
-                                        <SimpleGrid columns={{base: 4, sm: 4, lg: 4, xl: 4}} spacing={3}>
+                                        <SimpleGrid columns={{base: 3, sm: 1, lg: 2, xl: 3}} spacing={3}>
                                             <Image
                                                 key={`${index}`}
                                                 style={{height: '200px', width: '300px'}}
@@ -279,19 +279,26 @@ const AddCartNoTemplate = () => {
                                             </Box>
                                             <Box ml={20}>
                                                 <SimpleGrid columns={{base: 1, sm: 1, lg: 1, xl: 1}} spacing={3}>
-                                                    <Text textAlign='left' mt={1} fontSize={24} color='facebook.500'
-                                                          fontWeight={300}>Amount: {amount[index]}</Text>
-                                                    <Text textAlign='left' mt={1} fontSize={24} color='facebook.500'
-                                                          fontWeight={300}>Price: ${price[index]}</Text>
+                                                    <Text textAlign='left' mt={1} fontSize={24} color='facebook.500' fontWeight={700}>Amount: {amount[index]}</Text>
+                                                    <Text textAlign='left' mt={1} fontSize={24} color='facebook.500' fontWeight={700}>Price: ${price[index]}</Text>
                                                     <Button
                                                         variant='solid'
                                                         leftIcon={<AddShoppingCartIcon/>}
                                                         fontSize={20}
-                                                        px={0} mt={0}
+                                                        px={6}
+                                                        py={3}
+                                                        mt={0}
                                                         color='facebook'
+                                                        bg='blue.500'
+                                                        borderRadius={10}
+                                                        transition='background-color 0.3s'
+                                                        _hover={{
+                                                            bg: 'blue.600',
+                                                        }}
                                                         onClick={() => {
                                                             submit(index)
-                                                        }}>
+                                                        }}
+                                                    >
                                                         Add To Cart
                                                     </Button>
                                                 </SimpleGrid>
