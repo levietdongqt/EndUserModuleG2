@@ -32,40 +32,29 @@ export default function AddCartTemplate({ openDialog, handleCloseDialog, myImage
   const [amount, setAmount] = useState(1);
   const [price, setPrice] = useState(0);
   const [materialPage, setMaterialPage] = useState([]);
+  const popop = (title,messs) => {
+    toast({
+      title: title,
+      description: messs,
+      status: title.toLowerCase(),
+      duration: 2000,
+      isClosable: true,
+      position: "top"
+    });
+  }
   const submit = () => {
     const value = document.getElementById('amount').value;
     if(value > 100 || value <1) {
-      toast({
-        title: 'Warning',
-        description: 'Amount must be from 1 to 100 !',
-        status: 'warning',
-        duration: 2000,
-        isClosable: true,
-        position: "top"
-      });
+      popop("Warning",'Amount must be from 1 to 100 !')
       return;
     }
     setAmount(value);
     if(!templateSizeID) {
-      toast({
-        title: 'Warning',
-        description: 'Prints size is require !',
-        status: 'warning',
-        duration: 2000,
-        isClosable: true,
-        position: "top"
-      });
+      popop("Warning",'Prints size is require !')
       return;
     }
     if(!materialID ) {
-      toast({
-        title: 'Warning',
-        description: 'Material page is require !',
-        status: 'warning',
-        duration: 2000,
-        isClosable: true,
-        position: "top"
-      });
+      popop("Warning",'Material page is require !')
       return;
     }
     var formData = new FormData();
@@ -92,14 +81,7 @@ export default function AddCartTemplate({ openDialog, handleCloseDialog, myImage
           position: "top"
         });
       }else{
-        toast({
-          title: 'Error',
-          description: 'Add to cart fail, please reload and try again !',
-          status: 'error',
-          duration: 2000,
-          isClosable: true,
-          position: "top"
-        });
+        popop("Error",'Add to cart fail, please reload and try again !')
       }
     })
   }
@@ -123,7 +105,7 @@ export default function AddCartTemplate({ openDialog, handleCloseDialog, myImage
   },[amount,materialID,templateSizeID])
   useEffect(() => {
     console.log("Day ne", myImage)
-    setPrice(9)
+    setPrice(0)
     if (myImage) {
       getMaterialPage().then(response => {
         if (response.data.status === 200) {

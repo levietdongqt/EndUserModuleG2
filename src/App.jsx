@@ -22,6 +22,8 @@ import Collections from './pages/Collections';
 import Categories from "./pages/Categories";
 import AddCartNoTemplate from './pages/AddCartNoTemplate';
 import Contact from './pages/Contact';
+import Checkout from './pages/Checkout';
+
 const App = () => {
 
   const { currentUser } = useUserContext();
@@ -51,6 +53,7 @@ const App = () => {
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
         <Route path='/purchase' element={<Purchase />} />
+        <Route path='/checkout' element={<Checkout />} />
         <Route path='/search/:name' element={<Search />} />
         <Route path='/categories/:name' element={<Categories />} />
         <Route path='/categories/:name/collection/:name' element={<Collections />} />
