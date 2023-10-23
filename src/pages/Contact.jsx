@@ -35,7 +35,7 @@ const Contact = () => {
                         p={35}
                         flex="1"
                     >
-                        <Text variant="h4" align="center" mb={2} color={'#16113a'} fontSize={24} fontWeight={700}>
+                        <Text variant="h4" align="center" mb={5} color={'#16113a'} fontSize={24} fontWeight={700}>
                             Send us a message
                         </Text>
                         <form onSubmit={handleSubmit} style={{width: '100%'}}>

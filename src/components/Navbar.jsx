@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider } from '@chakra-ui/react';
+import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast } from '@chakra-ui/react';
 import {
   Person,
   Favorite,
@@ -23,7 +23,6 @@ import Hamburger from './Hamburger';
 import Dropdown from './Dropdown';
 import Searchbar from './Searchbar';
 import Upload from '../pages/Upload';
-
 const Navbar = () => {
 
   const [categories, setCategories] = useState([]);
