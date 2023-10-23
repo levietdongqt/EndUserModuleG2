@@ -16,7 +16,7 @@ export const getOrdersByStatus = async (status) => {
 };
 
 export const getOrdersByUserId = async (id) => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/orders/user/${id}`);
+    const { data } = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/User/Orders/${id}`);
     return data;
 };
 

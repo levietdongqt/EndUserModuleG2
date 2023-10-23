@@ -9,7 +9,6 @@ import { useSearchContext } from '../contexts/SearchContext';
 import {getAllTemplate, getTemplateBestller} from "../services/TemplateServices";
 import {getAllCollection } from '../services/CollectionServices';
 import Slider from "react-slick";
-
 const settings = {
   infinite: true,
   speed: 500,
@@ -39,10 +38,6 @@ const Home = () => {
         });
   }, []);
 
-  const onClickImage = () => {
-    setSearch('a');
-    navigate('/search');
-  }
   const desiredCollections = ['Book 1', 'Gift 1', 'Calendar 2', 'Card 2'];
   return (
       <>
@@ -50,6 +45,7 @@ const Home = () => {
           <Box display='flex' justifyContent='center' >
             <Carousel />
           </Box>
+
           <Box mt={4} mb={3}>
             <Box>
               <Heading as='h3' size='lg' display={'inline'}>Featured Products</Heading>
@@ -76,6 +72,7 @@ const Home = () => {
                                             state: {productId: bested.id},
                                           })
                                       }
+                                      loading={'lazy'}
                                   />
                                 </div>
                             ))}
@@ -144,7 +141,7 @@ const Home = () => {
             </Box>
             <Box color='#fff' alignItems='center' display='flex' flexDirection='column' mt={{ base: 5, md: 0 }} >
               <WorkspacePremium sx={{ fontSize: 50 }} color='inherit' />
-              <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Clothify Quality Assurance</Text>
+              <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Image Quality Assurance</Text>
             </Box>
           </Container>
         </Box>

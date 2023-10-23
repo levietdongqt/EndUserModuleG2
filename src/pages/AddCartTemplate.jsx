@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import ImageUploading from "react-images-uploading";
+import React, { useEffect, useState} from "react";
 import { useUserContext } from '../contexts/UserContext';
-import { uploadImages } from "../services/ImageServices";
 import ThemeProvider from '../theme';
 import ShowAlbum from "../components/ShowAlbum";
 import { getMaterialPage } from "../services/ImageServices";

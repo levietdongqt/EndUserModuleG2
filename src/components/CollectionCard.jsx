@@ -6,28 +6,23 @@ import { useUserContext } from '../contexts/UserContext';
 import { getCollectionById } from '../services/CollectionServices';
 import {getCategoryById} from "../services/CategoryServices";
 
-const CollectionCard = ({ collectionId}) => {
+const CollectionCard = ({ collectionId,categoryId}) => {
   const [cookies, setCookies, removeCookie] = useCookies(['cart']);
   const { currentUser } = useUserContext();
   const navigate = useNavigate();
   const [collections, setcollection] = useState([]);
   const [category, setcategory] = useState([]);
   const [amount, setAmount] = useState(0);
-
-  useEffect(() => {
-    if (collectionId) {
-        getCollectionById(collectionId).then((result) => {
-        setcollection(result.result);
-        let CategoryById = result.result.categoryId;
-        getCategoryById(CategoryById).then((result) => {
-            setcategory(result.result);
-        })
-        })
-
-
-    }
-  }, [collectionId, amount]);
-
+    useEffect(() => {
+        if (collectionId) {
+            getCollectionById(collectionId).then((result) => {
+                setcollection(result.result);
+            })
+            getCategoryById(categoryId).then((result) => {
+                setcategory(result.result);
+            })
+        }
+    }, [collectionId, amount]);
 
     const handleClick = (id) => {
         navigate(`/categories/${category.name}/collection/${collections.name}/`, { state: { collectionsId: id } });
@@ -49,6 +44,7 @@ const CollectionCard = ({ collectionId}) => {
                         objectFit='cover'
                         src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${collections.imageUrl}`}
                         onClick={() => handleClick(collections.id) }
+                        loading={'lazy'}
                          />
                   </div>
 
