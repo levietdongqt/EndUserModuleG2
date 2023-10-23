@@ -30,11 +30,11 @@ const Cart = () => {
     if (currentUser) {
       console.log("User ID", currentUser.id)
       getCartInfo(currentUser.id).then(response => {
-        if(response.data.status === 200){
+        if (response.data.status === 200) {
           setCookie("cart", response.data.result)
           setCart(response.data.result)
-        }else{
-          setCookie("cart", []) 
+        } else {
+          setCookie("cart", [])
           setCart([])
         }
       });
@@ -44,24 +44,28 @@ const Cart = () => {
   useEffect(() => {
     var price = 0
     var amount = 0;
-    if(cart.length>0){
+    if (cart.length > 0) {
+      var index = 0;
+      const newQuantities = [...updatedQuantities];
       cart.forEach((item) => {
+        newQuantities[index] = item.quantity;
         if (item.price && item.quantity) {
           price += item.price * item.quantity;
           amount += item.quantity;
         }
       });
+      setUpdatedQuantities(newQuantities);
       setTotalPrice(price);
       setTotalAmount(amount);
     }
-   
+
 
     currentUser && getUserById(currentUser)
       .then((result) => {
         setUserAddress(result.user.address);
       });
   }, [cart, cookies.cart, refresh, currentUser]);
-  
+
   const handleChange = () => {
     console.log("Hello");
   }
@@ -99,82 +103,82 @@ const Cart = () => {
     await deleteAllCart();
   };
 
-  if (currentUser && cart  && cart.length >= 1 && totalAmount > 0) {
-    console.log("cart",cart)
+  if (currentUser && cart && cart.length >= 1 && totalAmount > 0) {
+    console.log("cart", cart)
     return (
       <>
-       <Heading textAlign='center' fontSize={40} mt={8}  >Cart Information</Heading>
-      <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
-        <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
-          <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-            <TableContainer>
-              <Table variant='striped' colorScheme='gray'>
-                <Thead>
-                  <Tr>
-                    <Th>No.</Th>
-                    <Th>Template</Th>
-                    <Th>Image</Th>
-                    <Th>Size</Th>
-                    <Th>Material</Th>
-                    <Th>Amount</Th>
-                    <Th>Price</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {
-                    cart && cart.map((item, index) => {
+        <Heading textAlign='center' fontSize={40} mt={8}  >Cart Information</Heading>
+        <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
+          <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
+            <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+              <TableContainer>
+                <Table variant='striped' colorScheme='gray'>
+                  <Thead>
+                    <Tr>
+                      <Th>No.</Th>
+                      <Th>Template</Th>
+                      <Th>Image</Th>
+                      <Th>Size</Th>
+                      <Th>Material</Th>
+                      <Th>Amount</Th>
+                      <Th>Price</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {
+                      cart && cart.map((item, index) => {
 
-                      return (
-                        <>
-                          <Tr>
-                            <Td>{index + 1}</Td>
-                            <Td>{item.templateName}</Td>
-                            <Td>
-                              <ShowAlbum images = {item.images} />
+                        return (
+                          <>
+                            <Tr>
+                              <Td>{index + 1}</Td>
+                              <Td>{item.templateName}</Td>
+                              <Td>
+                                <ShowAlbum images={item.images} />
 
-                              {/* <Image w={200} h={150} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.image}`} alt='Images' /> */}
-                            </Td>
-                            <Td >{`${item.width}X${item.length}`}</Td>
-                            <Td >{item.materialPage}</Td>
-                            <Td > <Input
-                              type="number"
-                              value={updatedQuantities[index]}
-                              onChange={(e) => handleQuantityChange(e, index)}
-                              width={20}
-                            /></Td>
-                            <Td>$ {item.price * item.quantity}</Td>
-                          </Tr>
-                        </>
-                      )
-                    })
-                  }
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </div>
-          {/* {
+                                {/* <Image w={200} h={150} maxW={'100%'} src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.image}`} alt='Images' /> */}
+                              </Td>
+                              <Td >{`${item.width}X${item.length}`}</Td>
+                              <Td >{item.materialPage}</Td>
+                              <Td > <Input
+                                type="number"
+                                value={updatedQuantities[index]}
+                                onChange={(e) => handleQuantityChange(e, index)}
+                                width={20}
+                              /></Td>
+                              <Td>$ {item.price * item.quantity}</Td>
+                            </Tr>
+                          </>
+                        )
+                      })
+                    }
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </div>
+            {/* {
             cart && cart.map((myImages, index) => {
               return product.id && <ProductCart key={index} productId={product.id} />
             })
           }  */}
-        </SimpleGrid>
-        <Box my={5} borderLeft={{ base: 'none', md: '2px solid whitesmoke' }} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%', md: '20%' }} px={5} >
-          {
-            userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
-              <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
-              <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
-            </Box>
-          }
-          <Text fontSize={28} mt={10} fontWeight={600} color='facebook.500' >Order Details</Text>
-          <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Product Amount: {totalAmount}</Text>
-          <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Total Price: {totalPrice} $</Text>
-          <Button mt={10} colorScheme='facebook' onClick={onClickPurchase} >Purchase</Button>
-          <Button mt={3} variant='text' color='facebook.500' onClick={onClickRemove} >Remove All</Button>
+          </SimpleGrid>
+          <Box my={5} borderLeft={{ base: 'none', md: '2px solid whitesmoke' }} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%', md: '20%' }} px={5} >
+            {
+              userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
+                <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
+                <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
+              </Box>
+            }
+            <Text fontSize={28} mt={10} fontWeight={600} color='facebook.500' >Order Details</Text>
+            <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Product Amount: {totalAmount}</Text>
+            <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >Total Price: {totalPrice} $</Text>
+            <Button mt={10} colorScheme='facebook' onClick={onClickPurchase} >Purchase</Button>
+            <Button mt={3} variant='text' color='facebook.500' onClick={onClickRemove} >Remove All</Button>
 
+          </Box>
         </Box>
-      </Box>
       </>
-      
+
     )
   } else if (currentUser) {
     return (

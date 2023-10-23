@@ -22,6 +22,7 @@ import Collections from './pages/Collections';
 import Categories from "./pages/Categories";
 import AddCartNoTemplate from './pages/AddCartNoTemplate';
 import Checkout from './pages/Checkout';
+import OnlinePayment from './pages/OnlinePayment';
 
 const App = () => {
 
@@ -42,6 +43,7 @@ const App = () => {
           element={<PasswordRecovery />}
         />
         <Route path='/register' element={<Register />} />
+        <Route path='/OnlinePayment' element={<OnlinePayment />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/upload' element={<Upload />} />
         <Route path='/myimages' element={<MyImages />} />

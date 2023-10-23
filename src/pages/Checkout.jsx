@@ -9,6 +9,7 @@ import { useCartContext } from '../contexts/CartContext';
 import { useToast } from '@chakra-ui/react';
 import CreditInfo from '../components/CreditInfo';
 import { createOrder } from '../services/CartService';
+import OnlinePayment from './OnlinePayment';
 
 export default function Checkout() {
 
@@ -223,6 +224,7 @@ export default function Checkout() {
               </div>
 
               <button onClick={submit} class="btn btn-primary btn-lg btn-block mb" type="button">Continue to checkout</button>
+              <OnlinePayment amount={100} />
             </form>
           </div>
         </div>
