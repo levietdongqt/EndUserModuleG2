@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import { getOrderById, updateOrderStatus } from '../services/OrderServices';
 import CollectionCard from './CollectionCard';
-import ReportModal from './ReportModal';
+// import ReportModal from './ReportCard';
 
 const OrderCard = ({ orderId }) => {
 
@@ -98,7 +98,7 @@ const OrderCard = ({ orderId }) => {
                     }
                 </SimpleGrid>
             </Box>
-            <ReportModal onClose={onClose} isOpen={isOpen} orderId={orderId} />
+            {/* <ReportModal onClose={onClose} isOpen={isOpen} orderId={orderId} /> */}
         </>
     )
 }

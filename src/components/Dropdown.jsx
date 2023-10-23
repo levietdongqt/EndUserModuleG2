@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useDisclosure, MenuItem, Menu, MenuButton, MenuList, Box, Grid, GridItem, Heading, Image, Link } from '@chakra-ui/react';
+import { useDisclosure, MenuItem, Menu, MenuButton, MenuList, Box, Grid, GridItem, Heading, Image, Link,Button } from '@chakra-ui/react';
 import { getCategoryById } from '../services/CategoryServices';
 
-const Dropdown = ({ title, TemplateId }) => {
+const Dropdown = ({ title, CategoryId }) => {
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [category, setCategory] = useState(null);
 
     useEffect(() => {
         try {
-            getCategoryById(TemplateId)
+            getCategoryById(CategoryId)
                 .then((result) => {
                     setCategory(result.result);
                 });
         } catch (error) {
             console.log(error);
         }
-    }, [TemplateId]);
+    }, [CategoryId]);
 
     const handleClick = (categoryId) => {
-        navigate(`/categories/${category.name}`, { state: { categoryId: categoryId } });
+        if (category) {
+            navigate(`/categories/${category.name}`, { state: { categoryId: categoryId } });
+        }
     };
 
     return (
-        <Box pe={{ base: 2, md: 10 }}>
+        <Box px={{ base: 2, md: 4 }} py={{ base: 1, md:1 }}>
             <Menu isOpen={isOpen}>
                 <MenuButton
                     color='black'
@@ -64,7 +66,7 @@ const Dropdown = ({ title, TemplateId }) => {
                                                         <Heading
                                                             as='h4'
                                                             size='md'
-                                                            onClick={() => handleClick(collection.id)}
+                                                            onClick={() =>navigate(`/categories/${category.name}/collection/${collection.name}/`, { state: { collectionsId: collection.id } }) }
                                                             cursor={'pointer'}
                                                             _hover={{ color: 'grey' }}
                                                         >

@@ -8,8 +8,7 @@ import { useCartContext } from '../contexts/CartContext';
 import { useUserContext } from '../contexts/UserContext';
 import { getTemplateById } from '../services/TemplateServices';
 import {getAllize} from "../services/SizeServices";
-import { addFavorite, deleteFavorite } from '../services/UserServices';
-import useGetFavoriteStatus from '../hooks/useGetFavoriteStatus';
+
 import ReviewModal from './ReviewModal';
 
 
@@ -29,7 +28,6 @@ const TemplateCard = ({ templateId, isDelivered}) => {
     const [cookies, setCookies, removeCookie] = useCookies(['cart']);
     const { cart, setCart, refresh, setRefresh } = useCartContext();
     const { currentUser } = useUserContext();
-    const [status] = useGetFavoriteStatus(currentUser, templateId);
     const navigate = useNavigate();
     const [template, setTemplate] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -37,7 +35,6 @@ const TemplateCard = ({ templateId, isDelivered}) => {
     const [amount, setAmount] = useState(0);
     useEffect(() => {
         if (templateId) {
-            setIsFavorite(status);
             getTemplateById(templateId).then((result) => {
                 setTemplate(result.result);
             })
@@ -51,7 +48,7 @@ const TemplateCard = ({ templateId, isDelivered}) => {
     }, [templateId]);
 
 
-    const onClickFavorite = () => {
+   /* const onClickFavorite = () => {
         if (!isFavorite) {
             addFavorite(currentUser, templateId);
             setIsFavorite(true);
@@ -60,7 +57,7 @@ const TemplateCard = ({ templateId, isDelivered}) => {
             setIsFavorite(false);
         }
     };
-
+*/
     const onClickAddCart = () => {
         const currentIndex = cart.findIndex(item => item.id === templateId);
         if (currentIndex >= 0) {
@@ -104,6 +101,7 @@ const TemplateCard = ({ templateId, isDelivered}) => {
                                                     state: {productId: template.id},
                                                 })
                                             }
+                                            loading={'lazy'}
                                         />
                                     </div>
                                 )
