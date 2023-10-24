@@ -100,7 +100,7 @@ const MyImages = (props) => {
                         <Box position={'relative'}>
                           <Box position={'relative'}>
                             <Box >
-                              <ShowAlbum images={myImage.images} />
+                              <ShowAlbum images={myImage.images} isCart={false} />
                             </Box>
                             <Box position={'relative'}>
                               <Box
