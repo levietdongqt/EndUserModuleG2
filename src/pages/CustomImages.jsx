@@ -21,7 +21,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
 
-export default function ImagesChange({ openDialog, handleCloseDialog, myImages }) {
+export default function CustomImages({ openDialog, handleCloseDialog, myImage }) {
   const [images, setImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;

@@ -19,8 +19,11 @@ export default function Checkout() {
   const { currentUser } = useUserContext();
   const [total, setTotal] = useState(0)
   const navigate = useNavigate();
-  const [isCreditCard, setIsCreditCart] = useState(true);
   const [showCredit, setShowCredit] = useState(true);
+  const [sFullName, setFullName] = useState("");
+  const [sPhone, setPhone] = useState("");
+  const [sAddress, setAdress] = useState("");
+
   const [openCartDialog, setOpenCartDialog] = useState(false);
   const [orderDTO, setOrderDTO] = useState({
     userId: 0,
@@ -29,23 +32,23 @@ export default function Checkout() {
     address: "",
     email: "",
     totalPrice: 0,
-    note : ""
-});
-  const HandlePaymentMethod = (event) => {
-    const selectedValue = event.target.value;
-    setIsCreditCart(selectedValue);
-  }
+    note: ""
+  });
   const isSuccessPayPal = (isSuccess) => {
-      console.log("Successs")
-      swal({
-        title: "Information",
-        text: "The order have been created!",
-        icon: "info",
-      })
-      navigate("/")
+    console.log("Successs")
+    swal({
+      title: "Information",
+      text: "The order have been created!",
+      icon: "info",
+    })
+    navigate("/")
   }
-  useEffect(() => { 
+  useEffect(() => {
     if (currentUser) {
+      setFullName(currentUser.fullName)
+      setAdress(currentUser.address ? currentUser.address : "")
+      setPhone(currentUser.phone ? currentUser.phone : "")
+
       console.log("User ID", currentUser.id)
       getCartInfo(currentUser.id).then(response => {
         if (response.data.status === 200) {
@@ -64,9 +67,6 @@ export default function Checkout() {
       console.log("CookieCart: ", cart)
     }
   }, []);
-  useEffect(() => {
-    setShowCredit(isCreditCard)
-  }, [isCreditCard])
   const popop = (messs, status) => {
     toast({
       title: status,
@@ -78,7 +78,8 @@ export default function Checkout() {
     });
   }
   const submit = () => {
-    if(total <= 0) {
+
+    if (total <= 0) {
       swal({
         title: "Warning",
         text: "The order is invalid, please add something into cart first!",
@@ -89,7 +90,7 @@ export default function Checkout() {
     const phoneNumber = document.getElementById("phoneNumber").value;
     const address = document.getElementById("address").value;
     const note = document.getElementById("note").value;
-    const email =   currentUser.email;
+    const email = currentUser.email;
     const phoneRegex = /^\d{9,11}$/;
     var isValid = true;
     if (!fullName) {
@@ -104,7 +105,7 @@ export default function Checkout() {
       popop("Address is require! ", "Warning")
       isValid = false;
     }
-    if(note && note.length > 254){
+    if (note && note.length > 254) {
       popop("Note must be less than 255 characters! ", "Warning")
       isValid = false;
     }
@@ -116,7 +117,7 @@ export default function Checkout() {
         break;
       }
     }
-    
+    console.log("IsValid", isValid)
     if (isValid) {
       // eslint-disable-next-line no-restricted-globals
       if (confirm("Are you sure to purchase this order?")) {
@@ -127,22 +128,37 @@ export default function Checkout() {
           address: address,
           email: email,
           totalPrice: total,
-          note : note? note : ""
-      });
+          note: note ? note : ""
+        });
         if (paymentMethod === "true") {
           setOpenCartDialog(true)
         } else {
           directPayment(orderDTO).then(response => {
-            console.log("TAO ORDER",response.data)
+            if (response.data.status === 200) {
+              swal({
+                title: "Information",
+                text: "The order have been created! Please go to ",
+                icon: "info",
+              })
+              navigate("/")
+            }
+
           })
         }
       }
     }
-
-
   }
   const handleCloseDialogEdit = () => {
     setOpenCartDialog(false);
+  }
+  const changeHandler = (event) => {
+    setFullName(event.target.value)
+  }
+  const changeAdress = (event) => {
+    setAdress(event.target.value)
+  }
+  const changePhone = (event) => {
+    setPhone(event.target.value)
   }
   return (
     <div className="maincontainer">
@@ -186,7 +202,7 @@ export default function Checkout() {
               <div class="row">
                 <div class="mb-3">
                   <label for="firstName">Full name</label>
-                  <input type="text" class="form-control" id="fullName" placeholder="" value={currentUser ? currentUser.fullName : ""} required />
+                  <input type="text" class="form-control" id="fullName" placeholder="" value={sFullName} onChange={changeHandler} required />
                   <div class="invalid-feedback">
                     Valid first name is required.
                   </div>
@@ -194,14 +210,14 @@ export default function Checkout() {
               </div>
               <div class="mb-3">
                 <label for="username">Phone number</label>
-                <input type="text" class="form-control" id="phoneNumber" value={currentUser ? currentUser.phoneNumber : ""} placeholder="Phone number" required />
+                <input type="text" class="form-control" id="phoneNumber" value={sPhone} placeholder="Phone number" required onChange={changePhone} />
                 <div class="invalid-feedback">
                   Phone number is required.
                 </div>
               </div>
               <div class="mb-3">
                 <label for="address">Address</label>
-                <input type="text" class="form-control" id="address" value={currentUser ? currentUser.address : ""} placeholder="1234 Main St" required />
+                <input type="text" class="form-control" id="address" value={sAddress} placeholder="1234 Main St" required onChange={changeAdress} />
                 <div class="invalid-feedback">
                   Please enter your shipping address.
                 </div>
@@ -229,9 +245,9 @@ export default function Checkout() {
 
               <button onClick={submit} class="btn btn-primary btn-lg btn-block mb" type="button">Continue to checkout</button>
               {
-                openCartDialog && <OnlinePayment successHandler={isSuccessPayPal} amount={total}  orderDTO={orderDTO}/> 
+                openCartDialog && <OnlinePayment test= {openCartDialog} successHandler={isSuccessPayPal} amount={total} orderDTO={orderDTO} />
               }
-              
+
             </form>
           </div>
         </div>

@@ -38,7 +38,10 @@ const ButtonWrapper = ({ currency, showSpinner, amount,orderDTO,successHandler }
             if(response.status === 'COMPLETED'){
               successHandler(true);
               payPalPayment(orderDTO).then(response => {
-                console.log("TAO ORDER",response.data)
+                if(response.data.status === 200){
+                  console.log("TAO ORDER Payapl")
+                }
+                
               })
             }
         })}
@@ -47,7 +50,9 @@ const ButtonWrapper = ({ currency, showSpinner, amount,orderDTO,successHandler }
   );
 }
 
-export default function OnlinePayment({amount,orderDTO,successHandler}) {
+export default function OnlinePayment({amount,orderDTO,successHandler,test}) {
+  console.log("Pâypl",orderDTO)
+  console.log("Show",test)
   return (
     <div style={{ maxWidth: "750px", minHeight: "200px" }}>
       <PayPalScriptProvider options={{ clientId: "test", components: "buttons", currency: "USD" }}>
