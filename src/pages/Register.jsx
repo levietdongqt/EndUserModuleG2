@@ -5,6 +5,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import { Register as Signup } from '../services/UserServices';
 import RegisterValidations from '../validations/RegisterValidations';
+import bcrypt from 'bcryptjs/dist/bcrypt';
 
 const Register = () => {
 
@@ -27,6 +28,9 @@ const Register = () => {
     },
     onSubmit: async (values) => {
       let errorMessage = '';
+      console.log("Voooo")
+      const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
+      const hashedPassword = bcrypt.hashSync(values.password, salt);
       try {
         const userDTO = {
           fullName: values.fullName,
@@ -36,14 +40,14 @@ const Register = () => {
           address: values.address,
           dateOfBirth: values.dateOfBirth,
           gender: values.gender,
-          password: values.password,
+          password: hashedPassword,
         };
         const response = await Signup(userDTO);
 
         if (response.data) {
           navigate('/login');
           toast({
-            title: 'Welcome to CLOTHIFY!',
+            title: 'Welcome to MyImages!',
             description: 'Please check your email and confirm.',
             status: 'success',
             duration: 2000,

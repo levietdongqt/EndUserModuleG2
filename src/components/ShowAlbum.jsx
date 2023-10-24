@@ -2,26 +2,6 @@ import { Box, Image } from '@chakra-ui/react';
 import Slider from 'react-slick';
 const ShowAlbum = ({images}) => {
 
-  function SampleNextArrow(props) {
-    const { className, style, onClick } = props;
-    return (
-      <div
-        className={className}
-        style={{ ...style, display: "block", backgroundColor: '#261f15', color: '#fff', borderRadius: '25px', right: '0px' }}
-        onClick={onClick}
-      />
-    );
-  }
-  function SamplePrevArrow(props) {
-    const { className, style, onClick } = props;
-    return (
-      <div
-        className={className}
-        style={{ ...style, display: "block", backgroundColor: '#261f15', color: '#fff', borderRadius: '25px', left: '-20px' }}
-        onClick={onClick}
-      />
-    );
-  }
   const settings = {
     infinite: true,
     speed: 200,
@@ -29,8 +9,7 @@ const ShowAlbum = ({images}) => {
     slidesToScroll: 1,
     autoplay: true,
     arrows: true,
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
+
   };
   return (
     <>

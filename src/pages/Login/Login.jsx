@@ -8,7 +8,11 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 //import GoogleIcon from '@mui/icons-material/Google';
 import { useFormik } from 'formik';
+<<<<<<< HEAD
 import { sendmail } from '../../services/UserServices';
+=======
+import bcrypt from 'bcryptjs/dist/bcrypt';
+>>>>>>> main
 import { useUserContext } from '../../contexts/UserContext';
 import LoginValidations from '../../validations/LoginValidations';
 import { Login as LogIn, OAuth2Request } from '../../services/AuthServices';
@@ -70,7 +74,9 @@ const Login = () => {
       password: ''
     },
     onSubmit: values => {
-      LogIn(values.email, values.password)
+      const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
+      const hashedPassword = bcrypt.hashSync(values.password, salt);
+      LogIn(values.email, hashedPassword)
         .then((result) => {
           handldeResponse(result, remember);
         });

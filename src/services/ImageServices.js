@@ -9,6 +9,15 @@ export const getMyImages = async (userID) => {
     return error.response;
   }
 };
+export const getNoTemplate = async (userID) => {
+  try {
+    const response = await baseRequest.get(`/upload/LoadNoTemplate?userID=${userID}`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const getMaterialPage = async () => {
   try {
     const response = await baseRequest.get(`/MaterialPage`);
@@ -21,7 +30,6 @@ export const getMaterialPage = async () => {
 export const uploadImages = async (formData) => {
   try {
     const templateID =  formData.get('templateID')
-    console.log('Filesssss:', formData.get('files[0]'));
     if (templateID === 1) {
       const response = await baseRequest.post(`/upload/WithNoTemplate`, formData, {
         headers: {

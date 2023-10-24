@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import xReact, { useEffect, useState } from 'react';
 import { useLocation, useNavigate,useParams  } from 'react-router-dom';
 import {Box, SimpleGrid, Button, Select, Text, Icon, Heading, Container} from '@chakra-ui/react';
 import queryString from 'query-string';
 import TemplateCard from '../components/templateCard';
 import FilterMenu from '../components/FilterMenu';
 import {getTemplateByCollection } from '../services/CollectionServices';
-import {getTemplateByName } from '../services/TemplateServices'
-import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
 import Pagination  from '../components/Pagination';
-const Search = () => {
+const Collections = () => {
 
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { search, canSearch } = useSearchContext();
   const [template, setTemplates] = useState([]);
   const [sortBy, setSortBy] = useState("recommended");
   const [total, setTotal] = useState(0);
   const [show, setShow] = useState([]);
   const { name } = useParams();
   const [pagination, setPagination] = useState({
-    result: {
       page: 1,
       limit: 20,
       totalRows: 1,
-    },
   });
   const [filters , setFilters] = useState({
     limit: 20,
@@ -32,15 +27,30 @@ const Search = () => {
   })
   useEffect(() => {
     if (state !== null) {
-      getTemplateByCollection(state.collectionsId)
+      if (isNaN(filters.page)) {
+        // If the page is not a valid number, set it to 1
+        setFilters({
+          ...filters,
+          page: 1,
+        });
+        return;
+      }
+       const paramsString = queryString.stringify(filters);
+      getTemplateByCollection(state.collectionsId,paramsString)
         .then((result) => {
-          setShow(result.result);
-          setTemplates(result.result.templateNames);
-          setTotal(result.result.templateNames.length);
+          setShow(result.result.items);
+          setPagination({
+            totalRows: result.result.totalRows,
+            limit: result.result.limit,
+          });
+          result.result.items.forEach((item) => {
+            setTemplates(item.templateNames);
+            setTotal(item.templateNames.length);
+          });
         });
       setSortBy("recommended");
     }
-  }, [state, search, canSearch,filters]);
+  }, [state,filters]);
 
   const handlePageChange = (newPage) => {
     setFilters({
@@ -133,4 +143,4 @@ const Search = () => {
   )
 }
 
-export default Search;
+export default Collections;

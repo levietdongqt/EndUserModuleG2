@@ -8,13 +8,21 @@ const useGetUserHaveThis = (userId, productId) => {
 
     useEffect(() => {
         userId && productId &&
-            getOrdersByUserId(userId)
-                .then((result) => {
-                    result.orders.forEach((order) => {
-                        const result = (order.products.find(p => p === productId));
-                        result !== undefined && setHave(true);
-                    });
-                });
+        getOrdersByUserId(userId)
+            .then((result) => {
+              if(result.result.status === 'Enabled'){
+                  result.result.purchaseOrders.forEach((item) => {
+                      if (item.status === 'Received') {
+                          item.myImages?.forEach((order) => {
+                              const test = order.templateId === productId;
+                              if (test) {
+                                  setHave(true);
+                              }
+                          });
+                      }
+                  });
+              }
+            });
     }, [userId, productId]);
 
     return [have];

@@ -23,7 +23,6 @@ import Hamburger from './Hamburger';
 import Dropdown from './Dropdown';
 import Searchbar from './Searchbar';
 import Upload from '../pages/Upload';
-
 const Navbar = () => {
 
   const [categories, setCategories] = useState([]);
@@ -195,16 +194,30 @@ const Navbar = () => {
           <Hamburger base='none' sm='flex' md='none' />
         </Box>
         <Box
-          display={{ base: 'none', md: 'flex' }}
-          justifyContent={'center'}
-          py={{ base: 1, md: 2 }}
-          ps={5}
-          width='100%'>
+            display={{ base: 'none', md: 'flex' }}
+            justifyContent={'center'}
+            py={{ base: 1, md: 2 }}
+            ps={5}
+            width='100%'>
           {
             categories.map((index) => {
-              return index && <Dropdown key={index.id} title={index.name} TemplateId={index.id} name={index.name} />
+              return index && <Dropdown key={index.id} title={index.name} CategoryId={index.id} name={index.name} />
             })
           }
+          <Box
+              color='black'
+              fontSize={20}
+              fontWeight={500}
+              variant='outline'
+              borderBottom='3px solid white'
+              transition={.5}
+              _hover={{ color: 'facebook.500', borderBottom: '3px solid #385898' }}
+              onClick={() => navigate(`/contact`)}
+              cursor={'pointer'}
+              px={{ base: 2, md: 4 }} py={{ base: 1, md:1 }}
+          >
+            Contact
+          </Box>
         </Box>
       </Box>
       <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template = {1} />

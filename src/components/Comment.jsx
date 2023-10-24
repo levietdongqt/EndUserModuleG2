@@ -18,14 +18,23 @@ const Comment = ({ authorId, commentText, createdAt }) => {
             <Divider />
             <Box
                 display='flex'
-                mt={{ base: 5, md: 10 }} fontSize={20}
+                flexDirection='column'
+                mt={2}
+                fontSize={{ base: 16, md: 20 }}
+                padding={5}
+                backgroundColor='#f0f0f0'
+                borderRadius={8}
             >
-                <Text mr={2} fontWeight={600} >{author} </Text>
-                |
-                <Text ml={2} fontWeight={300} >{moment(createdAt).format('DD MMMM YYYY')}</Text>
+                <Box
+                    display='flex'
+                    justifyContent='space-between'
+                    alignItems='center'
+                >
+                    <Text fontWeight={600}>{author}</Text>
+                    <Text fontWeight={300}>{moment(createdAt).format('DD MMMM YYYY')}</Text>
+                </Box>
+                <Text mt={3} lineHeight={1.5}>{commentText}</Text>
             </Box>
-            <Text mt={5} mb={{ base: 5, md: 10 }} >{commentText}</Text>
-            <Divider />
         </Box>
     )
 }
