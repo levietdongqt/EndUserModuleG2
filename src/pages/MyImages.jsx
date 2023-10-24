@@ -11,6 +11,7 @@ import { BiPhotoAlbum, BiSolidCartAdd } from 'react-icons/bi';
 import { deleteMyImage } from '../services/ImageServices';
 import swal from 'sweetalert';
 import { MdDelete } from "react-icons/md";
+import CustomImages from './CustomImages';
 
 const MyImages = (props) => {
 
@@ -19,6 +20,7 @@ const MyImages = (props) => {
   const [myImages, setMyImages] = useState([]);
   const [myImage, setMyImage] = useState();
   const [openCartDialog, setOpenCartDialog] = useState(false);
+  const [openCustomImage, setOpenCustomImage] = useState(false);
   const [isHovered, setIsHovered] = useState([]);
   useEffect(() => {
     if (currentUser) {
@@ -48,6 +50,9 @@ const MyImages = (props) => {
   const handleCloseDialogEdit = () => {
     setOpenCartDialog(false);
   }
+  const handleCloseDialogEdit2 = () => {
+    setOpenCustomImage(false);
+  }
   const deleteHandler = async (id) => {
     // eslint-disable-next-line no-restricted-globals
     if (confirm("Are you sure to delete this item?")) {
@@ -67,7 +72,10 @@ const MyImages = (props) => {
     }
 
   }
-
+  const customHandler = async (myImage) => {
+    setMyImage(myImage)
+    setOpenCustomImage(true)
+  }
   if (currentUser !== "") {
     if (myImages && myImages.length > 0) {
       return (
@@ -111,7 +119,7 @@ const MyImages = (props) => {
                                 <Box h={'7.0625rem'} w={'12.5rem'}></Box>
                                 <List p={0} m={0} backgroundColor={isHovered ? 'rgba(65,70,70,0.5)' : '#414646'}>
                                   <ListItem display={'inline-block'} w={'22%'} height={'30px'} cursor={'pointer'} >
-                                    <Link onClick={() => { deleteHandler(myImage.id) }}>
+                                    <Link onClick={() => { customHandler(myImage) }}>
                                       <MdDelete fontSize={30} color={'#fff'} />
                                     </Link>
                                   </ListItem>
@@ -140,6 +148,7 @@ const MyImages = (props) => {
               </SimpleGrid>
             </Box>
             <AddCartTemplate openDialog={openCartDialog} handleCloseDialog={handleCloseDialogEdit} myImage={myImage} />
+            <CustomImages openDialog={openCustomImage} handleCloseDialog={handleCloseDialogEdit2} myImage={myImage} />
           </Box>
         </>
       )
