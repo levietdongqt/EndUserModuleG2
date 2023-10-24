@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Link, Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Input, Image, Container } from '@chakra-ui/react';
 import { ShoppingCart } from '@mui/icons-material';
@@ -21,6 +21,7 @@ const Cart = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
   const [updatedQuantities, setUpdatedQuantities] = useState([]);
+  const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
     const newUpdatedQuantities = [...updatedQuantities];
     newUpdatedQuantities[index] = event.target.value;
@@ -65,7 +66,7 @@ const Cart = () => {
       deleteToCart(productId).then((result) => {
         if (result.data.status === 200) {
           toast({
-            title: 'Infomation',
+            title: 'Information',
             description: 'Delete successfully !',
             status: 'info',
             duration: 2000,
@@ -140,16 +141,31 @@ const Cart = () => {
   };
 
   const onClickRemove = async () => {
-    setCart([]);
-    removeCookie('cart', { path: '/' });
-    await deleteAllCart();
+    var formData = new FormData();
+    cart.forEach((element,index) => {
+      formData.append(`productIdList[${index}]`, Number(element.productId));
+    });
+    await deleteAllCart(formData).then(response => {
+      if (response.data.status === 200) {
+        setCart([]);
+        removeCookie('cart', { path: '/' });
+      }else{
+        toast({
+          title: 'Error!',
+          description: 'Delete cart fail.',
+          status: 'error',
+          duration: 2000,
+          isClosable: true
+        });
+      }
+    });
   };
 
   if (currentUser && cart && cart.length >= 1 && totalAmount > 0) {
     return (
       <>
         <Heading textAlign='center' fontSize={40} mt={8}  >Photo Card</Heading>
-        <Container maxW='1140px'>
+        <Container maxW='1400px'>
           <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
             <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -194,7 +210,10 @@ const Cart = () => {
                                 </Td>
 
                                 <Td>${(item.price * item.quantity).toFixed(2)}</Td>
-                                <Td><Link _hover={{ color: 'red' }} onClick={() => { handleDelete(item.productId) }}><MdDelete fontSize={30} color={'facebook.500'} /></Link></Td>
+                                <Td>
+                                  <Link _hover={{ color: 'red' }} onClick={() => { handleDelete(item.productId) }}><MdDelete fontSize={30} color={'facebook.500'} />
+                                  </Link>
+                                </Td>
                               </Tr>
                             </>
                           )
@@ -222,7 +241,7 @@ const Cart = () => {
               </Box>
               <Text mt={3} fontSize={20} color='facebook.500' fontWeight={100} >Product Amount: {totalAmount}</Text>
               <Text mt={3} fontSize={20} color='black' fontWeight={300} >Total: {totalPrice} $</Text>
-              <Button mt={10} colorScheme='facebook' onClick={onClickPurchase} >Purchase</Button>
+              <Button mt={10} colorScheme='facebook' onClick={() => navigate("/checkout")} >Checkout</Button>
               <Button mt={3} variant='text' color='facebook.500' onClick={onClickRemove} >Remove All</Button>
 
             </Box>

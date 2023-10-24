@@ -38,28 +38,32 @@ const Login = () => {
         setCookie('currentUser', result.data.result, { path: '/' });
         setTokenCookie('access_token', result.data.token, { path: '/' })
       } else {
-        setCookie('currentUser', result.data.result, { path: '/',expires: 0 });
-        setTokenCookie('access_token', result.data.token, { path: '/',expires: 0 })
+        setCookie('currentUser', result.data.result, { path: '/', expires: 0 });
+        setTokenCookie('access_token', result.data.token, { path: '/', expires: 0 })
       };
     } else {
       resetForm();
       toast({
         title: 'Error!',
-        description: 'Wrong email or password.',
+        description: result.data.message,
         status: 'error',
         duration: 2000,
-        isClosable: true
+        isClosable: true,
+        position: "top"
       });
     }
 
 
   }
-  const { values, handleSubmit, handleChange, isValid, resetForm } = useFormik({
+  const { values, handleSubmit, handleChange, isValid, resetForm,errors } = useFormik({
     initialValues: {
       email: '',
       password: ''
     },
     onSubmit: values => {
+      console.log("Voooo")
+
+      console.log(values.email)
       const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
       const hashedPassword = bcrypt.hashSync(values.password, salt);
       LogIn(values.email, hashedPassword)
@@ -67,7 +71,7 @@ const Login = () => {
           handldeResponse(result, remember);
         });
     },
-    validationSchema: LoginValidations
+    validationSchema: LoginValidations,
   });
 
   const login = useGoogleLogin({

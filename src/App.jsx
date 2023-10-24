@@ -12,10 +12,8 @@ import Cart from './pages/Cart';
 import MyImages from './pages/MyImages';
 import Infos from './pages/Info/Infos';
 import Template from './pages/Template';
-import Purchase from './pages/Purchase';
 import Search from './pages/Search';
 import Orders from './pages/Orders';
-import Payment from './pages/Payment';
 import Upload from './pages/Upload';
 import { useUserContext } from './contexts/UserContext';
 import Collections from './pages/Collections';
@@ -54,12 +52,10 @@ const App = () => {
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
-        <Route path='/purchase' element={<Purchase />} />
         <Route path='/checkout' element={<Checkout />} />
         <Route path='/search/:name' element={<Search />} />
         <Route path='/categories/:name' element={<Categories />} />
         <Route path='/categories/:name/collection/:name' element={<Collections />} />
-        <Route path='/payment' element={<Payment />} />
 
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>

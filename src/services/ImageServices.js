@@ -9,6 +9,15 @@ export const getMyImages = async (userID) => {
     return error.response;
   }
 };
+export const deleteMyImage = async (myImmageId) => {
+  try {
+    const response = await baseRequest.delete(`/upload/deleteMyImage?myImmageId=${myImmageId}`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const getNoTemplate = async (userID) => {
   try {
     const response = await baseRequest.get(`/upload/LoadNoTemplate?userID=${userID}`);

@@ -5,12 +5,12 @@ import {
   usePayPalScriptReducer
 } from "@paypal/react-paypal-js";
 import { useEffect } from "react";
-
+import { payPalPayment } from "../services/CartService";
 // This value is from the props in the UI
 const style = { "layout": "vertical" };
 
 // Custom component to wrap the PayPalButtons and show loading spinner
-const ButtonWrapper = ({ currency, showSpinner, amount }) => {
+const ButtonWrapper = ({ currency, showSpinner, amount,orderDTO,successHandler }) => {
   const [{ isPending, options }, dispatch] = usePayPalScriptReducer();
   useEffect(() => {
     dispatch({
@@ -36,7 +36,10 @@ const ButtonWrapper = ({ currency, showSpinner, amount }) => {
         }
         onApprove={(data,actions) => actions.order.capture().then(async(response) => {
             if(response.status === 'COMPLETED'){
-              console.log("Thanh toan thanh cong",response)
+              successHandler(true);
+              // payPalPayment(orderDTO).then(response => {
+              //   console.log("TAO ORDER",response.data)
+              // })
             }
         })}
       />
@@ -44,11 +47,11 @@ const ButtonWrapper = ({ currency, showSpinner, amount }) => {
   );
 }
 
-export default function OnlinePayment({amount}) {
+export default function OnlinePayment({amount,orderDTO,successHandler}) {
   return (
     <div style={{ maxWidth: "750px", minHeight: "200px" }}>
       <PayPalScriptProvider options={{ clientId: "test", components: "buttons", currency: "USD" }}>
-        <ButtonWrapper currency={'USD'} amount={amount} showSpinner={false} />
+        <ButtonWrapper orderDTO={orderDTO} successHandler={successHandler} currency={'USD'} amount={amount} showSpinner={false} />
       </PayPalScriptProvider>
     </div>
   );

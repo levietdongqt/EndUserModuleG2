@@ -1,6 +1,16 @@
 import baseRequest from "../contexts/AxiosContext";
 
-export const createOrder = async (orderDTO) => {
+export const payPalPayment = async (orderDTO) => {
+  try {
+    console.log("orderDTO",orderDTO)
+    const response = await baseRequest.post(`/Cart/payPalPayment`,orderDTO);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
+export const directPayment = async (orderDTO) => {
   try {
     console.log("orderDTO",orderDTO)
     const response = await baseRequest.post(`/Cart/directPayment`,orderDTO);
@@ -39,7 +49,7 @@ export const updateToCart = async (productId, quantity) => {
 };
 export const deleteToCart = async (productId) => {
   try {
-    const response = await baseRequest.put(`/Cart/UpdateCart?productDetailID=${productId}`);
+    const response = await baseRequest.delete(`/Cart/deleteItem?productDetailID=${productId}`);
     return response;
   } catch (error) {
     console.log(error.response)
@@ -47,9 +57,9 @@ export const deleteToCart = async (productId) => {
   }
 };
 
-export const deleteAllCart = async (userID) => {
+export const deleteAllCart = async (productIdList) => {
   try {
-    const response = await baseRequest.get(`/Cart/deleteAllCart?userID=${userID}`);
+    const response = await baseRequest.delete(`/Cart/deleteAll`,productIdList);
     return response;
   } catch (error) {
     console.log(error.response)
