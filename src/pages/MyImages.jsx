@@ -10,6 +10,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { BiPhotoAlbum, BiSolidCartAdd } from 'react-icons/bi';
 import { deleteMyImage } from '../services/ImageServices';
 import swal from 'sweetalert';
+import { MdDelete } from "react-icons/md";
 
 const MyImages = (props) => {
 
@@ -48,19 +49,23 @@ const MyImages = (props) => {
     setOpenCartDialog(false);
   }
   const deleteHandler = async (id) => {
-    await deleteMyImage(id).then(response => {
-      if (response.data.status === 200) {
-        getMyImages(currentUser.id)
-          .then(result => {
-            setMyImages(result.data.result);
-          });
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Are you sure to delete this item?")) {
+      await deleteMyImage(id).then(response => {
+        if (response.data.status === 200) {
+          getMyImages(currentUser.id)
+            .then(result => {
+              setMyImages(result.data.result);
+            });
           swal({
-        title: "Information",
-        text: "Delete Successfully!",
-        icon: "info",
+            title: "Information",
+            text: "Delete Successfully!",
+            icon: "info",
+          })
+        }
       })
-      }
-    })
+    }
+
   }
 
   if (currentUser !== "") {
@@ -107,7 +112,7 @@ const MyImages = (props) => {
                                 <List p={0} m={0} backgroundColor={isHovered ? 'rgba(65,70,70,0.5)' : '#414646'}>
                                   <ListItem display={'inline-block'} w={'22%'} height={'30px'} cursor={'pointer'} >
                                     <Link onClick={() => { deleteHandler(myImage.id) }}>
-                                      <BiPhotoAlbum fontSize={30} color={'#fff'} />
+                                      <MdDelete fontSize={30} color={'#fff'} />
                                     </Link>
                                   </ListItem>
                                   <ListItem display={'inline-block'} w={'22%'} height={'30px'} cursor={'pointer'}>
@@ -119,10 +124,10 @@ const MyImages = (props) => {
                               </Box>
                             </Box>
                             <Box padding="0px 0px 0px 5px" margin="10px 0px 0px" lineHeight="20px">
-                              <Text textAlign='left' mt={1} mb={'0.3rem'} >
+                              <Text textAlign='center' mt={1} mb={'0.3rem'} >
                                 {dateTime.substring(0, indexOfT)}
                               </Text>
-                              <Text>
+                              <Text textAlign='center'>
                                 {myImage.templateName}
                               </Text>
                             </Box>

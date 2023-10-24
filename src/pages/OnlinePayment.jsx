@@ -37,9 +37,9 @@ const ButtonWrapper = ({ currency, showSpinner, amount,orderDTO,successHandler }
         onApprove={(data,actions) => actions.order.capture().then(async(response) => {
             if(response.status === 'COMPLETED'){
               successHandler(true);
-              // payPalPayment(orderDTO).then(response => {
-              //   console.log("TAO ORDER",response.data)
-              // })
+              payPalPayment(orderDTO).then(response => {
+                console.log("TAO ORDER",response.data)
+              })
             }
         })}
       />
