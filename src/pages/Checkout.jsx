@@ -78,6 +78,13 @@ export default function Checkout() {
     });
   }
   const submit = () => {
+    if(total <= 0) {
+      swal({
+        title: "Warning",
+        text: "The order is invalid, please add something into cart first!",
+        icon: "warning",
+      })
+    }
     const fullName = document.getElementById("fullName").value;
     const phoneNumber = document.getElementById("phoneNumber").value;
     const address = document.getElementById("address").value;
