@@ -54,19 +54,13 @@ const Infos = () => {
             fullName: user.fullName || "", // Set fullName to an empty string if undefined
             gender: user.gender || "",
             phone: user.phone || "",
-            dateOfBirth: user.dateOfBirth || "",
+            dateOfBirth: user.dateOfBirth,
             address: user.address || "",
             avatar: null,
         });
 
 
     }, [checkUpdate, isEditing]);
-    console.log(user.fullName)
-
-
-    console.log("editname:", editedUser.fullName)
-
-
 
     //#region  SET NAV TAB
     const handleTabChange = (tab) => {
