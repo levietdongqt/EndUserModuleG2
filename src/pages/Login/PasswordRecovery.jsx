@@ -6,6 +6,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { resetPassword, sendmail } from '../../services/UserServices';
 import RegisterValidations from '../../validations/RegisterValidations';
 import moment from 'moment';
+import bcrypt from 'bcryptjs/dist/bcrypt';
 
 function PasswordRecovery() {
     const toast = useToast();
@@ -72,12 +73,16 @@ function PasswordRecovery() {
             return;
         }
         try {
+            const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
+            const hashedOldPassword = bcrypt.hashSync(values.repassword, salt);
+            console.log(values.password)
             const userDTO = {
                 id: userId,
-                password: values.password,
+                password: hashedOldPassword,
             };
+            console.log(userDTO.password)
             const response = await resetPassword(userDTO);
-
+            console.log(response)
             if (response.data) {
                 navigate('/login');
                 toast({

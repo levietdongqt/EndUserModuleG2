@@ -7,7 +7,7 @@ import { Cancel, Error, Info, Person, LocationOn, Phone, Email } from '@mui/icon
 import moment from 'moment';
 import { getOrderById, updateOrderStatus, getDeliveryById } from '../services/OrderServices';
 import CollectionCard from './CollectionCard';
-import ReportModal from './ReportCard';
+// import ReportModal from './ReportCard';
 
 
 const OrderCard = ({ orderId, deId }) => {

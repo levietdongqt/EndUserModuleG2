@@ -8,11 +8,8 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 //import GoogleIcon from '@mui/icons-material/Google';
 import { useFormik } from 'formik';
-<<<<<<< HEAD
 import { sendmail } from '../../services/UserServices';
-=======
 import bcrypt from 'bcryptjs/dist/bcrypt';
->>>>>>> main
 import { useUserContext } from '../../contexts/UserContext';
 import LoginValidations from '../../validations/LoginValidations';
 import { Login as LogIn, OAuth2Request } from '../../services/AuthServices';
@@ -49,8 +46,8 @@ const Login = () => {
         setCookie('currentUser', result.data.result, { path: '/' });
         setTokenCookie('access_token', result.data.token, { path: '/' })
       } else {
-        setCookie('currentUser', result.data.result, { path: '/',expires: 0 });
-        setTokenCookie('access_token', result.data.token, { path: '/',expires: 0 })
+        setCookie('currentUser', result.data.result, { path: '/', expires: 0 });
+        setTokenCookie('access_token', result.data.token, { path: '/', expires: 0 })
       };
     } else {
       resetForm();

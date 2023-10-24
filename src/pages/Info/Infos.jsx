@@ -12,7 +12,9 @@ import { useFormik } from 'formik';
 import RegisterValidations from '../../validations/RegisterValidations';
 import '../Info/Style.css';
 import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { getOrdersByStatus } from '../../services/OrderServices';
 import { forwardRef } from 'react';
+import bcrypt from 'bcryptjs/dist/bcrypt';
 
 
 
@@ -36,6 +38,8 @@ const Infos = () => {
     const [activeTab, setActiveTab] = useState('PERSONAL');
     const [checkUpdate, setCheckUpdate] = useState(0);
     const gender = user.gender === null ? "" : user.gender ? "Male" : "Female";
+    const [puschaseActives, setPurchaseActives] = useState([]);
+    const [puschaseTotal, setPurchaseTotal] = useState();
 
 
     //CALL GET USER BY ID
@@ -61,6 +65,25 @@ const Infos = () => {
 
 
     }, [checkUpdate, isEditing]);
+
+    useEffect(() => {
+        const activePurchase = async () => {
+            try {
+                const statuses = ['Received']
+                const response = await getOrdersByStatus(currentUser.id, statuses);
+                const purchaseArray = response.result;
+                setPurchaseActives(purchaseArray.sort((a, b) => (Number(a.createDate) - Number(b.createDate))).reverse());
+                const totalPurchases = purchaseArray.length;
+                setPurchaseTotal(totalPurchases);
+            } catch (error) {
+                console.error('error : ', error);
+            }
+        }
+        activePurchase();
+    }, []);
+
+
+
 
     //#region  SET NAV TAB
     const handleTabChange = (tab) => {
@@ -241,11 +264,16 @@ const Infos = () => {
                 setError('Confirmation password does not match.');
                 return;
             }
-            user.oldPassword = oldPassword;
-            user.newPassword = newPassword;
+            const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
+            const hashedPassword = bcrypt.hashSync(newPassword, salt);
+            const hashedOldPassword = bcrypt.hashSync(oldPassword, salt);
+
+
+            user.oldPassword = hashedOldPassword;
+            user.password = hashedPassword;
 
             try {
-                console.log(user.id, user.oldPassword, user.newPassword);
+                console.log(user.id, user.oldPassword, user.password);
 
                 const result = await changePassword(user);
                 toast({
@@ -439,31 +467,6 @@ const Infos = () => {
                                     CHANGE PASSWORD
                                 </Nav.Link>
                                 <ChangePasswordModal isOpen={isModalOpen} onClose={handleCloseModal} />
-
-                                <Nav.Link
-                                    href=""
-                                    className={`custom-link ${activeTab === 'DELIVRERY' ? 'focused' : ''}`}
-                                    onClick={() => handleTabChange('DELIVRERY')}
-                                >
-                                    DELIVRERY ADDRESS
-                                </Nav.Link>
-
-                                <Nav.Link
-                                    href=""
-                                    className={`custom-link ${activeTab === 'TRANSACTION' ? 'focused' : ''}`}
-                                    onClick={() => handleTabChange('TRANSACTION')}
-                                >
-                                    TRANSACTION HISTORY
-                                </Nav.Link>
-
-                                <Nav.Link
-                                    href=""
-                                    className={`custom-link ${activeTab === 'IMAGES' ? 'focused' : ''}`}
-                                    onClick={() => handleTabChange('IMAGES')}
-                                >
-                                    MY IMAGES
-                                </Nav.Link>
-
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
@@ -512,222 +515,196 @@ const Infos = () => {
                                     <Text fontSize="xl" fontWeight="bold" >
                                         Total Transaction:
                                     </Text>
-                                    <Text fontSize="xl" fontWeight="bold" marginLeft="1" color="red">9</Text>
+                                    <Text fontSize="xl" fontWeight="bold" marginLeft="1" color="red">{puschaseTotal}</Text>
                                 </Flex>
                             </div>
                         </Box>
                     </Container>
-                    {activeTab === 'PERSONAL' && (
-                        <Box>
-                            {isEditing ?
-                                (
-                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
-                                        <Flex alignItems="center" justifyContent="flex-end" mb={2}>
-                                            <FaEdit size={20} cursor="pointer" onClick={handleEditClick} />
-                                        </Flex>
-                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                                            Basic Information
-                                        </Heading>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Full Name:
-                                            </Text>
-                                            <Text flex="3">{user.fullName}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Gender:
-                                            </Text>
-                                            <Text flex="3">{gender}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Email:
-                                            </Text>
-                                            <Text flex="3">{user.email}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Phone:
-                                            </Text>
-                                            <Text flex="3">{user.phone}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                BirthDay:
-                                            </Text>
-                                            <Text flex="3">{fmDateInfo}</Text>
-                                        </Flex>
-                                        <Flex alignItems="center" mb={2}>
-                                            <Text fontWeight="bold" flex="1">
-                                                Address:
-                                            </Text>
-                                            <Text flex="3">{user.address}</Text>
-                                        </Flex>
+                    <Box>
+                        {isEditing ?
+                            (
+                                < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                    <Flex alignItems="center" justifyContent="flex-end" mb={2}>
+                                        <FaEdit size={20} cursor="pointer" onClick={handleEditClick} />
+                                    </Flex>
+                                    <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                        Basic Information
+                                    </Heading>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            Full Name:
+                                        </Text>
+                                        <Text flex="3">{user.fullName}</Text>
+                                    </Flex>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            Gender:
+                                        </Text>
+                                        <Text flex="3">{gender}</Text>
+                                    </Flex>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            Email:
+                                        </Text>
+                                        <Text flex="3">{user.email}</Text>
+                                    </Flex>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            Phone:
+                                        </Text>
+                                        <Text flex="3">{user.phone}</Text>
+                                    </Flex>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            BirthDay:
+                                        </Text>
+                                        <Text flex="3">{fmDateInfo}</Text>
+                                    </Flex>
+                                    <Flex alignItems="center" mb={2}>
+                                        <Text fontWeight="bold" flex="1">
+                                            Address:
+                                        </Text>
+                                        <Text flex="3">{user.address}</Text>
+                                    </Flex>
+                                </Box>
+
+                            ) : (
+
+                                < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
+                                    <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
+                                        Update Basic Information
+                                    </Heading>
+                                    <Box as="form" onSubmit={handleSubmit} >
+
+                                        <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
+                                            onDragOver={allowDrop}>
+                                            <Avatar
+                                                size="2xl"
+                                                name=""
+                                                src={selectedImage || `${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`}
+                                                onClick={handleImageClick}
+                                                cursor="pointer"
+                                                draggable="true"
+                                            />
+                                            <input
+                                                id="imageInput"
+                                                type="file"
+                                                style={{ display: 'none' }}
+                                                onChange={handleImageChange}
+                                            />
+                                        </InputGroup>
+
+
+                                        <InputGroup mb={3} isInvalid={touched.fullName && errors.fullName}>
+                                            <InputLeftAddon w="120px">Full Name:</InputLeftAddon>
+                                            <Input
+                                                type="text"
+                                                name="fullName"
+                                                value={editedUser.fullName}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleInputChange(e);
+                                                }}
+                                                onBlur={handleBlur}
+                                            />
+                                        </InputGroup>
+                                        {touched.fullName && errors.fullName && (
+                                            <div style={{ color: 'red' }}>{errors.fullName}</div>
+                                        )}
+
+                                        <InputGroup mb={3} isInvalid={touched.gender && errors.gender}>
+                                            <InputLeftAddon w="120px">Gender:</InputLeftAddon>
+                                            <RadioGroup
+                                                name="gender"
+                                                value={values.gender}
+                                                onChange={handleChange}
+                                                pt={2}
+                                            >
+                                                <Radio value={true}
+                                                    isChecked={values.gender === true}
+                                                    onChange={() => setFieldValue("gender", true)} pr={5} pl={5}>Male</Radio>
+                                                <Radio value={false}
+                                                    isChecked={values.gender === false}
+                                                    onChange={() => setFieldValue("gender", false)} pr={2}>Female</Radio>
+                                            </RadioGroup>
+                                        </InputGroup>
+                                        {touched.gender && errors.gender && (
+                                            <div style={{ color: 'red' }}>{errors.gender}</div>
+                                        )}
+
+                                        <InputGroup mb={3} isInvalid={touched.phone && errors.phone}>
+                                            <InputLeftAddon w="120px">Phone:</InputLeftAddon>
+                                            <Input
+                                                type="text"
+                                                name="phone"
+                                                value={editedUser.phone}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleInputChange(e);
+                                                }}
+                                                onBlur={handleBlur}
+                                            />
+                                        </InputGroup>
+                                        {touched.phone && errors.phone && (
+                                            <div style={{ color: 'red' }}>{errors.phone}</div>
+                                        )}
+
+
+                                        <InputGroup mb={3} isInvalid={touched.dateOfBirth && errors.dateOfBirth}>
+                                            <InputLeftAddon w="120px">BirthDay:</InputLeftAddon>
+                                            <Input
+                                                type="date"
+                                                name="dateOfBirth"
+                                                value={editedUser.dateOfBirth}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleInputChange(e);
+                                                }}
+                                                onBlur={handleBlur}
+
+                                            />
+                                        </InputGroup>
+                                        {touched.dateOfBirth && errors.dateOfBirth && (
+                                            <div style={{ color: 'red' }}>{errors.dateOfBirth}</div>
+                                        )}
+
+
+                                        <InputGroup mb={3} isInvalid={touched.address && errors.address}>
+                                            <InputLeftAddon w="120px">Address:</InputLeftAddon>
+                                            <Input
+                                                type="text"
+                                                name="address"
+                                                value={editedUser.address}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleInputChange(e);
+                                                }}
+                                                onBlur={handleBlur}
+                                            />
+                                        </InputGroup>
+                                        {touched.address && errors.address && (
+                                            <div style={{ color: 'red' }}>{errors.address}</div>
+                                        )}
+
+
+                                        <Button colorScheme="blue" type="submit" >
+                                            Save
+                                        </Button>
+
+                                        <Button colorScheme="gray" ml={3} onClick={handleCancel}>
+                                            Cancel
+                                        </Button>
+
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+
+
+
+                                        </div>
                                     </Box>
+                                </Box>
 
-                                ) : (
-
-                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
-                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                                            Update Basic Information
-                                        </Heading>
-                                        <Box as="form" onSubmit={handleSubmit} >
-
-                                            <InputGroup mb={3} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} onDrop={handleDrop}
-                                                onDragOver={allowDrop}>
-                                                <Avatar
-                                                    size="2xl"
-                                                    name=""
-                                                    src={selectedImage || `${process.env.REACT_APP_API_BASE_URL_LOCAL}${user.avatar}`}
-                                                    onClick={handleImageClick}
-                                                    cursor="pointer"
-                                                    draggable="true"
-                                                />
-                                                <input
-                                                    id="imageInput"
-                                                    type="file"
-                                                    style={{ display: 'none' }}
-                                                    onChange={handleImageChange}
-                                                />
-                                            </InputGroup>
-
-
-                                            <InputGroup mb={3} isInvalid={touched.fullName && errors.fullName}>
-                                                <InputLeftAddon w="120px">Full Name:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="fullName"
-                                                    value={editedUser.fullName}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.fullName && errors.fullName && (
-                                                <div style={{ color: 'red' }}>{errors.fullName}</div>
-                                            )}
-
-                                            <InputGroup mb={3} isInvalid={touched.gender && errors.gender}>
-                                                <InputLeftAddon w="120px">Gender:</InputLeftAddon>
-                                                <RadioGroup
-                                                    name="gender"
-                                                    value={values.gender}
-                                                    onChange={handleChange}
-                                                    pt={2}
-                                                >
-                                                    <Radio value={true}
-                                                        isChecked={values.gender === true}
-                                                        onChange={() => setFieldValue("gender", true)} pr={5} pl={5}>Male</Radio>
-                                                    <Radio value={false}
-                                                        isChecked={values.gender === false}
-                                                        onChange={() => setFieldValue("gender", false)} pr={2}>Female</Radio>
-                                                </RadioGroup>
-                                            </InputGroup>
-                                            {touched.gender && errors.gender && (
-                                                <div style={{ color: 'red' }}>{errors.gender}</div>
-                                            )}
-
-                                            <InputGroup mb={3} isInvalid={touched.phone && errors.phone}>
-                                                <InputLeftAddon w="120px">Phone:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="phone"
-                                                    value={editedUser.phone}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.phone && errors.phone && (
-                                                <div style={{ color: 'red' }}>{errors.phone}</div>
-                                            )}
-
-
-                                            <InputGroup mb={3} isInvalid={touched.dateOfBirth && errors.dateOfBirth}>
-                                                <InputLeftAddon w="120px">BirthDay:</InputLeftAddon>
-                                                <Input
-                                                    type="date"
-                                                    name="dateOfBirth"
-                                                    value={editedUser.dateOfBirth}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-
-                                                />
-                                            </InputGroup>
-                                            {touched.dateOfBirth && errors.dateOfBirth && (
-                                                <div style={{ color: 'red' }}>{errors.dateOfBirth}</div>
-                                            )}
-
-
-                                            <InputGroup mb={3} isInvalid={touched.address && errors.address}>
-                                                <InputLeftAddon w="120px">Address:</InputLeftAddon>
-                                                <Input
-                                                    type="text"
-                                                    name="address"
-                                                    value={editedUser.address}
-                                                    onChange={(e) => {
-                                                        handleChange(e);
-                                                        handleInputChange(e);
-                                                    }}
-                                                    onBlur={handleBlur}
-                                                />
-                                            </InputGroup>
-                                            {touched.address && errors.address && (
-                                                <div style={{ color: 'red' }}>{errors.address}</div>
-                                            )}
-
-
-                                            <Button colorScheme="blue" type="submit" >
-                                                Save
-                                            </Button>
-
-                                            <Button colorScheme="gray" ml={3} onClick={handleCancel}>
-                                                Cancel
-                                            </Button>
-
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-
-
-
-                                            </div>
-                                        </Box>
-                                    </Box>
-
-                                )}
-                        </Box>
-                    )}
-                    {activeTab === 'TRANSACTION' && (
-                        <Box>
-                            {isEditing ?
-                                (
-                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
-
-                                    </Box>
-
-                                ) : (
-
-                                    < Box borderWidth="1px" borderRadius="lg" p={4} maxW="100%" mx="auto" boxShadow="lg" width={{ base: '100%', sm: '90%' }} marginTop="5">
-                                        <Heading textAlign='center' color={'facebook.500'} fontSize={32} fontWeight={600} mb={10}>
-                                            Update TRANSACTION HISTORY
-                                        </Heading>
-
-                                    </Box>
-
-                                )}
-                        </Box>
-                    )}
-                    {activeTab === 'IMAGES' && (
-                        <div>MY IMAGES</div>
-                    )}
-
+                            )}
+                    </Box>
                 </Box>
             </Flex >
         </Box >

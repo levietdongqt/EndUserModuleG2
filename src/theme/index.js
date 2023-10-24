@@ -21,8 +21,8 @@ export default function ThemeProvider({ children }) {
   theme.components = componentsOverride(theme);
 
   return (
-      <MUIThemeProvider theme={theme}>
-        {children}
-      </MUIThemeProvider>
+    <MUIThemeProvider theme={theme}>
+      {children}
+    </MUIThemeProvider>
   );
 }
