@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { useCartContext } from '../contexts/CartContext';
 import { useToast } from '@chakra-ui/react';
-import CreditInfo from '../components/CreditInfo';
-import { createOrder } from '../services/CartService';
+import { directPayment } from '../services/CartService';
+import OnlinePayment from './OnlinePayment';
+import swal from 'sweetalert';
 
 export default function Checkout() {
 
@@ -17,6 +18,7 @@ export default function Checkout() {
   const { cart, setCart, refresh } = useCartContext();
   const { currentUser } = useUserContext();
   const [total, setTotal] = useState(0)
+  const navigate = useNavigate();
   const [isCreditCard, setIsCreditCart] = useState(true);
   const [showCredit, setShowCredit] = useState(true);
   const [openCartDialog, setOpenCartDialog] = useState(false);
@@ -33,7 +35,16 @@ export default function Checkout() {
     const selectedValue = event.target.value;
     setIsCreditCart(selectedValue);
   }
-  useEffect(() => {
+  const isSuccessPayPal = (isSuccess) => {
+      console.log("Successs")
+      swal({
+        title: "Information",
+        text: "The order have been created!",
+        icon: "info",
+      })
+      navigate("/")
+  }
+  useEffect(() => { 
     if (currentUser) {
       console.log("User ID", currentUser.id)
       getCartInfo(currentUser.id).then(response => {
@@ -69,12 +80,10 @@ export default function Checkout() {
   const submit = () => {
     const fullName = document.getElementById("fullName").value;
     const phoneNumber = document.getElementById("phoneNumber").value;
-    const email = document.getElementById("email").value;
     const address = document.getElementById("address").value;
     const note = document.getElementById("note").value;
-
+    const email =   currentUser.email;
     const phoneRegex = /^\d{9,11}$/;
-    const mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     var isValid = true;
     if (!fullName) {
       popop("Full name is require! ", "Warning")
@@ -82,10 +91,6 @@ export default function Checkout() {
     }
     if (!phoneNumber || !phoneRegex.test(phoneNumber)) {
       popop("Phone number is invalid! ", "Warning")
-      isValid = false;
-    }
-    if (!email || !mailformat.test(email)) {
-      popop("Email is is invalid! ", "Warning")
       isValid = false;
     }
     if (!address) {
@@ -104,7 +109,7 @@ export default function Checkout() {
         break;
       }
     }
-
+    
     if (isValid) {
       // eslint-disable-next-line no-restricted-globals
       if (confirm("Are you sure to purchase this order?")) {
@@ -120,7 +125,7 @@ export default function Checkout() {
         if (paymentMethod === "true") {
           setOpenCartDialog(true)
         } else {
-          createOrder(orderDTO).then(response => {
+          directPayment(orderDTO).then(response => {
             console.log("TAO ORDER",response.data)
           })
         }
@@ -188,13 +193,6 @@ export default function Checkout() {
                 </div>
               </div>
               <div class="mb-3">
-                <label for="email">Email </label>
-                <input type="email" class="form-control" value={currentUser ? currentUser.email : ""} id="email" placeholder="you@example.com" />
-                <div class="invalid-feedback">
-                  Please enter a valid email address for shipping updates.
-                </div>
-              </div>
-              <div class="mb-3">
                 <label for="address">Address</label>
                 <input type="text" class="form-control" id="address" value={currentUser ? currentUser.address : ""} placeholder="1234 Main St" required />
                 <div class="invalid-feedback">
@@ -223,11 +221,14 @@ export default function Checkout() {
               </div>
 
               <button onClick={submit} class="btn btn-primary btn-lg btn-block mb" type="button">Continue to checkout</button>
+              {
+                openCartDialog && <OnlinePayment successHandler={isSuccessPayPal} amount={total}  orderDTO={orderDTO}/> 
+              }
+              
             </form>
           </div>
         </div>
       </div>
-      <CreditInfo handleCloseDialog={handleCloseDialogEdit} openDialog={openCartDialog} />
     </div>
 
   )

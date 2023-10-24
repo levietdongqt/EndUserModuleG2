@@ -53,10 +53,11 @@ const Login = () => {
       resetForm();
       toast({
         title: 'Error!',
-        description: 'Wrong email or password.',
+        description: result.data.message,
         status: 'error',
         duration: 2000,
-        isClosable: true
+        isClosable: true,
+        position: "top"
       });
     }
   }
@@ -65,12 +66,16 @@ const Login = () => {
 
 
   //#region FORMIK CHEKC ERROR AND SUBMIT LOGIN
+
   const { values, handleSubmit, handleChange, isValid, resetForm } = useFormik({
     initialValues: {
       email: '',
       password: ''
     },
     onSubmit: values => {
+      console.log("Voooo")
+
+      console.log(values.email)
       const salt = "$2a$10$tpe4SRcMCzhG0xHhUFAs1.";
       const hashedPassword = bcrypt.hashSync(values.password, salt);
       LogIn(values.email, hashedPassword)
@@ -78,7 +83,7 @@ const Login = () => {
           handldeResponse(result, remember);
         });
     },
-    validationSchema: LoginValidations
+    validationSchema: LoginValidations,
   });
   //#endregion
 

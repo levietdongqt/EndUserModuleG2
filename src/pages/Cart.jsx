@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Link, Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Input, Image,Container } from '@chakra-ui/react';
+import { Link, Box, Text, Icon, Heading, Button, SimpleGrid, useToast, TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Input, Image, Container } from '@chakra-ui/react';
 import { ShoppingCart } from '@mui/icons-material';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
-import {getCartInfo, deleteAllCart, updateToCart, deleteToCart} from '../services/CartService';
+import { getCartInfo, deleteAllCart, updateToCart, deleteToCart } from '../services/CartService';
 import CollectionCard from '../components/CollectionCard';
 import ShowAlbum from '../components/ShowAlbum';
 import { FcDeleteRow } from 'react-icons/fc';
-import {MdDelete} from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 const Cart = () => {
 
   const toast = useToast();
@@ -21,6 +21,7 @@ const Cart = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
   const [updatedQuantities, setUpdatedQuantities] = useState([]);
+  const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
     const newUpdatedQuantities = [...updatedQuantities];
     newUpdatedQuantities[index] = event.target.value;
@@ -29,11 +30,11 @@ const Cart = () => {
   useEffect(() => {
     if (currentUser) {
       getCartInfo(currentUser.id).then(response => {
-        if(response.data.status === 200){
+        if (response.data.status === 200) {
           setCookie("cart", response.data.result)
           setCart(response.data.result)
-        }else{
-          setCookie("cart", []) 
+        } else {
+          setCookie("cart", [])
           setCart([])
         }
       });
@@ -61,55 +62,55 @@ const Cart = () => {
   }, [cart, cookies.cart, refresh, currentUser]);
 
   const handleDelete = (productId) => {
-        if(currentUser){
-          deleteToCart(productId).then((result) => {
-            if(result.data.status === 200){
-              toast({
-                title: 'Infomation',
-                description: 'Delete successfully !',
-                status: 'info',
-                duration: 2000,
-                isClosable: true,
-                position: "top"
-              });
-            }else{
-              toast({
-                title: 'Error',
-                description: 'Delete fail, please reload and try again !',
-                status: 'error',
-                duration: 2000,
-                isClosable: true,
-                position: "top"
-              });
-            }
-        });
+    if (currentUser) {
+      deleteToCart(productId).then((result) => {
+        if (result.data.status === 200) {
+          toast({
+            title: 'Information',
+            description: 'Delete successfully !',
+            status: 'info',
+            duration: 2000,
+            isClosable: true,
+            position: "top"
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Delete fail, please reload and try again !',
+            status: 'error',
+            duration: 2000,
+            isClosable: true,
+            position: "top"
+          });
         }
+      });
+    }
   }
-  const handleUpdateQuantity = (productId,Index) => {
-      if(currentUser){
-        const amount = Number(updatedQuantities[Index]);
-        updateToCart(productId,amount).then((result) => {
-          if(result.data.status === 200){
-            toast({
-              title: 'Infomation',
-              description: 'Update quantity successfully !',
-              status: 'info',
-              duration: 2000,
-              isClosable: true,
-              position: "top"
-            });
-          }else{
-            toast({
-              title: 'Error',
-              description: 'Update quantity fail, please reload and try again !',
-              status: 'error',
-              duration: 2000,
-              isClosable: true,
-              position: "top"
-            });
-          }
-        });
-      }
+  const handleUpdateQuantity = (productId, Index) => {
+    if (currentUser) {
+      const amount = Number(updatedQuantities[Index]);
+      updateToCart(productId, amount).then((result) => {
+        if (result.data.status === 200) {
+          toast({
+            title: 'Infomation',
+            description: 'Update quantity successfully !',
+            status: 'info',
+            duration: 2000,
+            isClosable: true,
+            position: "top"
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Update quantity fail, please reload and try again !',
+            status: 'error',
+            duration: 2000,
+            isClosable: true,
+            position: "top"
+          });
+        }
+      });
+    }
   };
   const onClickPurchase = () => {
     if (currentUser) {
@@ -140,47 +141,62 @@ const Cart = () => {
   };
 
   const onClickRemove = async () => {
-    setCart([]);
-    removeCookie('cart', { path: '/' });
-    await deleteAllCart();
+    var formData = new FormData();
+    cart.forEach((element,index) => {
+      formData.append(`productIdList[${index}]`, Number(element.productId));
+    });
+    await deleteAllCart(formData).then(response => {
+      if (response.data.status === 200) {
+        setCart([]);
+        removeCookie('cart', { path: '/' });
+      }else{
+        toast({
+          title: 'Error!',
+          description: 'Delete cart fail.',
+          status: 'error',
+          duration: 2000,
+          isClosable: true
+        });
+      }
+    });
   };
 
-  if (currentUser && cart  && cart.length >= 1 && totalAmount > 0) {
+  if (currentUser && cart && cart.length >= 1 && totalAmount > 0) {
     return (
       <>
-       <Heading textAlign='center' fontSize={40} mt={8}  >Photo Card</Heading>
-       <Container maxW='1140px'>
-      <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
-        <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
-          <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-            <TableContainer>
-              <Table variant='striped' colorScheme='gray' size={"md"}>
-                <Thead >
-                  <Tr borderBottom={'2px'} >
-                    <Th>Image</Th>
-                    <Th>Template</Th>
-                    <Th>Size</Th>
-                    <Th>Material</Th>
-                    <Th>Amount</Th>
-                    <Th>Price</Th>
-                    <Th></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {
-                    cart && cart.map((item, index) => {
-                      return (
-                        <>
-                          <Tr key={index}>
-                            <Td>
-                              <ShowAlbum images = {item.images} /></Td>
-                            <Td>
-                              <Text color={'#284b9b'} fontSize={18} fontWeight={700}>{item.templateName}</Text>
-                            </Td>
-                            <Td >{`${item.width} X ${item.length}`}</Td>
-                            <Td >{item.materialPage}</Td>
-                              <Td textAlign={'center'}>
-                                <Input
+        <Heading textAlign='center' fontSize={40} mt={8}  >Photo Card</Heading>
+        <Container maxW='1400px'>
+          <Box display='flex' flexDirection={{ base: 'column', md: 'row' }} >
+            <SimpleGrid width='80%' p={{ base: 3, md: 5 }} columns={{ base: 1, sm: 1, md: 1 }} spacing={{ base: 3, md: 5 }} >
+              <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                <TableContainer>
+                  <Table variant='striped' colorScheme='gray' size={"md"}>
+                    <Thead >
+                      <Tr borderBottom={'2px'} >
+                        <Th>Image</Th>
+                        <Th>Template</Th>
+                        <Th>Size</Th>
+                        <Th>Material</Th>
+                        <Th>Amount</Th>
+                        <Th>Price</Th>
+                        <Th></Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {
+                        cart && cart.map((item, index) => {
+                          return (
+                            <>
+                              <Tr key={index}>
+                                <Td>
+                                  <ShowAlbum images={item.images} /></Td>
+                                <Td>
+                                  <Text color={'#284b9b'} fontSize={18} fontWeight={700}>{item.templateName}</Text>
+                                </Td>
+                                <Td >{`${item.width} X ${item.length}`}</Td>
+                                <Td >{item.materialPage}</Td>
+                                <Td textAlign={'center'}>
+                                  <Input
                                     type="number"
                                     value={updatedQuantities[index]}
                                     onChange={(e) => handleQuantityChange(e, index)}
@@ -189,47 +205,50 @@ const Cart = () => {
                                     borderRadius={10}
                                     textAlign="center"
                                     display={'block'}
-                                />
-                                <Button mt={0.5} color='facebook' _hover={{color:"blue"}} onClick={() => handleUpdateQuantity(item.productId,index)}>Update</Button>
-                              </Td>
+                                  />
+                                  <Button mt={0.5} color='facebook' _hover={{ color: "blue" }} onClick={() => handleUpdateQuantity(item.productId, index)}>Update</Button>
+                                </Td>
 
-                            <Td>${(item.price * item.quantity).toFixed(2)}</Td>
-                            <Td><Link  _hover={{  color: 'red'}} onClick={() => {handleDelete(item.productId)}}><MdDelete fontSize={30} color={'facebook.500'}/></Link></Td>
-                          </Tr>
-                        </>
-                      )
-                    })
-                  }
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </div>
-          {/* {
+                                <Td>${(item.price * item.quantity).toFixed(2)}</Td>
+                                <Td>
+                                  <Link _hover={{ color: 'red' }} onClick={() => { handleDelete(item.productId) }}><MdDelete fontSize={30} color={'facebook.500'} />
+                                  </Link>
+                                </Td>
+                              </Tr>
+                            </>
+                          )
+                        })
+                      }
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </div>
+              {/* {
             cart && cart.map((myImages, index) => {
               return product.id && <ProductCart key={index} productId={product.id} />
             })
           }  */}
-        </SimpleGrid>
-        <Box my={5} borderLeft={{ base: 'none', md: '2px solid whitesmoke' }} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%', md: '20%' }} px={5} >
-          {
-            userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
-              <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
-              <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
-            </Box>
-          }
-          <Box borderBottom={'2px'}>
-            <Text fontSize={22} mt={0} fontWeight={600} color='facebook.500' mb={'0.45rem'} >Order Summary</Text>
-          </Box>
-          <Text mt={3} fontSize={20} color='facebook.500' fontWeight={100} >Product Amount: {totalAmount}</Text>
-          <Text mt={3} fontSize={20} color='black' fontWeight={300} fontWeight={700}>Total: {totalPrice} $</Text>
-          <Button mt={10} colorScheme='facebook' onClick={onClickPurchase} >Purchase</Button>
-          <Button mt={3} variant='text' color='facebook.500' onClick={onClickRemove} >Remove All</Button>
+            </SimpleGrid>
+            <Box my={5} borderLeft={{ base: 'none', md: '2px solid whitesmoke' }} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%', md: '20%' }} px={5} >
+              {
+                userAddress && <Box my={3} flexDirection='column' display='flex' bg='#fff' width={{ base: '100%' }}  >
+                  <Text fontSize={28} mt={3} fontWeight={600} color='facebook.500' >Address</Text>
+                  <Text mt={3} fontSize={24} color='facebook.500' fontWeight={300} >{userAddress}</Text>
+                </Box>
+              }
+              <Box borderBottom={'2px'}>
+                <Text fontSize={22} mt={0} fontWeight={600} color='facebook.500' mb={'0.45rem'} >Order Summary</Text>
+              </Box>
+              <Text mt={3} fontSize={20} color='facebook.500' fontWeight={100} >Product Amount: {totalAmount}</Text>
+              <Text mt={3} fontSize={20} color='black' fontWeight={300} >Total: {totalPrice} $</Text>
+              <Button mt={10} colorScheme='facebook' onClick={() => navigate("/checkout")} >Checkout</Button>
+              <Button mt={3} variant='text' color='facebook.500' onClick={onClickRemove} >Remove All</Button>
 
-        </Box>
-      </Box>
-       </Container>
+            </Box>
+          </Box>
+        </Container >
       </>
-      
+
     )
   } else if (currentUser) {
     return (

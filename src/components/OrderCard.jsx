@@ -212,7 +212,8 @@ const OrderCard = ({ orderId, deId }) => {
                     }
                 </SimpleGrid>
             </Box>
-            <ReportModal onClose={onClose} isOpen={isOpen} orderId={orderId} /> */}
+
+            {/* <ReportModal onClose={onClose} isOpen={isOpen} orderId={orderId} /> */}
         </>
     )
 }
