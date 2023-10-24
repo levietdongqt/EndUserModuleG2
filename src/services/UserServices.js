@@ -58,15 +58,33 @@ export const changePassword = async (userDTO) => {
   return response;
 };
 
+//RESET PASSWORD
+export const resetPassword = async (userDTO) => {
+  const response = await baseRequest.put(
+    `/User/PassReco`,
+    userDTO
+  );
+
+  return response;
+};
+
+
 //CONFIRM
 export const confirm = async (userId, code) => {
   const response = await baseRequest.get(
     `/User/ConfirmEmail?userId=${userId}&code=${code}`,
     userId, code
   );
-
   return response;
 };
+
+
+// SENMAIL PR 
+export const sendmail = async (email) => {
+  const response = await baseRequest.get(`/User/SendMailPR?email=${email}`);
+  return response;
+};
+
 
 
 
