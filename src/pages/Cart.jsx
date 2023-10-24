@@ -24,8 +24,15 @@ const Cart = () => {
   const [refreshPage, setFefreshPage] = useState(0);
   const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
+    const oldValue = updatedQuantities[index];    
+    const newValue =  event.target.value;
+    console.log("Value",oldValue,newValue)
+
+    const priceChange = (newValue - oldValue) * cart[index].price
+    console.log("Price",priceChange)
+    setTotalPrice(Number((totalPrice + priceChange).toFixed(2)));
     const newUpdatedQuantities = [...updatedQuantities];
-    newUpdatedQuantities[index] = event.target.value;
+    newUpdatedQuantities[index] = newValue;
     setUpdatedQuantities(newUpdatedQuantities);
   };
   useEffect(() => {
@@ -60,7 +67,7 @@ const Cart = () => {
       });
       setUpdatedQuantities(newQuantities);
       setProductIdList(newProductIdList)
-      setTotalPrice(price);
+      setTotalPrice(Number(price.toFixed(2)));
       setTotalAmount(amount);
     }
   }, [cart, cookies.cart, refresh, currentUser]);
@@ -97,7 +104,7 @@ const Cart = () => {
       updateToCart(productId, amount).then((result) => {
         if (result.data.status === 200) {
           toast({
-            title: 'Infomation',
+            title: 'Information',
             description: 'Update quantity successfully !',
             status: 'info',
             duration: 2000,

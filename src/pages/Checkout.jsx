@@ -55,7 +55,7 @@ export default function Checkout() {
             var price = currentItem.quantity * currentItem.price;
             return accumulator + price
           }, 0)
-          setTotal(totalPrice);
+          setTotal(Number(totalPrice.toFixed(2)));
         } else {
           setCookie("cart", [])
           setCart([])
@@ -159,7 +159,7 @@ export default function Checkout() {
                         <small class="text-muted">Material: {item.materialPage}</small>
                       </div>
                       <div >
-                        <h6 class="my-0 textRight" >${item.price * item.quantity}</h6>
+                        <h6 class="my-0 textRight" >${Number((item.price * item.quantity).toFixed(2))}</h6>
                         <span class="text-muted">Amount: {item.quantity}</span>
                       </div>
 
