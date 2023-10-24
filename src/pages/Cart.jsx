@@ -21,6 +21,7 @@ const Cart = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
   const [updatedQuantities, setUpdatedQuantities] = useState([]);
+  const [refreshPage, setFefreshPage] = useState(0);
   const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
     const newUpdatedQuantities = [...updatedQuantities];
@@ -40,13 +41,15 @@ const Cart = () => {
       });
       console.log("CookieCart: ", cart)
     }
-  }, []);
+  }, [refreshPage, currentUser]);
+
   useEffect(() => {
     var price = 0
     var amount = 0;
     if (cart.length > 0) {
       var index = 0;
       const newQuantities = [...updatedQuantities];
+      const newProductIdList = cart.map(item => item.productId);
       cart.forEach((item) => {
         newQuantities[index] = item.quantity;
         index++;
@@ -56,6 +59,7 @@ const Cart = () => {
         }
       });
       setUpdatedQuantities(newQuantities);
+      setProductIdList(newProductIdList)
       setTotalPrice(price);
       setTotalAmount(amount);
     }
@@ -73,6 +77,7 @@ const Cart = () => {
             isClosable: true,
             position: "top"
           });
+          setFefreshPage(refreshPage + 1);
         } else {
           toast({
             title: 'Error',
@@ -141,24 +146,23 @@ const Cart = () => {
   };
 
   const onClickRemove = async () => {
-    var formData = new FormData();
-    cart.forEach((element,index) => {
-      formData.append(`productIdList[${index}]`, Number(element.productId));
-    });
-    await deleteAllCart(formData).then(response => {
-      if (response.data.status === 200) {
-        setCart([]);
-        removeCookie('cart', { path: '/' });
-      }else{
-        toast({
-          title: 'Error!',
-          description: 'Delete cart fail.',
-          status: 'error',
-          duration: 2000,
-          isClosable: true
-        });
-      }
-    });
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Are you sure to delete all product in the cart?")) {
+      await deleteAllCart(productIdList).then(response => {
+        if (response.data.status === 200) {
+          setCart([]);
+          removeCookie('cart', { path: '/' });
+        } else {
+          toast({
+            title: 'Error!',
+            description: 'Delete cart fail.',
+            status: 'error',
+            duration: 2000,
+            isClosable: true
+          });
+        }
+      });
+    }
   };
 
   if (currentUser && cart && cart.length >= 1 && totalAmount > 0) {
