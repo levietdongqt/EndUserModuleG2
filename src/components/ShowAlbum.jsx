@@ -1,6 +1,6 @@
 import { Box, Image } from '@chakra-ui/react';
 import Slider from 'react-slick';
-const ShowAlbum = ({images}) => {
+const ShowAlbum = ({images, isCart}) => {
 
   const settings = {
     infinite: true,
@@ -21,7 +21,7 @@ const ShowAlbum = ({images}) => {
                 key={`${image.id}`}
                 style={{ height: '150px', width: '200px' }}
                 objectFit={'cover'}
-                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${image}`}
+                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${isCart? image:image.imageUrl }`}
               />
             </div>
           ))}
