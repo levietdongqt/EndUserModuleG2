@@ -65,14 +65,18 @@ export default function Upload({
             status: "success",
             duration: 2000,
             isClosable: true,
+            position: "top"
           });
+          setImages([]);
+          handleCloseDialog(true)
         } else {
           toast({
             title: "warning",
-            description: "Upload Fail!.",
+            description: "The image is exist in this template!.",
             status: "error",
             duration: 2000,
             isClosable: true,
+            position: "top"
           });
         }
       });

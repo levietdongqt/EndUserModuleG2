@@ -124,10 +124,10 @@ const MyImages = (props) => {
                               </Box>
                             </Box>
                             <Box padding="0px 0px 0px 5px" margin="10px 0px 0px" lineHeight="20px">
-                              <Text textAlign='left' mt={1} mb={'0.3rem'} >
+                              <Text textAlign='center' mt={1} mb={'0.3rem'} >
                                 {dateTime.substring(0, indexOfT)}
                               </Text>
-                              <Text>
+                              <Text textAlign='center'>
                                 {myImage.templateName}
                               </Text>
                             </Box>
