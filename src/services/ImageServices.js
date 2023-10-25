@@ -9,6 +9,15 @@ export const getMyImages = async (userID) => {
     return error.response;
   }
 };
+export const deleteImages = async (imageIdList) => {
+  try {
+    const response = await baseRequest.post(`/upload/deleteImages`,imageIdList);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const deleteMyImage = async (myImmageId) => {
   try {
     const response = await baseRequest.delete(`/upload/deleteMyImage?myImmageId=${myImmageId}`);

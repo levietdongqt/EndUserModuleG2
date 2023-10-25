@@ -43,9 +43,11 @@ const Login = () => {
       });
       navigate('/');
       if (remember) {
+        console.log("luuuu lauuu")
         setCookie('currentUser', result.data.result, { path: '/' });
         setTokenCookie('access_token', result.data.token, { path: '/' })
       } else {
+        console.log("Luuu 1 xiuuuu")
         setCookie('currentUser', result.data.result, { path: '/', expires: 0 });
         setTokenCookie('access_token', result.data.token, { path: '/', expires: 0 })
       };
