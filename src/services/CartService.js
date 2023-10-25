@@ -38,6 +38,15 @@ export const addToCart = async (formData) => {
     return error.response;
   }
 };
+export const addToCartAllSimple = async (formData) => {
+  try {
+    const response = await baseRequest.post(`/Cart/addToCartAllSimple`,formData);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const updateToCart = async (productId, quantity) => {
   try {
     const response = await baseRequest.put(`/Cart/UpdateCart?productDetailID=${productId}&quantity=${quantity}`);

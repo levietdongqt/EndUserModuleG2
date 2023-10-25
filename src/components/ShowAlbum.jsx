@@ -18,6 +18,7 @@ const ShowAlbum = ({images, isCart}) => {
           {images && images.map((image, index) => (
             <div key={index} style={{ height: '100%', width: '100%' }}>
               <Image
+                alt={index}
                 key={`${image.id}`}
                 style={{ height: '150px', width: '200px' }}
                 objectFit={'cover'}

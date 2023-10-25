@@ -120,7 +120,7 @@ export default function Checkout() {
     if (isValid) {
       // eslint-disable-next-line no-restricted-globals
       if (confirm("Are you sure to purchase this order?")) {
-        setOrderDTO({
+        const newOrder = {
           userId: currentUser.id,
           fullName: fullName, // Set fullName to an empty string if undefined
           phone: phoneNumber,
@@ -128,16 +128,17 @@ export default function Checkout() {
           email: email,
           totalPrice: total,
           note: note ? note : ""
-        });
+        }
+        setOrderDTO(newOrder);
         if (paymentMethod === "true") {
           console.log("vo ne");
           setOpenCartDialog(true)
         } else {
-          directPayment(orderDTO).then(response => {
+          directPayment(newOrder).then(response => {
             if (response.data.status === 200) {
               swal({
                 title: "Information",
-                text: "The order have been created! Please go to ",
+                text: "The order have been created! Please come to our office to make payment",
                 icon: "info",
               })
               navigate("/")
