@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -22,7 +22,7 @@ import AddCartNoTemplate from './pages/AddCartNoTemplate';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import OnlinePayment from './pages/OnlinePayment';
-
+import AllTemplates from './pages/AllTemplates';
 const App = () => {
 
   const { currentUser } = useUserContext();
@@ -45,10 +45,11 @@ const App = () => {
         <Route path='/OnlinePayment' element={<OnlinePayment />} />
         <Route path='/cart' element={<Cart />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='/allTemplates' element={<AllTemplates />} />
+        <Route path='/allTemplates/:page' element={<AllTemplates />} />
         <Route path='/upload' element={<Upload />} />
         <Route path='/myimages' element={<MyImages />} />
         <Route path='/myimages/noTemplate' element={<AddCartNoTemplate />} />
-        <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
         <Route path='/orders' element={currentUser ? <Orders /> : <Navigate to='/' />} />
@@ -56,6 +57,7 @@ const App = () => {
         <Route path='/search/:name' element={<Search />} />
         <Route path='/categories/:name' element={<Categories />} />
         <Route path='/categories/:name/collection/:name' element={<Collections />} />
+
 
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>

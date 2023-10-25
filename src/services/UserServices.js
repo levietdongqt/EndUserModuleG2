@@ -85,7 +85,14 @@ export const sendmail = async (email) => {
   return response;
 };
 
-
+export const feedback = async (content,userId,email) => {
+  const {data} = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/FeedBack/Create`, {
+    content,
+    userId,
+    email,
+  });
+  return data;
+};
 
 
 export const addFavorite = async (id, productId) => {

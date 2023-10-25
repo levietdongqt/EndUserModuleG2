@@ -5,24 +5,35 @@ import { MenuItem } from '@chakra-ui/react';
 import { getCategoryById } from '../services/CategoryServices';
 
 const CategoryMenuItems = ({ genreId }) => {
-
-    const [categories, setCategories] = useState([]);
+    const [category, setCategory] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        let isMounted = true;
+
         getCategoryById(genreId)
             .then((result) => {
-                setCategories(result.result);
+                if (isMounted) {
+                    setCategory(result.result);
+                }
             });
-    },[genreId]);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [genreId]);
 
     const handleClick = (categoryId) => {
-        navigate('/search', { state: { categoryId: categoryId } });
+        navigate(`/categories/${category.name}`, { state: { categoryId: categoryId } });
     };
 
-    return
-        <MenuItem onClick={() => handleClick(categories.id)} >{categories.name}</MenuItem>
+    if (!category) {
+        return null;
+    }
 
-}
+    return (
+        <MenuItem onClick={() => handleClick(category.id)} fontWeight={600} fontSize={15}>{category.name}</MenuItem>
+    );
+};
 
 export default CategoryMenuItems;

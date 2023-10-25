@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Image, Text, Icon, Button, useDisclosure, Select,MenuItem } from '@chakra-ui/react';
-import { Favorite, RateReview, ShoppingCart } from '@mui/icons-material';
+import { Box, Image, Text, useDisclosure } from '@chakra-ui/react';
 import Slider from 'react-slick';
 import { useCartContext } from '../contexts/CartContext';
-import { useUserContext } from '../contexts/UserContext';
 import { getTemplateById } from '../services/TemplateServices';
-import {getAllize} from "../services/SizeServices";
 
 import ReviewModal from './ReviewModal';
 
 
 const settings = {
     infinite: true,
-    speed: 500,
+    speed: 1500,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -27,10 +24,8 @@ const TemplateCard = ({ templateId, isDelivered}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [cookies, setCookies, removeCookie] = useCookies(['cart']);
     const { cart, setCart, refresh, setRefresh } = useCartContext();
-    const { currentUser } = useUserContext();
     const navigate = useNavigate();
     const [template, setTemplate] = useState([]);
-    const [isFavorite, setIsFavorite] = useState(false);
     const [inCart, setInCart] = useState(false);
     const [amount, setAmount] = useState(0);
     useEffect(() => {
@@ -38,26 +33,10 @@ const TemplateCard = ({ templateId, isDelivered}) => {
             getTemplateById(templateId).then((result) => {
                 setTemplate(result.result);
             })
-
-            /*cart.forEach((item) => {
-                if (item.id === templateId) {
-                    setInCart(true);
-                    setAmount(item.amount);
-                }})*/
         }
     }, [templateId]);
 
 
-   /* const onClickFavorite = () => {
-        if (!isFavorite) {
-            addFavorite(currentUser, templateId);
-            setIsFavorite(true);
-        } else {
-            deleteFavorite(currentUser, templateId);
-            setIsFavorite(false);
-        }
-    };
-*/
     const onClickAddCart = () => {
         const currentIndex = cart.findIndex(item => item.id === templateId);
         if (currentIndex >= 0) {
@@ -87,6 +66,7 @@ const TemplateCard = ({ templateId, isDelivered}) => {
                     mt={{ base: 3, sm: 0 }}
                     mx={{ base: 0, md: 2 }}
                 >
+
                         <Slider {...settings} style={{width: '358px', margin: '0 auto'}}>
                             {template.templateImages && template.templateImages.map((image, index) =>
                                  (
@@ -96,12 +76,12 @@ const TemplateCard = ({ templateId, isDelivered}) => {
                                             style={{height: '200px', width: '340px'}}
                                             objectFit='cover'
                                             src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`}
+                                            alt={image.id}
                                             onClick={() =>
                                                 navigate(`/template/${template.name}`, {
                                                     state: {productId: template.id},
                                                 })
                                             }
-                                            loading={'lazy'}
                                         />
                                     </div>
                                 )

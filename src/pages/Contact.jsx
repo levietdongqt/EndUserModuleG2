@@ -1,18 +1,50 @@
-import React, {useState} from 'react';
-import {Box, Grid, Image, Alert, Input, Textarea, Button, Text, FormControl, Heading} from '@chakra-ui/react';
+import React, {useEffect, useState} from 'react';
+import {Box, Grid, Input, Textarea, Button, Text, Heading,useToast} from '@chakra-ui/react';
 import {FaSquareTwitter,FaSquareFacebook,FaSquareInstagram,FaSquareYoutube} from 'react-icons/fa6';
+import { feedback } from '../services/UserServices'
+import { useUserContext } from '../contexts/UserContext';
+import {useNavigate} from "react-router-dom";
 
 const Contact = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const navigate = useNavigate();
     const [message, setMessage] = useState('');
-    const [emailSent, setEmailSent] = useState(false);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Xử lý logic khi người dùng submit form
+    const {currentUser} = useUserContext();
+    const toast = useToast();
+    useEffect(() => {
+        if (currentUser) {
+            setName(currentUser.fullName);
+            setEmail(currentUser.email);
+        }
+    }, []);
+    const handleSubmit = () => {
+        feedback(message,currentUser? currentUser.id: null, email)
+            .then((result) => {
+                if (result.status === 201) {
+                    toast({
+                        title: 'Success!',
+                        description: 'Send feedback successfully.',
+                        status: 'success',
+                        duration: 2000,
+                        isClosable: true
+                    });
+                    navigate('/');
+                } else {
+                    toast({
+                        title: 'Error!',
+                        description: 'Cannot send feedback',
+                        status: 'error',
+                        duration: 2000,
+                        isClosable: true
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                // Handle error here
+            });
     };
-    const position = [51.505, -0.09]
     return (
         <Box maxW="1140px" mx="auto" p={8}>
             <Box textAlign={'center'} mb={10}>
@@ -38,7 +70,7 @@ const Contact = () => {
                         <Text variant="h4" align="center" mb={5} color={'#16113a'} fontSize={24} fontWeight={700}>
                             Send us a message
                         </Text>
-                        <form onSubmit={handleSubmit} style={{width: '100%'}}>
+                        <form  style={{width: '100%'}} method="post" >
                             <Box mb={4}>
                                 <Input
                                     lineHeight={'28px'}
@@ -47,7 +79,7 @@ const Contact = () => {
                                     borderRadius="8px"
                                     p="10px 10px 10px 30px"
                                     transition="all .15s ease-out"
-                                    placeholder="Tên"
+                                    placeholder="Name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     marginY="normal"
@@ -79,7 +111,7 @@ const Contact = () => {
                                     borderRadius="8px"
                                     p="10px 10px 10px 30px"
                                     transition="all .15s ease-out"
-                                    placeholder="Tin nhắn"
+                                    placeholder="Message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     marginY="normal"
@@ -90,10 +122,11 @@ const Contact = () => {
 
                             <Button
                                 width={'100%'}
-                                type="submit"
+                                type="button"
                                 marginTop="2"
                                 backgroundColor="#000"
                                 color="#fff"
+                                onClick={handleSubmit}
                                 _hover={{
                                     backgroundColor: '#111',
                                 }}

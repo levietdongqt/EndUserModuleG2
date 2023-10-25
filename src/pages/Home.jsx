@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Text, Container, SimpleGrid, Image, CircularProgress,Heading,Link,Flex,Grid,GridItem } from '@chakra-ui/react';
+import { Box, Text, Container, SimpleGrid, Image,Heading,Link } from '@chakra-ui/react';
 import { AccountBalanceWallet, AssignmentReturn, WorkspacePremium } from '@mui/icons-material';
-import {DefaultPlayer as Video} from 'react-html5video';
 import Carousel from '../components/Carousel';
-import { getAllCategories } from '../services/CategoryServices';
-import { useSearchContext } from '../contexts/SearchContext';
-import {getAllTemplate, getTemplateBestller} from "../services/TemplateServices";
-import {getAllCollection } from '../services/CollectionServices';
+import {getTemplateBestller} from "../services/TemplateServices";
+import {getAllCollectionFeature } from '../services/CollectionServices';
 import Slider from "react-slick";
 const settings = {
   infinite: true,
-  speed: 500,
+  speed: 1500,
   slidesToShow: 1,
   slidesToScroll: 1,
   autoplay: true,
@@ -21,24 +18,21 @@ const settings = {
 const Home = () => {
 
   const navigate = useNavigate();
-  const { setSearch } = useSearchContext();
-  const [categories, setCategory] = useState([]);
   const [collections, setCollection] = useState([]);
   const [best, setBest] = useState([]);
   useEffect(() => {
-    Promise.all([
-      getAllCategories(),
-      getAllCollection(),
-      getTemplateBestller()
-    ])
-        .then(([categoriesResult, collectionResult, bestResult]) => {
-          setCategory(categoriesResult.result);
-          setCollection(collectionResult.result);
-          setBest(bestResult.result);
-        });
-  }, []);
+    if (collections.length === 0 && best.length === 0) {
+      Promise.all([
+        getAllCollectionFeature(),
+        getTemplateBestller()
+      ])
+          .then(([collectionResult, bestResult]) => {
+            setCollection(collectionResult.result);
+            setBest(bestResult.result);
+          });
+    }
+  }, [collections, best]);
 
-  const desiredCollections = ['Book 1', 'Gift 1', 'Calendar 2', 'Card 2'];
   return (
       <>
         <Container maxW='1140px' mx="auto">
@@ -49,7 +43,7 @@ const Home = () => {
           <Box mt={4} mb={3}>
             <Box>
               <Heading as='h3' size='lg' display={'inline'}>Featured Products</Heading>
-              <Link float="right" textColor={'facebook.500'} display={'inline-block'} lineHeight={'36px'} textDecoration={'auto'}>Shop all product</Link>
+              <Link onClick={() => navigate('/allTemplates')} float="right" textColor={'facebook.500'} display={'inline-block'} lineHeight={'36px'} textDecoration={'auto'}>Shop all product</Link>
             </Box>
             <Box  mt={7}>
               <SimpleGrid columns={[3, null, 4]} spacing='35px'>
@@ -101,27 +95,23 @@ const Home = () => {
               <SimpleGrid columns={2} spacing={10}>
                 {
                     collections &&
-                    desiredCollections.map((collectionName, index) => {
-                      const collection = collections.find((cat) => cat.name === collectionName);
-                      if (collection) {
+                    collections.map((collection, index) => {
                         return (
-                            <Box key={collection.name}>
+                            <Box key={index}>
                               <Image w={570} h={270} maxW={'100%'} cursor={'pointer'} onClick={() =>
-                                  navigate(`/search/${collection.name}`, {
+                                  navigate(`/categories/${collection.category.name}/collection/${collection.name}`, {
                                     state: {collectionsId: collection.id},
                                   })
                               } src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${collection.imageUrl}`} />
                               <Box mt={3}>
-                                <Link color={'#284b9b'} onClick={() =>
-                                    navigate(`/search/${collection.name}`, {
-                                      state: {collectionsId: collection.id},
-                                    })
-                                } > {collection.name} ></Link>
+                                  <Link color={'#284b9b'} onClick={() =>
+                                      navigate(`/categories/${collection.category.name}/collection/${collection.name}`, {
+                                        state: {collectionsId: collection.id},
+                                      })
+                                  } > {collection.name} ></Link>
                               </Box>
                             </Box>
-                        );
-                      }
-                      return null;
+                        )
                     })
                 }
               </SimpleGrid>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast } from '@chakra-ui/react';
+import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast,Link,Image } from '@chakra-ui/react';
 import {
   Person,
   Favorite,
@@ -14,8 +14,6 @@ import {
   Edit,
   AttachFile, BrowseGallery, BrowseGallerySharp, Collections
 } from '@mui/icons-material';
-
-import { getAllTemplate } from '../services/TemplateServices';
 import { getAllCategories } from '../services/CategoryServices';
 import { useUserContext } from '../contexts/UserContext';
 import { useCartContext } from '../contexts/CartContext';
@@ -75,7 +73,6 @@ const Navbar = () => {
 
     setCurrentUser('');
   };
-
   return (
     <>
       <Box
@@ -99,16 +96,13 @@ const Navbar = () => {
             display='flex'
             alignItems='center'
             justifyContent={{ base: 'space-between', sm: 'start' }}
-
           >
-            <Text
-              fontSize={40}
-              fontWeight={700}
-              color={'#fff'}
-              letterSpacing={-2}
+            <Link
               cursor='pointer'
               onClick={() => navigate('/')}
-            >MyImages</Text>
+            ><Box maxWidth="160px" ml={10}>
+              <Image src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}/assets/Logo.png`} w={'100%'} h={'auto'} />
+            </Box></Link>
             <Hamburger base='flex' sm='none' md='none' />
           </Box>
           <Searchbar />

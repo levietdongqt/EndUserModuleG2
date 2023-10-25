@@ -74,11 +74,14 @@
     const [meterial, setMeterial] = useState([]);
     const [selectedSizeId, setSelectedSizeId] = useState(0);
     const [selectedMaterialId, setSelectedMaterialId] = useState(0);
+    const [selectedSizeIdfisrt, setselectedSizeIdfisrt] = useState(0);
+    const [selectedMaterialIdfisrt, setselectedMaterialIdfisrt] = useState(0);
     useEffect(() => {
       getTemplateById(location.state.productId)
         .then((result) => {
           setTemplate(result.result);
           setSizes(result.result.sizesDTO);
+          setselectedSizeIdfisrt(result.result.sizesDTO[0]);
           setDescription(result.result.descriptionTemplates);
           setComments(result.result.reviews);
           //star
@@ -92,7 +95,9 @@
       getAllMaterialPage().then((result) => {
         if(result.result.forEach((r)=>{
           if(r.status === true){
+
             setMeterial(result);
+            setselectedMaterialIdfisrt(result.result[0]);
           }
         }));
       });
@@ -135,15 +140,16 @@
 
     const handlePrice = () => {
       if (selectedSizeId && selectedMaterialId) {
-        const selectedSize = sizes.find((item) => item.id === Number(selectedSizeId) );
+        const selectedSize = sizes.find((item) => item.id === Number(selectedSizeId));
         const selectedMaterial = meterial.result.find((item) => item.id === Number(selectedMaterialId));
         if (selectedSize && selectedMaterial) {
           const price = selectedSize.width * selectedSize.length * selectedMaterial.pricePerInch + template.pricePlusPerOne;
-          return price;
+          return price; // Round the price to 2 decimal places
         }
       }
-      // Nếu không có kích thước hoặc chất liệu được chọn, trả về giá mặc định từ template.pricePlusPerOne
-      return template.pricePlusPerOne;
+      const selectedSize = selectedSizeIdfisrt;
+      const selectedMaterial = selectedMaterialIdfisrt;
+      return selectedSize.width * selectedSize.length * selectedMaterial.pricePerInch + template.pricePlusPerOne;
     };
 
     const onClickWrite = () => {
@@ -195,7 +201,6 @@
                     starRatedColor="#FFD700"
                     numberOfStars={5}
                     name='rating' />
-
                 </Box>
                 <Text mt={5} fontSize={28} fontWeight={400} color='facebook.500' >
                   Price : <b> {handlePrice() ? handlePrice().toFixed(2) + '$' : 'N/A'} </b>
@@ -203,18 +208,16 @@
                 <Divider />
                 <Text mt={3} fontSize={20} fontWeight={500} >Sizes</Text>
                 <Select
-                    placeholder='Select Size'
                     onChange={(event) => setSelectedSizeId(event.target.value)}
                 >
                   {sizes.map((item, index) => (
-                      <option  key={index} value={item.id} >
+                      <option key={index} value={item.id}>
                         {`${item.width}x${item.length}`}
                       </option>
                   ))}
                 </Select>
                 <Text mt={3} fontSize={20} fontWeight={500} >Material Page</Text>
                 <Select mt={3} onChange={(event) => setSelectedMaterialId(event.target.value)}
-                    placeholder='Select Material Page...'
                 >
                   {
                     meterial.result && meterial.result.map((item, index) => (
