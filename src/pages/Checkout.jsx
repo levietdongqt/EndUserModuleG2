@@ -78,10 +78,6 @@ export default function Checkout() {
     });
   }
   const submit = () => {
-<<<<<<< HEAD
-    console.log(showCredit);
-=======
-
     if (total <= 0) {
       swal({
         title: "Warning",
@@ -89,7 +85,6 @@ export default function Checkout() {
         icon: "warning",
       })
     }
->>>>>>> 9e075c49f5850af674cdc8218e3b6bd42060e386
     const fullName = document.getElementById("fullName").value;
     const phoneNumber = document.getElementById("phoneNumber").value;
     const address = document.getElementById("address").value;
