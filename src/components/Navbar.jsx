@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast } from '@chakra-ui/react';
+import { Box, Text, Icon, Menu, MenuList, MenuItem, MenuButton, MenuGroup, Divider,useToast,Image } from '@chakra-ui/react';
 import {
   Person,
   Favorite,
@@ -57,6 +57,7 @@ const Navbar = () => {
     getAllCategories()
       .then(result => {
         setCategories(result.result);
+
       });
     var count = 0;
   /*if(cart.length){
@@ -101,14 +102,16 @@ const Navbar = () => {
             justifyContent={{ base: 'space-between', sm: 'start' }}
 
           >
-            <Text
-              fontSize={40}
-              fontWeight={700}
-              color={'#fff'}
-              letterSpacing={-2}
-              cursor='pointer'
-              onClick={() => navigate('/')}
-            >MyImages</Text>
+            <Box maxW={'180px'}>
+              <Image
+                  src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}/assets/logo.png`}
+                  maxW={'100%'}
+                  alt={'haha'}
+                  cursor='pointer'
+                  onClick={() => navigate('/')}
+              />
+            </Box>
+
             <Hamburger base='flex' sm='none' md='none' />
           </Box>
           <Searchbar />
@@ -200,7 +203,7 @@ const Navbar = () => {
             ps={5}
             width='100%'>
           {
-            categories.map((index) => {
+            categories && categories.map((index) => {
               return index && <Dropdown key={index.id} title={index.name} CategoryId={index.id} name={index.name} />
             })
           }

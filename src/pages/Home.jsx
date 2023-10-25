@@ -4,10 +4,9 @@ import { Box, Text, Container, SimpleGrid, Image, CircularProgress,Heading,Link,
 import { AccountBalanceWallet, AssignmentReturn, WorkspacePremium } from '@mui/icons-material';
 import {DefaultPlayer as Video} from 'react-html5video';
 import Carousel from '../components/Carousel';
-import { getAllCategories } from '../services/CategoryServices';
 import { useSearchContext } from '../contexts/SearchContext';
 import {getAllTemplate, getTemplateBestller} from "../services/TemplateServices";
-import {getAllCollection } from '../services/CollectionServices';
+import {getCollectionFeature } from '../services/CollectionServices';
 import Slider from "react-slick";
 const settings = {
   infinite: true,
@@ -19,26 +18,20 @@ const settings = {
 
 };
 const Home = () => {
-
   const navigate = useNavigate();
-  const { setSearch } = useSearchContext();
-  const [categories, setCategory] = useState([]);
   const [collections, setCollection] = useState([]);
   const [best, setBest] = useState([]);
   useEffect(() => {
     Promise.all([
-      getAllCategories(),
-      getAllCollection(),
+      getCollectionFeature(),
       getTemplateBestller()
     ])
-        .then(([categoriesResult, collectionResult, bestResult]) => {
-          setCategory(categoriesResult.result);
+        .then(([ collectionResult, bestResult]) => {
           setCollection(collectionResult.result);
           setBest(bestResult.result);
         });
   }, []);
 
-  const desiredCollections = ['Book 1', 'Gift 1', 'Calendar 2', 'Card 2'];
   return (
       <>
         <Container maxW='1140px' mx="auto">
@@ -49,7 +42,6 @@ const Home = () => {
           <Box mt={4} mb={3}>
             <Box>
               <Heading as='h3' size='lg' display={'inline'}>Featured Products</Heading>
-              <Link float="right" textColor={'facebook.500'} display={'inline-block'} lineHeight={'36px'} textDecoration={'auto'}>Shop all product</Link>
             </Box>
             <Box  mt={7}>
               <SimpleGrid columns={[3, null, 4]} spacing='35px'>
@@ -101,27 +93,19 @@ const Home = () => {
               <SimpleGrid columns={2} spacing={10}>
                 {
                     collections &&
-                    desiredCollections.map((collectionName, index) => {
-                      const collection = collections.find((cat) => cat.name === collectionName);
-                      if (collection) {
+                    collections.map((collection, index) => {
                         return (
-                            <Box key={collection.name}>
+                            <Box key={index}>
                               <Image w={570} h={270} maxW={'100%'} cursor={'pointer'} onClick={() =>
-                                  navigate(`/search/${collection.name}`, {
-                                    state: {collectionsId: collection.id},
-                                  })
+                                  navigate(`/categories/${collection.category.name}/collection/${collection.name}/`, { state: { collectionsId: collection.id } })
                               } src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${collection.imageUrl}`} />
                               <Box mt={3}>
                                 <Link color={'#284b9b'} onClick={() =>
-                                    navigate(`/search/${collection.name}`, {
-                                      state: {collectionsId: collection.id},
-                                    })
+                                    navigate(`/categories/${collection.category.name}/collection/${collection.name}/`, { state: { collectionsId: collection.id } })
                                 } > {collection.name} ></Link>
                               </Box>
                             </Box>
                         );
-                      }
-                      return null;
                     })
                 }
               </SimpleGrid>

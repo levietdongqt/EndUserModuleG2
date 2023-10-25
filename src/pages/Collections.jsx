@@ -7,6 +7,7 @@ import FilterMenu from '../components/FilterMenu';
 import {getTemplateByCollection } from '../services/CollectionServices';
 import { SearchOff } from '@mui/icons-material';
 import Pagination  from '../components/Pagination';
+import React from "react";
 const Collections = () => {
 
   const navigate = useNavigate();
@@ -65,17 +66,21 @@ const Collections = () => {
       sortByPriceAsc();
     } else if (e.target.value === "highest") {
       sortByPriceDesc();
+    }else if (e.target.value === "recommended") {
+      sortByBestSeller();
     }
   };
 
   const sortByPriceAsc = () => {
     setTemplates(template.sort((a, b) => (a.pricePlusPerOne - b.pricePlusPerOne)));
   };
-
+  const sortByBestSeller = () => {
+    const sortedTemplate = [...template].sort((a, b) => b.quantitySold - a.quantitySold);
+    setTemplates(sortedTemplate);
+  };
   const sortByPriceDesc = () => {
     setTemplates(template.sort((a, b) => (b.pricePlusPerOne - a.pricePlusPerOne)));
   };
-
   return (
       <Container maxW='1140px'>
         <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} >
@@ -87,21 +92,19 @@ const Collections = () => {
           <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="flex-start"
               py={5}
           >
-            <FilterMenu
-                columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
-                setProducts={template}
-                setSortBy={setSortBy}
-            />
-            <Box display={'flex'} m={3} alignItems={'center'}>
+            <Box>
               <Text fontSize={16} fontWeight={500} mb={0} float={'right'}>&nbsp;{total} Results</Text>
+            </Box>
+            <Box>
               <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px'>
                 <option value='recommended'>Best Sellers</option>
                 <option value='lowest'>Lowest Price</option>
                 <option value='highest'>Highest Price</option>
               </Select>
+            </Box>
+            <Box>
             </Box>
           </Box>
           <SimpleGrid minChildWidth={280} gap={3} spacingX={5} >
