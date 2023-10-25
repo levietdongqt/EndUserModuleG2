@@ -72,3 +72,13 @@ export const uploadImages = async (formData) => {
   }
 
 };
+
+export const LoadImagesByTemplateIdAsync = async (templateID,userID) => {
+  try {
+    const response = await baseRequest.get(`/upload/LoadMyImagesByTemplateId?templateId=${templateID}&userId=${userID}`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
