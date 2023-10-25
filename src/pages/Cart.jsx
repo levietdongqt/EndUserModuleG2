@@ -26,10 +26,7 @@ const Cart = () => {
   const handleQuantityChange = (event, index) => {
     const oldValue = updatedQuantities[index];    
     const newValue =  event.target.value;
-    console.log("Value",oldValue,newValue)
-
     const priceChange = (newValue - oldValue) * cart[index].price
-    console.log("Price",priceChange)
     setTotalPrice(Number((totalPrice + priceChange).toFixed(2)));
     const newUpdatedQuantities = [...updatedQuantities];
     newUpdatedQuantities[index] = newValue;
@@ -200,7 +197,7 @@ const Cart = () => {
                             <>
                               <Tr key={index}>
                                 <Td>
-                                  <ShowAlbum images={item.images} /></Td>
+                                  <ShowAlbum images={item.images} isCart={true} /></Td>
                                 <Td>
                                   <Text color={'#284b9b'} fontSize={18} fontWeight={700}>{item.templateName}</Text>
                                 </Td>

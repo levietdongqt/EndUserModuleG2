@@ -147,7 +147,7 @@ export default function AddCartTemplate({ openDialog, handleCloseDialog, myImage
                       <SimpleGrid columns={{ base: 1, sm: 1, lg: 1, xl: 1 }} spacing={3} >
                         <SimpleGrid columns={{ base: 2, sm: 3, lg: 3, xl: 3 }} spacing={3} >
                           <Box>
-                            <ShowAlbum images={myImage.images} />
+                            <ShowAlbum images={myImage.images} isCart={false} />
                             <Text textAlign='center' fontSize={20} mt={1} fontWeight={100} >
                               {myImage.templateName}
                             </Text>
