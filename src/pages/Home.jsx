@@ -112,24 +112,24 @@ const Home = () => {
             </Box>
           </Box>
 
+      </Container>
+      <Box bg='#323264' mt={10} >
+        <Container maxWidth={1200} display='flex' justifyContent='space-between' alignItems='center' flexDirection={{ base: 'column', md: 'row' }} py={7}>
+          <Box color='#fff' alignItems='center' display='flex' flexDirection='column' >
+            <AccountBalanceWallet sx={{ fontSize: 50 }} color='inherit' />
+            <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Secure Payment Options</Text>
+          </Box>
+          <Box color='#fff' alignItems='center' display='flex' flexDirection='column' mt={{ base: 5, md: 0 }} >
+            <AssignmentReturn sx={{ fontSize: 50 }} color='inherit' />
+            <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >30 Days Free Returns</Text>
+          </Box>
+          <Box color='#fff' alignItems='center' display='flex' flexDirection='column' mt={{ base: 5, md: 0 }} >
+            <WorkspacePremium sx={{ fontSize: 50 }} color='inherit' />
+            <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Image Quality Assurance</Text>
+          </Box>
         </Container>
-        <Box bg='#323264' mt={10} >
-          <Container maxWidth={1200} display='flex' justifyContent='space-between' alignItems='center' flexDirection={{ base: 'column', md: 'row' }} py={7}>
-            <Box color='#fff' alignItems='center' display='flex' flexDirection='column' >
-              <AccountBalanceWallet sx={{ fontSize: 50 }} color='inherit' />
-              <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Secure Payment Options</Text>
-            </Box>
-            <Box color='#fff' alignItems='center' display='flex' flexDirection='column' mt={{ base: 5, md: 0 }} >
-              <AssignmentReturn sx={{ fontSize: 50 }} color='inherit' />
-              <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >30 Days Free Returns</Text>
-            </Box>
-            <Box color='#fff' alignItems='center' display='flex' flexDirection='column' mt={{ base: 5, md: 0 }} >
-              <WorkspacePremium sx={{ fontSize: 50 }} color='inherit' />
-              <Text mt={3} fontSize={20} fontWeight={600} color='inherit' >Image Quality Assurance</Text>
-            </Box>
-          </Container>
-        </Box>
-        {/*{fadeImages.length === 0 && (
+      </Box>
+      {/*{fadeImages.length === 0 && (
                 <>
                   <Box my={20} display='flex' justifyContent='center' width='100%'>
                     <CircularProgress isIndeterminate color='facebook.500' />
@@ -139,7 +139,7 @@ const Home = () => {
                   </Box>
                 </>
             )}*/}
-      </>
+    </>
   )
 }
 

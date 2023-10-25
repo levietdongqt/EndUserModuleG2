@@ -9,6 +9,15 @@ export const getMyImages = async (userID) => {
     return error.response;
   }
 };
+export const deleteImages = async (imageIdList) => {
+  try {
+    const response = await baseRequest.post(`/upload/deleteImages`,imageIdList);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
+};
 export const deleteMyImage = async (myImmageId) => {
   try {
     const response = await baseRequest.delete(`/upload/deleteMyImage?myImmageId=${myImmageId}`);
@@ -62,4 +71,14 @@ export const uploadImages = async (formData) => {
     return error.response;
   }
 
+};
+
+export const LoadImagesByTemplateIdAsync = async (templateID,userID) => {
+  try {
+    const response = await baseRequest.get(`/upload/LoadMyImagesByTemplateId?templateId=${templateID}&userId=${userID}`);
+    return response;
+  } catch (error) {
+    console.log(error.response)
+    return error.response;
+  }
 };

@@ -223,7 +223,10 @@ const Navbar = () => {
           </Box>
         </Box>
       </Box>
-      <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template = {1} />
+      {
+       openUpload && <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template = {1} />
+      }
+     
     </>
 
 

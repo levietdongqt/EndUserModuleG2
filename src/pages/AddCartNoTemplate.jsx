@@ -160,6 +160,7 @@ const AddCartNoTemplate = () => {
         var formData = new FormData();
         formData.append("userID", currentUser.id)
         formData.append("myImageID", myImage[index].id)
+        formData.append("templateId", myImage[index].templateId)
         formData.append("materialPageId", materialID[index])
         formData.append("temlateSizeId", templateSizeID[index])
         formData.append("quantity", amount[index])
@@ -215,7 +216,7 @@ const AddCartNoTemplate = () => {
                                                 key={`${index}`}
                                                 style={{height: '200px', width: '300px'}}
                                                 objectFit={'cover'}
-                                                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.images[0]}`}
+                                                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.images[0].imageUrl}`}
                                             />
                                             <Box>
                                                 <SimpleGrid columns={{base: 1, sm: 1, lg: 1, xl: 1}} spacing={3}>

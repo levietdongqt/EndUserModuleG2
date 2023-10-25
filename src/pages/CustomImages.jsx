@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import ImageUploading from "react-images-uploading";
-import {
-  uploadImages,
-  LoadImagesByTemplateIdAsync,
-  deleteImages
-} from "../services/ImageServices";
+import { useUserContext } from "../contexts/UserContext";
+import { uploadImages } from "../services/ImageServices";
 import ThemeProvider from "../theme";
 import {
+  Paper,
   Button,
+  Typography,
+  TextField,
   Box,
   Grid,
   Dialog,
@@ -16,95 +16,67 @@ import {
   DialogActions,
   styled,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import RestoreIcon from '@mui/icons-material/Restore';
 import UndoIcon from "@mui/icons-material/Undo";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
+import { deleteImages } from "../services/ImageServices";
 import swal from "sweetalert";
-import { useUserContext } from "../contexts/UserContext";
 
-export default function Upload({
+export default function CustomImages({
   openDialog,
   handleCloseDialog,
-  template,
-  oldImages,
+  myImage,
 }) {
-  const [images, setImages] = React.useState([]);
-  const [myImage, setMyImage] = React.useState([]);
-  const [restoreImages,setRestoreImages] = React.useState([]);
+  const [images, setImages] = useState([]);
+  const [restoreImages, setRestoreImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
   const toast = useToast();
+  useEffect(() => {
+    loadImages();
+    if (!openDialog) {
+      setImages([]);
+      console.log(restoreImages);
+      setRestoreImages([]);
+    }
+  }, [myImage, openDialog]);
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
   };
-
   const errorPopup = (mess) => {
     swal({
       title: "Warning",
       text: mess,
       icon: "warning",
-    });
-  };
-
-  useEffect(() => {
-    loadImages();
-    if(!openDialog){
-      setImages([]);
-    }
-  }, []);
-
-  const loadImages = async () =>{
-    if (template) {
-      var templateId = 1;
-      if (template === 1) {
-        templateId = 1;
-      } else {
-        templateId = template.id;
-      }
-      console.log(template);
-      const userId = currentUser.id;
-      console.log("Id", templateId);
-      const res = await LoadImagesByTemplateIdAsync(templateId, userId);
-      if(res.data.status === 200){
-        var result = res.data.result;
-        console.log("cm",result);
-        setMyImage(result);
-          if (result && Array.isArray(result.images) && result.images.length > 0) {
-            result.images.forEach((image) => {
-              const img = {
-                id: image.id,
-                data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
-              };
-              setImages((prev) => [...prev, img]);
-            });
-          }
-          console.log(images);
-        
-      }
-    }
+    })
   }
-
- 
-
   const CustomDialogContent = styled(DialogContent)({
     display: "flex",
     flexDirection: "column",
     padding: "30px",
     margin: "20px",
   });
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
   const submit = async () => {
-   var isContinue = true;
-   if(images.length === 0){
-    errorPopup("You can't delete all files in here!")
-   }
-    if (restoreImages && restoreImages.length > 0 && images.length > 0) {
+    var isContinue = true;
+    if (restoreImages && restoreImages.length > 0) {
       const deletedIds = restoreImages.map((image) => image.id);
      await deleteImages(deletedIds).then(response => {
         if(response.data.status !== 200){
@@ -154,6 +126,20 @@ export default function Upload({
 
     }
   };
+  //XỬ lý Upload Hình ảnh
+  const loadImages = async () => {
+    console.log(myImage);
+    if (Array.isArray(myImage.images) && myImage.images.length > 0) {
+      myImage.images.forEach((image) => {
+        const img = {
+          id: image.id,
+          data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
+        };
+        setImages((prev) => [...prev, img]);
+      });
+    }
+    console.log(images);
+  };
   return (
     <>
       <ThemeProvider>
@@ -171,11 +157,11 @@ export default function Upload({
           }}
         >
           <DialogTitle
-            color={"#132043"}
+            color={"Highlight"}
             align={"center"}
-            style={{ fontSize: 30, letterSpacing: "0.1em" }}
+            style={{ fontSize: 30 }}
           >
-            {template === 1 ? "Simple Upload" : "Upload With Template"}
+            Edit Albums
           </DialogTitle>
           <CustomDialogContent>
             <div>
@@ -232,8 +218,8 @@ export default function Upload({
                         }}
                         {...dragProps}
                       ></Button>
-                      &nbsp;
                     </Tooltip>
+                    &nbsp;
                     <Tooltip title="Restore">
                       <Button
                         size="100px"
@@ -270,11 +256,8 @@ export default function Upload({
                               src={image.data_url}
                             />
                             <div className="image-item__btn-wrapper">
-                              <Tooltip title="Undo">
-                                <Button
-                                  size="100px"
-                                  startIcon={<UndoIcon />}
-                                  color="info"
+                              <Tooltip title="Change">
+                                <IconButton
                                   onClick={async (event) => {
                                     setRestoreImages((prev) => [
                                       ...prev,
@@ -282,14 +265,12 @@ export default function Upload({
                                     ]);
                                     onImageUpdate(index);
                                   }}
-                                  {...dragProps}
-                                ></Button>
+                                >
+                                  <UndoIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                               </Tooltip>
                               <Tooltip title="Remove">
-                                <Button
-                                  size="100px"
-                                  startIcon={<DeleteIcon />}
-                                  color="error"
+                                <IconButton
                                   onClick={async (event) => {
                                     if (image.id !== undefined) {
                                       setRestoreImages((prev) => [
@@ -299,8 +280,12 @@ export default function Upload({
                                     }
                                     onImageRemove(index);
                                   }}
-                                  {...dragProps}
-                                ></Button>
+                                >
+                                  <DeleteIcon
+                                    sx={{ fontSize: 20 }}
+                                    color="error"
+                                  />
+                                </IconButton>
                               </Tooltip>
                             </div>
                           </Grid>
@@ -318,18 +303,10 @@ export default function Upload({
                 ))} */}
                     {errors && (
                       <div>
-                        {errors.maxNumber &&
-                          errorPopup(
-                            "Number of selected images exceed maxNumber"
-                          )}
-                        {errors.acceptType &&
-                          errorPopup("Your selected file type is not allow")}
-                        {errors.maxFileSize &&
-                          errorPopup("Selected file size exceed maxFileSize")}
-                        {errors.resolution &&
-                          errorPopup(
-                            "Selected file is not match your desired resolution"
-                          )}
+                        {errors.maxNumber && errorPopup("Number of selected images exceed maxNumber")}
+                        {errors.acceptType && errorPopup("Your selected file type is not allow")}
+                        {errors.maxFileSize && errorPopup("Selected file size exceed maxFileSize")}
+                        {errors.resolution && errorPopup("Selected file is not match your desired resolution")}
                       </div>
                     )}
                   </div>
@@ -341,9 +318,9 @@ export default function Upload({
           <DialogActions>
             <Button
               component="label"
-              variant="outlined"
+              variant="contained"
               startIcon={<CloudUploadIcon />}
-              color="inherit"
+              color="primary"
               sx={
                 {
                   // ... các style khác
@@ -353,18 +330,7 @@ export default function Upload({
             >
               Save
             </Button>
-            <Button
-              component="label"
-              variant="outlined"
-              startIcon={<ExitToAppIcon />}
-              color="success"
-              sx={{
-                letterSpacing: "0.05em",
-              }}
-              onClick={handleCloseDialog}
-            >
-              Close
-            </Button>
+            <Button onClick={handleCloseDialog}>Close</Button>
           </DialogActions>
         </Dialog>
       </ThemeProvider>

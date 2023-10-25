@@ -11,6 +11,10 @@ import { BiPhotoAlbum, BiSolidCartAdd } from 'react-icons/bi';
 import { deleteMyImage } from '../services/ImageServices';
 import swal from 'sweetalert';
 import { MdDelete } from "react-icons/md";
+import { VscGitPullRequestNewChanges } from 'react-icons/vsc'
+import CustomImages from './CustomImages';
+import IsoIcon from '@mui/icons-material/Iso';
+import format from 'date-fns/format';
 
 const MyImages = (props) => {
 
@@ -19,7 +23,10 @@ const MyImages = (props) => {
   const [myImages, setMyImages] = useState([]);
   const [myImage, setMyImage] = useState();
   const [openCartDialog, setOpenCartDialog] = useState(false);
+  const [openCustomImage, setOpenCustomImage] = useState(false);
   const [isHovered, setIsHovered] = useState([]);
+  const [refreshPage, setRefreshPage] = useState(0);
+
   useEffect(() => {
     if (currentUser) {
       getMyImages(currentUser.id)
@@ -28,15 +35,16 @@ const MyImages = (props) => {
         });
     }
 
-  }, []);
+  }, [refreshPage]);
   const showAddCart = (myImage) => {
     setMyImage(myImage)
-    if (myImage.templateId !== 1) {
-      setOpenCartDialog(true);
-    }
-    else {
-      navigate("/myimages/noTemplate")
-    }
+    setOpenCartDialog(true);
+
+  }
+  function fDateTime(date, newFormat) {
+    const fm = newFormat || 'dd-MM-yyyy p';
+  
+    return date ? format(new Date(date), fm) : '';
   }
   const handleOpacica = (index, value) => {
     setIsHovered(prev => {
@@ -47,6 +55,10 @@ const MyImages = (props) => {
   }
   const handleCloseDialogEdit = () => {
     setOpenCartDialog(false);
+  }
+  const handleCloseDialogEdit2 = () => {
+    setOpenCustomImage(false);
+    setRefreshPage(refreshPage + 1);
   }
   const deleteHandler = async (id) => {
     // eslint-disable-next-line no-restricted-globals
@@ -67,19 +79,21 @@ const MyImages = (props) => {
     }
 
   }
-
+  const customHandler = async (myImage) => {
+    setMyImage(myImage)
+    setOpenCustomImage(true)
+  }
   if (currentUser !== "") {
     if (myImages && myImages.length > 0) {
       return (
         <>
           <Heading textAlign='center' fontSize={30} mt={8} mb={7} >My Images</Heading>
+          <Container maxW={'1140px'}>
           <Box display={'flex'} justifyContent={'center'} >
             <Box px={10} py={5} mx={1}>
               <SimpleGrid columns={{ base: 2, sm: 3, lg: 3, xl: 4 }} spacing={7} >
                 {
                   myImages && myImages.map((myImage, index) => {
-                    const dateTime = myImage.createDate;
-                    const indexOfT = dateTime.indexOf('T');
                     return (<>
                       <Box key={index}
                         width={'16.6%'}
@@ -91,8 +105,8 @@ const MyImages = (props) => {
                       >
                         <Box position={'relative'}>
                           <Box position={'relative'}>
-                            <Box >
-                              <ShowAlbum images={myImage.images} />
+                            <Box  m={5}>
+                              <ShowAlbum images={myImage.images} isCart={false} />
                             </Box>
                             <Box position={'relative'}>
                               <Box
@@ -111,8 +125,8 @@ const MyImages = (props) => {
                                 <Box h={'7.0625rem'} w={'12.5rem'}></Box>
                                 <List p={0} m={0} backgroundColor={isHovered ? 'rgba(65,70,70,0.5)' : '#414646'}>
                                   <ListItem display={'inline-block'} w={'22%'} height={'30px'} cursor={'pointer'} >
-                                    <Link onClick={() => { deleteHandler(myImage.id) }}>
-                                      <MdDelete fontSize={30} color={'#fff'} />
+                                    <Link onClick={() => { customHandler(myImage) }}>
+                                      <VscGitPullRequestNewChanges fontSize={30} color={'#fff'} />
                                     </Link>
                                   </ListItem>
                                   <ListItem display={'inline-block'} w={'22%'} height={'30px'} cursor={'pointer'}>
@@ -125,7 +139,7 @@ const MyImages = (props) => {
                             </Box>
                             <Box padding="0px 0px 0px 5px" margin="10px 0px 0px" lineHeight="20px">
                               <Text textAlign='center' mt={1} mb={'0.3rem'} >
-                                {dateTime.substring(0, indexOfT)}
+                                {fDateTime(myImage.createDate)}
                               </Text>
                               <Text textAlign='center'>
                                 {myImage.templateName}
@@ -140,7 +154,11 @@ const MyImages = (props) => {
               </SimpleGrid>
             </Box>
             <AddCartTemplate openDialog={openCartDialog} handleCloseDialog={handleCloseDialogEdit} myImage={myImage} />
+            <CustomImages openDialog={openCustomImage} handleCloseDialog={handleCloseDialogEdit2} myImage={myImage} />
           </Box>
+          </Container>
+          
+
         </>
       )
     } else {

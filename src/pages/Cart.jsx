@@ -24,12 +24,9 @@ const Cart = () => {
   const [refreshPage, setFefreshPage] = useState(0);
   const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
-    const oldValue = updatedQuantities[index];    
-    const newValue =  event.target.value;
-    console.log("Value",oldValue,newValue)
-
+    const oldValue = updatedQuantities[index];
+    const newValue = event.target.value;
     const priceChange = (newValue - oldValue) * cart[index].price
-    console.log("Price",priceChange)
     setTotalPrice(Number((totalPrice + priceChange).toFixed(2)));
     const newUpdatedQuantities = [...updatedQuantities];
     newUpdatedQuantities[index] = newValue;
@@ -73,30 +70,34 @@ const Cart = () => {
   }, [cart, cookies.cart, refresh, currentUser]);
 
   const handleDelete = (productId) => {
-    if (currentUser) {
-      deleteToCart(productId).then((result) => {
-        if (result.data.status === 200) {
-          toast({
-            title: 'Information',
-            description: 'Delete successfully !',
-            status: 'info',
-            duration: 2000,
-            isClosable: true,
-            position: "top"
-          });
-          setFefreshPage(refreshPage + 1);
-        } else {
-          toast({
-            title: 'Error',
-            description: 'Delete fail, please reload and try again !',
-            status: 'error',
-            duration: 2000,
-            isClosable: true,
-            position: "top"
-          });
-        }
-      });
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Are you sure to delete this item?")) {
+      if (currentUser) {
+        deleteToCart(productId).then((result) => {
+          if (result.data.status === 200) {
+            toast({
+              title: 'Information',
+              description: 'Delete successfully !',
+              status: 'info',
+              duration: 2000,
+              isClosable: true,
+              position: "top"
+            });
+            setFefreshPage(refreshPage + 1);
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Delete fail, please reload and try again !',
+              status: 'error',
+              duration: 2000,
+              isClosable: true,
+              position: "top"
+            });
+          }
+        });
+      }
     }
+
   }
   const handleUpdateQuantity = (productId, Index) => {
     if (currentUser) {
@@ -200,13 +201,13 @@ const Cart = () => {
                             <>
                               <Tr key={index}>
                                 <Td>
-                                  <ShowAlbum images={item.images} /></Td>
+                                  <ShowAlbum images={item.images} isCart={true} /></Td>
                                 <Td>
                                   <Text color={'#284b9b'} fontSize={18} fontWeight={700}>{item.templateName}</Text>
                                 </Td>
                                 <Td >{`${item.width} X ${item.length}`}</Td>
                                 <Td >{item.materialPage}</Td>
-                                <Td textAlign={'center'}>
+                                <Td textAlign={'center'} >
                                   <Input
                                     type="number"
                                     value={updatedQuantities[index]}

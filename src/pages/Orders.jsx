@@ -26,6 +26,7 @@ const Orders = () => {
           : ['Canceled'];
         const response = await getOrdersByStatus(currentUser.id, statuses);
         var purchaseArray = response.result;
+        console.log("Purchase",purchaseArray)
         setPurchaseActives(purchaseArray.sort((a, b) => (Number(a.createDate) - Number(b.createDate))).reverse());
 
       } catch (error) {
