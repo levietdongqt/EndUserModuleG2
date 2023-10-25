@@ -21,10 +21,18 @@ const Cart = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [userAddress, setUserAddress] = useState("");
   const [updatedQuantities, setUpdatedQuantities] = useState([]);
+  const [refreshPage, setFefreshPage] = useState(0);
   const [productIdList, setProductIdList] = useState([]);
   const handleQuantityChange = (event, index) => {
+    const oldValue = updatedQuantities[index];    
+    const newValue =  event.target.value;
+    console.log("Value",oldValue,newValue)
+
+    const priceChange = (newValue - oldValue) * cart[index].price
+    console.log("Price",priceChange)
+    setTotalPrice(Number((totalPrice + priceChange).toFixed(2)));
     const newUpdatedQuantities = [...updatedQuantities];
-    newUpdatedQuantities[index] = event.target.value;
+    newUpdatedQuantities[index] = newValue;
     setUpdatedQuantities(newUpdatedQuantities);
   };
   useEffect(() => {
@@ -40,13 +48,15 @@ const Cart = () => {
       });
       console.log("CookieCart: ", cart)
     }
-  }, []);
+  }, [refreshPage, currentUser]);
+
   useEffect(() => {
     var price = 0
     var amount = 0;
     if (cart.length > 0) {
       var index = 0;
       const newQuantities = [...updatedQuantities];
+      const newProductIdList = cart.map(item => item.productId);
       cart.forEach((item) => {
         newQuantities[index] = item.quantity;
         index++;
@@ -56,7 +66,8 @@ const Cart = () => {
         }
       });
       setUpdatedQuantities(newQuantities);
-      setTotalPrice(price);
+      setProductIdList(newProductIdList)
+      setTotalPrice(Number(price.toFixed(2)));
       setTotalAmount(amount);
     }
   }, [cart, cookies.cart, refresh, currentUser]);
@@ -73,6 +84,7 @@ const Cart = () => {
             isClosable: true,
             position: "top"
           });
+          setFefreshPage(refreshPage + 1);
         } else {
           toast({
             title: 'Error',
@@ -92,7 +104,7 @@ const Cart = () => {
       updateToCart(productId, amount).then((result) => {
         if (result.data.status === 200) {
           toast({
-            title: 'Infomation',
+            title: 'Information',
             description: 'Update quantity successfully !',
             status: 'info',
             duration: 2000,
@@ -141,24 +153,23 @@ const Cart = () => {
   };
 
   const onClickRemove = async () => {
-    var formData = new FormData();
-    cart.forEach((element,index) => {
-      formData.append(`productIdList[${index}]`, Number(element.productId));
-    });
-    await deleteAllCart(formData).then(response => {
-      if (response.data.status === 200) {
-        setCart([]);
-        removeCookie('cart', { path: '/' });
-      }else{
-        toast({
-          title: 'Error!',
-          description: 'Delete cart fail.',
-          status: 'error',
-          duration: 2000,
-          isClosable: true
-        });
-      }
-    });
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Are you sure to delete all product in the cart?")) {
+      await deleteAllCart(productIdList).then(response => {
+        if (response.data.status === 200) {
+          setCart([]);
+          removeCookie('cart', { path: '/' });
+        } else {
+          toast({
+            title: 'Error!',
+            description: 'Delete cart fail.',
+            status: 'error',
+            duration: 2000,
+            isClosable: true
+          });
+        }
+      });
+    }
   };
 
   if (currentUser && cart && cart.length >= 1 && totalAmount > 0) {

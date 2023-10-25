@@ -39,7 +39,8 @@ export const getMaterialPage = async () => {
 export const uploadImages = async (formData) => {
   try {
     const templateID =  formData.get('templateID')
-    if (templateID === 1) {
+    console.log("templateID",templateID)
+    if (templateID === "1") {
       const response = await baseRequest.post(`/upload/WithNoTemplate`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data', // Cần đặt Content-Type là 'multipart/form-data'

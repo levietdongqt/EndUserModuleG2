@@ -18,7 +18,7 @@ const RegisterValidations = yup.object().shape({
     phone: yup
         .string()
         .required("Phone number is required")
-        .matches(/^\d{11}$/, "Phone number must be 11 digits"),
+        .matches(/^\d{9,11}$/, "Phone number must be between 9 and 11 digits"),
 
     gender: yup.boolean().required("Gender is required"),
     terms: yup.boolean().oneOf([true], "You must agree to the Terms of Service and Privacy Policy").required("You must agree to the Terms of Service and Privacy Policy"),

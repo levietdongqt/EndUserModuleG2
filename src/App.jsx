@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login/Login';
 import Confirm from './pages/Login/Confirm'
-/*import PasswordRecovery from './pages/Login/PasswordRecovery';*/
+import PasswordRecovery from './pages/Login/PasswordRecovery';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
 import MyImages from './pages/MyImages';
@@ -37,10 +37,10 @@ const App = () => {
           path="/login/confirm"
           element={<Confirm />}
         />
-        {/*<Route
+        <Route
           path="/login/passwordrecovery"
           element={<PasswordRecovery />}
-        />*/}
+        />
         <Route path='/register' element={<Register />} />
         <Route path='/OnlinePayment' element={<OnlinePayment />} />
         <Route path='/cart' element={<Cart />} />

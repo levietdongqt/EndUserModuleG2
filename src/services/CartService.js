@@ -59,7 +59,8 @@ export const deleteToCart = async (productId) => {
 
 export const deleteAllCart = async (productIdList) => {
   try {
-    const response = await baseRequest.delete(`/Cart/deleteAll`,productIdList);
+    console.log(productIdList)
+    const response = await baseRequest.put(`/Cart/deleteAll`,productIdList);
     return response;
   } catch (error) {
     console.log(error.response)
