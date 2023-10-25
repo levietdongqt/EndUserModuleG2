@@ -4,10 +4,7 @@ import { useUserContext } from "../contexts/UserContext";
 import { uploadImages } from "../services/ImageServices";
 import ThemeProvider from "../theme";
 import {
-  Paper,
   Button,
-  Typography,
-  TextField,
   Box,
   Grid,
   Dialog,
@@ -25,6 +22,7 @@ import UndoIcon from "@mui/icons-material/Undo";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
+import swal from "sweetalert";
 
 export default function Upload({
   openDialog,
@@ -39,6 +37,13 @@ export default function Upload({
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
   };
+  const errorPopup = (mess ) => {
+    swal({
+      title: "Warning",
+      text: mess,
+      icon: "warning",
+    })
+  }
   const CustomDialogContent = styled(DialogContent)({
     display: "flex",
     flexDirection: "column",
@@ -69,15 +74,7 @@ export default function Upload({
           setImages([]);
           handleCloseDialog(true)
         } else {
-          toast({
-            title: "warning",
-            description: "The image is exist in this template!.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-            position: "top"
-
-          });
+            errorPopup(response.data.message)
         }
       });
     }
@@ -214,22 +211,10 @@ export default function Upload({
                 ))} */}
                     {errors && (
                       <div>
-                        {errors.maxNumber && (
-                          <span>
-                            Number of selected images exceed maxNumber
-                          </span>
-                        )}
-                        {errors.acceptType && (
-                          <span>Your selected file type is not allow</span>
-                        )}
-                        {errors.maxFileSize && (
-                          <span>Selected file size exceed maxFileSize</span>
-                        )}
-                        {errors.resolution && (
-                          <span>
-                            Selected file is not match your desired resolution
-                          </span>
-                        )}
+                        {errors.maxNumber && errorPopup("Number of selected images exceed maxNumber")}
+                        {errors.acceptType &&  errorPopup("Your selected file type is not allow")}
+                        {errors.maxFileSize && errorPopup("Selected file size exceed maxFileSize")}
+                        {errors.resolution && errorPopup("Selected file is not match your desired resolution")}
                       </div>
                     )}
                   </div>

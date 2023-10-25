@@ -26,6 +26,8 @@ import UndoIcon from "@mui/icons-material/Undo";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
+import { deleteImages } from "../services/ImageServices";
+import swal from "sweetalert";
 
 export default function CustomImages({
   openDialog,
@@ -48,6 +50,13 @@ export default function CustomImages({
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
   };
+  const errorPopup = (mess) => {
+    swal({
+      title: "Warning",
+      text: mess,
+      icon: "warning",
+    })
+  }
   const CustomDialogContent = styled(DialogContent)({
     display: "flex",
     flexDirection: "column",
@@ -66,35 +75,55 @@ export default function CustomImages({
     width: 1,
   });
   const submit = async () => {
-    if(restoreImages && restoreImages.length>0){
+    var isContinue = true;
+    if (restoreImages && restoreImages.length > 0) {
       const deletedIds = restoreImages.map((image) => image.id);
-      //Goi APi DELETE ALL ở đây;
+     await deleteImages(deletedIds).then(response => {
+        if(response.data.status !== 200){
+            errorPopup(response.data.message);
+            isContinue = false;
+        }
+      })
     }
-    if (images.length > 0) {
+    if (images.length > 0 && isContinue ) {
       const formData = new FormData();
       formData.append("userID", currentUser.id);
+      formData.append("templateID", myImage.templateId);
+      console.log("Imagesssssss", images)
+      var isUpload = false;
       images.forEach((image) => {
+        if (image.file) {
+          isUpload = true;
+        }
         formData.append(`files`, image.file);
       });
-      uploadImages(formData).then((response) => {
-        if (response.data.status === 200) {
-          toast({
-            title: "Success",
-            description: "Upload successfully!.",
-            status: "success",
-            duration: 2000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            title: "warning",
-            description: "Upload Fail!.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-          });
-        }
-      });
+      if (isUpload) {
+        uploadImages(formData).then((response) => {
+          if (response.data.status === 200) {
+            toast({
+              title: "Success",
+              description: "Upload successfully!.",
+              status: "success",
+              duration: 2000,
+              isClosable: true,
+              position: 'top'
+            });
+            handleCloseDialog(true)
+          } else {
+            errorPopup(response.data.message);
+          }
+        });
+      }else{
+        toast({
+          title: "Success",
+          description: "Update images successfully!.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          position: 'top'
+        });
+      }
+
     }
   };
   //XỬ lý Upload Hình ảnh
@@ -243,12 +272,12 @@ export default function CustomImages({
                               <Tooltip title="Remove">
                                 <IconButton
                                   onClick={async (event) => {
-                                    if(image.id !== undefined){
+                                    if (image.id !== undefined) {
                                       setRestoreImages((prev) => [
                                         ...prev,
                                         image,
                                       ]);
-                                    }                                   
+                                    }
                                     onImageRemove(index);
                                   }}
                                 >
@@ -274,22 +303,10 @@ export default function CustomImages({
                 ))} */}
                     {errors && (
                       <div>
-                        {errors.maxNumber && (
-                          <span>
-                            Number of selected images exceed maxNumber
-                          </span>
-                        )}
-                        {errors.acceptType && (
-                          <span>Your selected file type is not allow</span>
-                        )}
-                        {errors.maxFileSize && (
-                          <span>Selected file size exceed maxFileSize</span>
-                        )}
-                        {errors.resolution && (
-                          <span>
-                            Selected file is not match your desired resolution
-                          </span>
-                        )}
+                        {errors.maxNumber && errorPopup("Number of selected images exceed maxNumber")}
+                        {errors.acceptType && errorPopup("Your selected file type is not allow")}
+                        {errors.maxFileSize && errorPopup("Selected file size exceed maxFileSize")}
+                        {errors.resolution && errorPopup("Selected file is not match your desired resolution")}
                       </div>
                     )}
                   </div>
