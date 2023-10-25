@@ -59,9 +59,6 @@ const Home = () => {
                 (
                   <Box key={bested.id}
                     _hover={{
-                      '& .cart-icon': {
-                        display: 'block', // Hiển thị biểu tượng giỏ hàng khi hover vào Box
-                      },
                       transform: 'scale(1.2)'
 
                     }}
@@ -111,21 +108,6 @@ const Home = () => {
                         >
                           {bested.name}
                         </Link>
-                        <Box
-                          display="none" // Ẩn biểu tượng giỏ hàng ban đầu
-                          position="absolute"
-                          left="100%" // Đặt biểu tượng giỏ hàng bên phải của link
-                          top="0"
-                          transform="translate(-50%, 0)" // Để căn giữa theo chiều ngang
-                          className="cart-icon" // Sử dụng className để xác định biểu tượng giỏ hàng
-                          _hover={{
-                            display: 'block', // Hiển thị biểu tượng giỏ hàng khi hover vào Box
-                          }}
-                        >
-                          <Icon as={FaShoppingCart} w={6} h={6} color="#284b9b" _hover={{ color: '#C13584' }} />
-                        </Box>
-
-
                       </Box>
                     </Box>
 
@@ -153,9 +135,6 @@ const Home = () => {
                     return (
                       <Box key={collection.name}
                         _hover={{
-                          '& .cart-icon': {
-                            display: 'block', // Hiển thị biểu tượng giỏ hàng khi hover vào Box
-                          },
                           transform: 'scale(1.2)', // Phóng to ảnh khi hover
                         }}
                       >
@@ -187,19 +166,7 @@ const Home = () => {
                           >
                             {collection.name}
                           </Link>
-                          <Box
-                            display="none" // Ẩn biểu tượng giỏ hàng ban đầu
-                            position="absolute"
-                            left="100%" // Đặt biểu tượng giỏ hàng bên phải của link
-                            top="0"
-                            transform="translate(-50%, 0)" // Để căn giữa theo chiều ngang
-                            className="cart-icon" // Sử dụng className để xác định biểu tượng giỏ hàng
-                            _hover={{
-                              display: 'block', // Hiển thị biểu tượng giỏ hàng khi hover vào Box
-                            }}
-                          >
-                            <Icon as={FaShoppingCart} w={6} h={6} color="#284b9b" _hover={{ color: '#C13584' }} />
-                          </Box>
+
                         </Box>
                       </Box>
                     );

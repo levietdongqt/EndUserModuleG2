@@ -99,6 +99,38 @@ const OrderCard = ({ orderId, deId }) => {
                 }
             }
         }
+        if (orderStatus === "Order is on way.") {
+            const confirmCancel = window.confirm('Are you sure you have received the goods?');
+
+            if (confirmCancel) {
+                const purDTO = {
+                    id: orderId,
+                    status: "Received"
+                };
+
+                try {
+                    const result = await updateOrderStatus(purDTO);
+                    if (!result) {
+                        toast({
+                            title: 'Failed to cancel the order.',
+                            description: 'Please try again later.',
+                            status: 'error',
+                        });
+                    } else {
+
+                        setOrderStatus("Order canceled");
+                        setCheckUpdate(checkUpdate + 1);
+                        toast({
+                            title: 'Order Canceled',
+                            description: 'Your order has been successfully canceled.',
+                            status: 'success',
+                        });
+                    }
+                } catch (error) {
+                    console.error('An error occurred:', error);
+                }
+            }
+        }
     };
 
     return (
@@ -109,7 +141,7 @@ const OrderCard = ({ orderId, deId }) => {
 
                 <Td>
                     <Flex justifyContent="center">
-                        <Text fontSize={15} p={2} fontWeight={400} color='facebook.500'>{moment(date).format('DD.MM.YY - hh:mm A')}</Text>
+                        <Text fontSize={15} p={2} fontWeight={400} color='facebook.500'>{moment(date).format('YYYY-MM-DD hh:mm A')}</Text>
                     </Flex>
                 </Td>
                 <Td>
@@ -140,6 +172,10 @@ const OrderCard = ({ orderId, deId }) => {
                         ) : orderStatus === "Order placed." ? (
                             <Button onClick={onClickCancel} my={2} colorScheme='facebook'>
                                 Cancel Order<Cancel sx={{ ml: 2 }} />
+                            </Button>
+                        ) : orderStatus === "Order is on way." ? (
+                            <Button onClick={onClickCancel} my={2} colorScheme='facebook'>
+                                Received<Cancel sx={{ ml: 2 }} />
                             </Button>
                         ) : (
                             [] // Hiển thị mảng rỗng
