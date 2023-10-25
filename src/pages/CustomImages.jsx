@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import ImageUploading from "react-images-uploading";
-import { useUserContext } from '../contexts/UserContext';
+import { useUserContext } from "../contexts/UserContext";
 import { uploadImages } from "../services/ImageServices";
-import ThemeProvider from '../theme';
+import ThemeProvider from "../theme";
 import {
   Paper,
   Button,
@@ -15,65 +15,101 @@ import {
   DialogContent,
   DialogActions,
   styled,
-} from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RestoreIcon from '@mui/icons-material/Restore';
+import UndoIcon from "@mui/icons-material/Undo";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
 
-export default function CustomImages({ openDialog, handleCloseDialog, myImage }) {
+export default function CustomImages({
+  openDialog,
+  handleCloseDialog,
+  myImage,
+}) {
   const [images, setImages] = useState([]);
+  const [restoreImages, setRestoreImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
   const toast = useToast();
+  useEffect(() => {
+    loadImages();
+    if (!openDialog) {
+      setImages([]);
+      console.log(restoreImages);
+      setRestoreImages([]);
+    }
+  }, [myImage, openDialog]);
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
   };
   const CustomDialogContent = styled(DialogContent)({
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '30px',
-    margin: '20px',
+    display: "flex",
+    flexDirection: "column",
+    padding: "30px",
+    margin: "20px",
   });
-  const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
     height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
+    overflow: "hidden",
+    position: "absolute",
     bottom: 0,
     left: 0,
-    whiteSpace: 'nowrap',
+    whiteSpace: "nowrap",
     width: 1,
   });
   const submit = async () => {
+    if(restoreImages && restoreImages.length>0){
+      const deletedIds = restoreImages.map((image) => image.id);
+      //Goi APi DELETE ALL ở đây;
+    }
     if (images.length > 0) {
       const formData = new FormData();
-      formData.append('userID', currentUser.id);
+      formData.append("userID", currentUser.id);
       images.forEach((image) => {
         formData.append(`files`, image.file);
       });
       uploadImages(formData).then((response) => {
         if (response.data.status === 200) {
           toast({
-            title: 'Success',
-            description: 'Upload successfully!.',
-            status: 'success',
+            title: "Success",
+            description: "Upload successfully!.",
+            status: "success",
             duration: 2000,
-            isClosable: true
+            isClosable: true,
           });
         } else {
           toast({
-            title: 'warning',
-            description: 'Upload Fail!.',
-            status: 'error',
+            title: "warning",
+            description: "Upload Fail!.",
+            status: "error",
             duration: 2000,
-            isClosable: true
+            isClosable: true,
           });
         }
       });
     }
-
+  };
+  //XỬ lý Upload Hình ảnh
+  const loadImages = async () => {
+    console.log(myImage);
+    if (Array.isArray(myImage.images) && myImage.images.length > 0) {
+      myImage.images.forEach((image) => {
+        const img = {
+          id: image.id,
+          data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
+        };
+        setImages((prev) => [...prev, img]);
+      });
+    }
+    console.log(images);
   };
   return (
     <>
@@ -84,14 +120,19 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
           maxWidth="md"
           PaperProps={{
             style: {
-              backgroundColor: 'whitesmoke', // thay đổi màu nền theo ý muốn của bạn
+              backgroundColor: "whitesmoke", // thay đổi màu nền theo ý muốn của bạn
               width: 1000, // thay đổi độ rộng cố định theo ý muốn của bạn
               height: 800, // thay đổi chiều dài cố định theo ý muốn của bạn
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)",
             },
           }}
         >
-          <DialogTitle color={'Highlight'} align={'center'} style={{ fontSize: 30 }}>
+          <DialogTitle
+            color={"Highlight"}
+            align={"center"}
+            style={{ fontSize: 30 }}
+          >
+            Edit Albums
           </DialogTitle>
           <CustomDialogContent>
             <div>
@@ -111,7 +152,7 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                   onImageRemove,
                   isDragging,
                   dragProps,
-                  errors
+                  errors,
                 }) => (
                   // write your building UI
                   <div className="upload__image-wrapper">
@@ -123,17 +164,45 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                 >
                   Click or Drop here 
                 </button> */}
-                    <Button
-                      size="100px"
-                      startIcon={<AddPhotoAlternateIcon />}
-                      color="primary"
-                      onClick={onImageUpload}
-                      {...dragProps}
-
-                    >
-                    </Button>
+                    <Tooltip title="Upload">
+                      <Button
+                        size="100px"
+                        startIcon={<AddPhotoAlternateIcon />}
+                        color="primary"
+                        onClick={onImageUpload}
+                        {...dragProps}
+                      ></Button>
+                    </Tooltip>
                     &nbsp;
-                    <button onClick={onImageRemoveAll} > | Remove all</button>
+                    <Tooltip title="Delete All">
+                      <Button
+                        size="100px"
+                        startIcon={<DeleteForeverIcon />}
+                        color="error"
+                        onClick={async () => {
+                          const imagesHsId = imageList.filter(
+                            (img) => img.id !== undefined
+                          );
+                          // const deletedIds = imagesHsId.map((item) => item.id);
+                          setRestoreImages(imagesHsId);
+                          onImageRemoveAll();
+                        }}
+                        {...dragProps}
+                      ></Button>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip title="Restore">
+                      <Button
+                        size="100px"
+                        startIcon={<RestoreIcon />}
+                        color="warning"
+                        onClick={async () => {
+                          setImages((prev) => [...prev, ...restoreImages]);
+                          setRestoreImages([]);
+                        }}
+                        {...dragProps}
+                      ></Button>
+                    </Tooltip>
                     <hr></hr>
                     <Grid container spacing={2}>
                       {imageList.map((image, index) => {
@@ -146,20 +215,49 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                                 width: 200,
                                 maxHeight: { xs: 233, md: 167 },
                                 maxWidth: { xs: 350, md: 250 },
-                                border: '0.5px thin #000', // Thêm khung đen 2px
+                                border: "0.5px thin #000", // Thêm khung đen 2px
                                 borderRadius: 1, // Bo tròn góc 8px
-                                transition: 'transform 0.3s', // Thêm hiệu ứng chuyển đổi 0.3 giây
-                                '&:hover': {
-                                  transform: 'scale(1.1)', // Hiệu ứng phóng to khi di chuột qua hình ảnh
-                                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
+                                transition: "transform 0.3s", // Thêm hiệu ứng chuyển đổi 0.3 giây
+                                "&:hover": {
+                                  transform: "scale(1.1)", // Hiệu ứng phóng to khi di chuột qua hình ảnh
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)", // Hiệu ứng bóng đổ khi di chuột qua hình ảnh
                                 },
                               }}
                               alt={`Image ${index}`}
                               src={image.data_url}
                             />
                             <div className="image-item__btn-wrapper">
-                              <button onClick={() => onImageUpdate(index)}>Change</button>
-                              <button onClick={() => onImageRemove(index)}>Remove</button>
+                              <Tooltip title="Change">
+                                <IconButton
+                                  onClick={async (event) => {
+                                    setRestoreImages((prev) => [
+                                      ...prev,
+                                      image,
+                                    ]);
+                                    onImageUpdate(index);
+                                  }}
+                                >
+                                  <UndoIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Remove">
+                                <IconButton
+                                  onClick={async (event) => {
+                                    if(image.id !== undefined){
+                                      setRestoreImages((prev) => [
+                                        ...prev,
+                                        image,
+                                      ]);
+                                    }                                   
+                                    onImageRemove(index);
+                                  }}
+                                >
+                                  <DeleteIcon
+                                    sx={{ fontSize: 20 }}
+                                    color="error"
+                                  />
+                                </IconButton>
+                              </Tooltip>
                             </div>
                           </Grid>
                         );
@@ -177,7 +275,9 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
                     {errors && (
                       <div>
                         {errors.maxNumber && (
-                          <span>Number of selected images exceed maxNumber</span>
+                          <span>
+                            Number of selected images exceed maxNumber
+                          </span>
                         )}
                         {errors.acceptType && (
                           <span>Your selected file type is not allow</span>
@@ -217,9 +317,6 @@ export default function CustomImages({ openDialog, handleCloseDialog, myImage })
           </DialogActions>
         </Dialog>
       </ThemeProvider>
-
     </>
-
-
   );
 }

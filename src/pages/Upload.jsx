@@ -65,7 +65,6 @@ export default function Upload({
             status: "success",
             duration: 2000,
             isClosable: true,
-            position: "top"
           });
           setImages([]);
           handleCloseDialog(true)
@@ -77,6 +76,7 @@ export default function Upload({
             duration: 2000,
             isClosable: true,
             position: "top"
+
           });
         }
       });
