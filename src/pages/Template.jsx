@@ -312,7 +312,10 @@
           </Box>
         </Box>
         <ReviewModal isOpen={isOpen} onClose={onClose} productId={location.state.productId}  />
-        <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template ={template} />
+        {
+          openUpload &&  <Upload openDialog={openUpload} handleCloseDialog={handleCloseDialogEdit} template ={template} />
+        }
+       
       </ChakraProvider>
     )
   }
