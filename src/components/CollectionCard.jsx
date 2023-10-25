@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { Box, Image, Text} from '@chakra-ui/react';
+import { Box, Image, Text, Icon, Button, useDisclosure } from '@chakra-ui/react';
 import { useUserContext } from '../contexts/UserContext';
 import { getCollectionById } from '../services/CollectionServices';
 import {getCategoryById} from "../services/CategoryServices";
@@ -22,7 +22,7 @@ const CollectionCard = ({ collectionId,categoryId}) => {
                 setcategory(result.result);
             })
         }
-    }, [collectionId,categoryId, amount]);
+    }, [collectionId, amount]);
 
     const handleClick = (id) => {
         navigate(`/categories/${category.name}/collection/${collections.name}/`, { state: { collectionsId: id } });

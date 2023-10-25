@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button } from '@chakra-ui/react';
-import styled from 'styled-components';
-const ActiveButton = styled(Button)`
-  background-color: green;
-  color: white;
-  &.active-page {
-    background-color: green;
-    color: white;
-  }
-`;
+
 function Pagination(props) {
     const { pagination, onPageChange } = props;
     const { limit, totalRows } = pagination;
 
     const totalPages = Math.ceil(totalRows / limit);
+
     const [page, setPage] = useState(parseInt(pagination.page, 10));
 
     const pageNumbers = [];
@@ -41,23 +34,10 @@ function Pagination(props) {
             </Button>
 
             {pageNumbers.map((pageNumber) => (
-                pageNumber === page ? (
-                    <ActiveButton
-                        key={pageNumber}
-                        onClick={() => handlePageChange(pageNumber)}
-                        className="active-page"
-                    >
-                        {pageNumber}
-                    </ActiveButton>
-                ) : (
-                    <Button
-                        key={pageNumber}
-                        onClick={() => handlePageChange(pageNumber)}
-                    >
-                        {pageNumber}
-                    </Button>
-                ))
-            )}
+                <Button key={pageNumber} onClick={() => handlePageChange(pageNumber)}>
+                    {pageNumber}
+                </Button>
+            ))}
 
             {totalPages > 1 && (
                 <Button

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Box, Text, Checkbox } from '@chakra-ui/react';
 import { useState } from 'react';
 
+import { getProductByColor, getProductByGender, getProductByPrice, getProductsByQueries } from '../services/ProductServices';
 import { useSearchContext } from '../contexts/SearchContext';
 
 const FilterMenu = ({ setProducts, setSortBy }) => {
@@ -20,6 +21,45 @@ const FilterMenu = ({ setProducts, setSortBy }) => {
         setMaxPrice(250);
     }, [canSearch]);
 
+    const onChangePriceRange = (val) => {
+        setCanSearch(false);
+        setMinPrice(val[0]);
+        setMaxPrice(val[1]);
+    };
+
+    const onChangeColor = () => {
+        setCanSearch(false);
+    };
+
+    const onChangeGender = (e) => {
+        setCanSearch(false);
+        setGender(e.target.value);
+    };
+
+    const onClickSearch = () => {
+        setSortBy("recommended");
+        if (gender !== "all" && color !== "all") {
+            getProductsByQueries(minPrice, maxPrice, gender, color)
+                .then(result => {
+                    setProducts(result.products);
+                });
+        } else if (gender !== "all" && color === "all") {
+            getProductByGender(gender, minPrice, maxPrice)
+                .then((result) => {
+                    setProducts(result.products);
+                });
+        } else if (color !== "all" && gender === "all") {
+            getProductByColor(color, minPrice, maxPrice)
+                .then((result) => {
+                    setProducts(result.products);
+                });
+        } else {
+            getProductByPrice(minPrice, maxPrice)
+                .then((result) => {
+                    setProducts(result.products);
+                });
+        }
+    };
 
     return (
         <Box

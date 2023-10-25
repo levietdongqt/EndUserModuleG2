@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import xReact, { useEffect, useState } from 'react';
 import { useLocation, useNavigate,useParams  } from 'react-router-dom';
 import {Box, SimpleGrid, Button, Select, Text, Icon, Heading, Container} from '@chakra-ui/react';
 import queryString from 'query-string';
@@ -14,14 +14,15 @@ const Collections = () => {
   const [template, setTemplates] = useState([]);
   const [sortBy, setSortBy] = useState("recommended");
   const [total, setTotal] = useState(0);
+  const [show, setShow] = useState([]);
   const { name } = useParams();
   const [pagination, setPagination] = useState({
       page: 1,
-      limit: 15,
+      limit: 20,
       totalRows: 1,
   });
   const [filters , setFilters] = useState({
-    limit: 15,
+    limit: 20,
     page: 1,
   })
   useEffect(() => {
@@ -37,6 +38,7 @@ const Collections = () => {
        const paramsString = queryString.stringify(filters);
       getTemplateByCollection(state.collectionsId,paramsString)
         .then((result) => {
+          setShow(result.result.items);
           setPagination({
             totalRows: result.result.totalRows,
             limit: result.result.limit,

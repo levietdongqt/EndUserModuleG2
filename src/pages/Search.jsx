@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, SimpleGrid, Button, Select, Text, Icon, Heading, Container } from '@chakra-ui/react';
 import queryString from 'query-string';
 import TemplateCard from '../components/templateCard';
 import FilterMenu from '../components/FilterMenu';
+import { getTemplateByCollection } from '../services/CollectionServices';
 import { getTemplateByName } from '../services/TemplateServices';
 import { useSearchContext } from '../contexts/SearchContext';
 import { SearchOff } from '@mui/icons-material';
@@ -11,22 +12,50 @@ import Pagination from '../components/Pagination';
 
 const Search = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const { search, canSearch } = useSearchContext();
   const [template, setTemplates] = useState([]);
   const [sortBy, setSortBy] = useState("recommended");
   const [total, setTotal] = useState(0);
   const { name } = useParams();
+  let { paramsString } = useState("");
   const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 15,
-    totalRows: 1,
+      page: 1,
+      limit: 20,
+      totalRows: 1,
+
   });
   const [filters, setFilters] = useState({
-    limit: 15,
+    limit: 20,
     page: 1,
   });
 
-  const fetchData = useCallback(() => {
+  useEffect(() => {
+    // Check if there is stored data in the browser storage
+    const storedData = sessionStorage.getItem('templateData');
+    if (storedData) {
+      setTemplates(JSON.parse(storedData));
+    } else {
+      fetchData();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (search !== "" && search !== " " && search !== null && search !== undefined && canSearch) {
+      paramsString = queryString.stringify(filters);
+      if (search !== filters.name) {
+        setFilters({
+          ...filters,
+          name: search,
+          page: 1,
+        });
+      }
+      fetchData();
+      setSortBy("recommended");
+    }
+  }, [paramsString, state, search, canSearch, filters]);
+
+  const fetchData = () => {
     if (isNaN(filters.page)) {
       setFilters({
         ...filters,
@@ -34,53 +63,28 @@ const Search = () => {
       });
       return;
     }
-    getTemplateByName(search, queryString.stringify(filters))
+    getTemplateByName(search, paramsString)
         .then((result) => {
           setTemplates(result.result.items);
           setPagination({
             totalRows: result.result.totalRows,
             limit: result.result.limit,
           });
-          setTotal(search.length);
+          setTotal(search.length - 1);
           // Store the retrieved data in the browser storage
           sessionStorage.setItem('templateData', JSON.stringify(result.result.items));
-          sessionStorage.setItem('totalReviews', JSON.stringify(search.length));
         });
-  }, [search, filters]);
-
-  useEffect(() => {
-    // Check if there is stored data in the browser storage
-    const storedData = sessionStorage.getItem('templateData');
-    const totalData = sessionStorage.getItem('totalReviews');
-    if (storedData) {
-      setTemplates(JSON.parse(storedData));
-      setTotal(JSON.parse(totalData));
-    } else {
-      fetchData();
-    }
-  }, [fetchData]);
-
-  useEffect(() => {
-    if (search !== "" && search !== " " && search !== null && search !== undefined && canSearch) {
-      setFilters({
-        ...filters,
-        name: search,
-        page: 1,
-      });
-      setSortBy("recommended");
-    }
-  }, [search, canSearch, filters]);
-
-  const handlePageChange = useCallback((newPage) => {
-    // Check if newPage is a positive integer
-    const validNewPage = parseInt(newPage, 10); // Convert newPage to an integer
+  };
+  const handlePageChange = (newPage) => {
+    // Kiểm tra xem newPage có phải là một số nguyên dương
+    const validNewPage = parseInt(newPage, 10); // Chuyển đổi newPage thành số nguyên
     if (!isNaN(validNewPage) && validNewPage > 0) {
       setFilters({
         ...filters,
         page: validNewPage,
       });
     }
-  }, [filters]);
+  };
 
   const handleChange = (e) => {
     setSortBy(e.target.value);
@@ -92,12 +96,13 @@ const Search = () => {
   };
 
   const sortByPriceAsc = () => {
-    setTemplates(template.sort((a, b) => a.pricePlusPerOne - b.pricePlusPerOne));
+    setTemplates(template.sort((a, b) => (a.pricePlusPerOne - b.pricePlusPerOne)));
   };
 
   const sortByPriceDesc = () => {
-    setTemplates(template.sort((a, b) => b.pricePlusPerOne - a.pricePlusPerOne));
+    setTemplates(template.sort((a, b) => (b.pricePlusPerOne - a.pricePlusPerOne)));
   };
+
   return (
       <Container maxW='1140px'>
         <Box px={{ base: 2, sm: 3, md: 5 }} my={3} py={3} >
