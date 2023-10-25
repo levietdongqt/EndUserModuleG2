@@ -78,7 +78,6 @@ export default function Checkout() {
     });
   }
   const submit = () => {
-
     if (total <= 0) {
       swal({
         title: "Warning",
@@ -131,6 +130,7 @@ export default function Checkout() {
           note: note ? note : ""
         });
         if (paymentMethod === "true") {
+          console.log("vo ne");
           setOpenCartDialog(true)
         } else {
           directPayment(orderDTO).then(response => {
