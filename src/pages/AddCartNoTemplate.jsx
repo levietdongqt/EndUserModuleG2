@@ -215,7 +215,7 @@ const AddCartNoTemplate = () => {
                                                 key={`${index}`}
                                                 style={{height: '200px', width: '300px'}}
                                                 objectFit={'cover'}
-                                                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.images[0]}`}
+                                                src={`${process.env.REACT_APP_API_BASE_URL_LOCAL}${item.images[0].imageUrl}`}
                                             />
                                             <Box>
                                                 <SimpleGrid columns={{base: 1, sm: 1, lg: 1, xl: 1}} spacing={3}>
