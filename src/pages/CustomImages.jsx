@@ -16,26 +16,35 @@ import {
   DialogActions,
   styled,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RestoreIcon from '@mui/icons-material/Restore';
 import UndoIcon from "@mui/icons-material/Undo";
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { useToast } from "@chakra-ui/react";
 import "../upload.css";
 
-export default function Upload({
+export default function CustomImages({
   openDialog,
   handleCloseDialog,
-  template,
-  oldImages,
+  myImage,
 }) {
-  const [images, setImages] = React.useState([]);
+  const [images, setImages] = useState([]);
+  const [restoreImages, setRestoreImages] = useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
   const toast = useToast();
+  useEffect(() => {
+    loadImages();
+    if (!openDialog) {
+      setImages([]);
+      console.log(restoreImages);
+      setRestoreImages([]);
+    }
+  }, [myImage, openDialog]);
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
   };
@@ -45,15 +54,25 @@ export default function Upload({
     padding: "30px",
     margin: "20px",
   });
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
   const submit = async () => {
+    if(restoreImages && restoreImages.length>0){
+      const deletedIds = restoreImages.map((image) => image.id);
+      //Goi APi DELETE ALL ở đây;
+    }
     if (images.length > 0) {
       const formData = new FormData();
       formData.append("userID", currentUser.id);
-      if (template === 1) {
-        formData.append("templateID", 1);
-      } else {
-        formData.append("templateID", template.id);
-      }
       images.forEach((image) => {
         formData.append(`files`, image.file);
       });
@@ -66,21 +85,31 @@ export default function Upload({
             duration: 2000,
             isClosable: true,
           });
-          setImages([]);
-          handleCloseDialog(true)
         } else {
           toast({
             title: "warning",
-            description: "The image is exist in this template!.",
+            description: "Upload Fail!.",
             status: "error",
             duration: 2000,
             isClosable: true,
-            position: "top"
-
           });
         }
       });
     }
+  };
+  //XỬ lý Upload Hình ảnh
+  const loadImages = async () => {
+    console.log(myImage);
+    if (Array.isArray(myImage.images) && myImage.images.length > 0) {
+      myImage.images.forEach((image) => {
+        const img = {
+          id: image.id,
+          data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
+        };
+        setImages((prev) => [...prev, img]);
+      });
+    }
+    console.log(images);
   };
   return (
     <>
@@ -99,13 +128,11 @@ export default function Upload({
           }}
         >
           <DialogTitle
-            color={"#132043"}
+            color={"Highlight"}
             align={"center"}
-            style={{ fontSize: 30,letterSpacing:'0.1em' }}
+            style={{ fontSize: 30 }}
           >
-            {template === 1
-              ? "Simple Upload"
-              : "Upload With Template"}
+            Edit Albums
           </DialogTitle>
           <CustomDialogContent>
             <div>
@@ -152,7 +179,27 @@ export default function Upload({
                         size="100px"
                         startIcon={<DeleteForeverIcon />}
                         color="error"
-                        onClick={onImageRemoveAll}
+                        onClick={async () => {
+                          const imagesHsId = imageList.filter(
+                            (img) => img.id !== undefined
+                          );
+                          // const deletedIds = imagesHsId.map((item) => item.id);
+                          setRestoreImages(imagesHsId);
+                          onImageRemoveAll();
+                        }}
+                        {...dragProps}
+                      ></Button>
+                    </Tooltip>
+                    &nbsp;
+                    <Tooltip title="Restore">
+                      <Button
+                        size="100px"
+                        startIcon={<RestoreIcon />}
+                        color="warning"
+                        onClick={async () => {
+                          setImages((prev) => [...prev, ...restoreImages]);
+                          setRestoreImages([]);
+                        }}
                         {...dragProps}
                       ></Button>
                     </Tooltip>
@@ -180,23 +227,36 @@ export default function Upload({
                               src={image.data_url}
                             />
                             <div className="image-item__btn-wrapper">
-                              <Tooltip title="Undo">
-                              <Button
-                                size="100px"
-                                startIcon={<UndoIcon />}
-                                color="info"
-                                onClick={() => onImageUpdate(index)}
-                                {...dragProps}
-                              ></Button>
+                              <Tooltip title="Change">
+                                <IconButton
+                                  onClick={async (event) => {
+                                    setRestoreImages((prev) => [
+                                      ...prev,
+                                      image,
+                                    ]);
+                                    onImageUpdate(index);
+                                  }}
+                                >
+                                  <UndoIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
                               </Tooltip>
                               <Tooltip title="Remove">
-                              <Button
-                                size="100px"
-                                startIcon={<DeleteIcon />}
-                                color="error"
-                                onClick={() => onImageRemove(index)}
-                                {...dragProps}
-                              ></Button>
+                                <IconButton
+                                  onClick={async (event) => {
+                                    if(image.id !== undefined){
+                                      setRestoreImages((prev) => [
+                                        ...prev,
+                                        image,
+                                      ]);
+                                    }                                   
+                                    onImageRemove(index);
+                                  }}
+                                >
+                                  <DeleteIcon
+                                    sx={{ fontSize: 20 }}
+                                    color="error"
+                                  />
+                                </IconButton>
                               </Tooltip>
                             </div>
                           </Grid>
@@ -241,9 +301,9 @@ export default function Upload({
           <DialogActions>
             <Button
               component="label"
-              variant="outlined"
+              variant="contained"
               startIcon={<CloudUploadIcon />}
-              color="inherit"
+              color="primary"
               sx={
                 {
                   // ... các style khác
@@ -253,20 +313,7 @@ export default function Upload({
             >
               Save
             </Button>
-              <Button
-                component="label"
-                variant="outlined"
-                startIcon={<ExitToAppIcon />}
-                color="success"
-                sx={
-                  {
-                    letterSpacing: '0.05em'
-                  }
-                }
-                onClick={handleCloseDialog}
-              >
-                Close
-              </Button>
+            <Button onClick={handleCloseDialog}>Close</Button>
           </DialogActions>
         </Dialog>
       </ThemeProvider>
