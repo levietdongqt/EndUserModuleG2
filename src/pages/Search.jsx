@@ -32,8 +32,10 @@ const Search = () => {
   useEffect(() => {
     // Check if there is stored data in the browser storage
     const storedData = sessionStorage.getItem('templateData');
+    const total = sessionStorage.getItem('total');
     if (storedData) {
       setTemplates(JSON.parse(storedData));
+      setTotal(JSON.parse(total));
     } else {
       fetchData();
     }
@@ -69,9 +71,10 @@ const Search = () => {
             totalRows: result.result.totalRows,
             limit: result.result.limit,
           });
-          setTotal(search.length - 1);
+          setTotal(result.result.items.length);
           // Store the retrieved data in the browser storage
           sessionStorage.setItem('templateData', JSON.stringify(result.result.items));
+          sessionStorage.setItem('totalRows', JSON.stringify(result.result.items.length));
         });
   };
   const handlePageChange = (newPage) => {

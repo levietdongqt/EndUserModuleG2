@@ -92,12 +92,13 @@ const Collections = () => {
           <Box
               display="flex"
               justifyContent="space-between"
+              alignItems="center"
               py={5}
           >
-            <Box>
-              <Text fontSize={16} fontWeight={500} mb={0} float={'right'}>&nbsp;{total} Results</Text>
+            <Box >
+              <Text fontSize={16} fontWeight={500} >&nbsp;{total} Results</Text>
             </Box>
-            <Box>
+            <Box float={'right'}>
               <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px'>
                 <option value='recommended'>Best Sellers</option>
                 <option value='lowest'>Lowest Price</option>

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, {useEffect,useState} from 'react';
 import { Box, Text, IconButton, Container, Link, Image } from '@chakra-ui/react';
 import { Apple, Facebook, Google, Instagram, Twitter, YouTube } from '@mui/icons-material';
 import { useNavigate } from "react-router-dom";
+import { getAllCategories} from "../services/CategoryServices";
 
 const Footer = () => {
     const navigate = useNavigate();
+    const [category, setCategory] = useState([]);
+    useEffect(() => {
+        getAllCategories().then((result) => {
+            setCategory(result.result);
+        })
+    }, []);
     const getLink = (path) => {
         window.open(path, '_blank');
     }
@@ -43,22 +50,27 @@ const Footer = () => {
             </Box>
             <Container maxW='1200px' display='flex' py={10} justifyContent='space-between' flexDirection={{ base: 'column', sm: 'row' }}>
                 <Box textAlign={{ base: 'center', sm: 'start' }} py={5}>
-                    <Text fontSize={24} fontWeight={600}>Help</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Frequently Asked Questions</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Return And Exchange</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Support Team</Text>
+
+                    <Text fontSize={24} fontWeight={600}>Site Map</Text>
+                    {
+                    category && category.map((item) => {
+                        return (
+                            <Text key={item.id} mt={2} _hover={{ textDecoration: 'underline' }} fontWeight={500} cursor={'pointer'}
+                            onClick={() =>navigate(`/categories/${item.name}`, { state: { categoryId: item.id } })}
+                            >{item.name}</Text>
+                        )
+                    })
+                    }
                 </Box>
                 <Box textAlign={{ base: 'center', sm: 'start' }} py={5}>
                     <Text fontSize={24} fontWeight={600}>Corporate</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Career Opportunities</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Our Stores</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>About Us</Text>
+                    <Text mt={2} _hover={{ textDecoration: 'underline' }} cursor={'pointer'} onClick={() => navigate('/contact')}>Contact Us</Text>
                 </Box>
                 <Box textAlign={{ base: 'center', sm: 'start' }} py={5}>
                     <Text fontSize={24} fontWeight={600}>Policies</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Privacy Policies</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Terms & Conditions</Text>
-                    <Text mt={2} _hover={{ textDecoration: 'underline' }}>Return Policies</Text>
+                    <Text mt={2} _hover={{ textDecoration: 'underline' }} cursor={'pointer'}>Privacy Policies</Text>
+                    <Text mt={2} _hover={{ textDecoration: 'underline' }} cursor={'pointer'}>Terms & Conditions</Text>
+                    <Text mt={2} _hover={{ textDecoration: 'underline' }} cursor={'pointer'}>Return Policies</Text>
                 </Box>
             </Container>
         </Box>
