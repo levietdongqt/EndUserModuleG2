@@ -181,7 +181,7 @@ export default function Upload({
             align={"center"}
             style={{ fontSize: 30, letterSpacing: "0.1em" }}
           >
-            {template === 1 ? "Simple Upload" : "Upload With Template"}
+            {template === 1 ? "Simple Upload" : `Upload With ${template.name}`}
           </DialogTitle>
           <CustomDialogContent>
             <div>

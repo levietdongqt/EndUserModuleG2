@@ -77,7 +77,11 @@ export default function CustomImages({
   });
   const submit = async () => {
     var isContinue = true;
-    if (restoreImages && restoreImages.length > 0) {
+    if (images.length === 0) {
+      errorPopup("The uploading must be have some images!")
+      return;
+    }
+    if (restoreImages && restoreImages.length > 0 && images.length > 0) {
       const deletedIds = restoreImages.map((image) => image.id);
      await deleteImages(deletedIds).then(response => {
         if(response.data.status !== 200){
@@ -130,12 +134,17 @@ export default function CustomImages({
   const hanlderRemoveAll = () => {
       // eslint-disable-next-line no-restricted-globals
       if(confirm("Are you sure to detele this template?")){
-        deleteMyImage(myImage.id).then(response => {
-          swal({
-            title: "Information",
-            text: "Delete template successfully!",
-            icon: "info",
-          })
+        deleteMyImage(myImage.id,currentUser.id).then(response => {
+          if(response.data.status === 200){
+            swal({
+              title: "Information",
+              text: "Delete template successfully!",
+              icon: "info",
+            })
+          }else{
+            errorPopup(response.data.message)
+          }
+         
           handleCloseDialog(true);
 
         })
