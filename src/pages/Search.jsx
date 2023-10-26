@@ -23,7 +23,6 @@ const Search = () => {
       page: 1,
       limit: 20,
       totalRows: 1,
-
   });
   const [filters, setFilters] = useState({
     limit: 20,
@@ -33,8 +32,10 @@ const Search = () => {
   useEffect(() => {
     // Check if there is stored data in the browser storage
     const storedData = sessionStorage.getItem('templateData');
+    const total = sessionStorage.getItem('total');
     if (storedData) {
       setTemplates(JSON.parse(storedData));
+      setTotal(JSON.parse(total));
     } else {
       fetchData();
     }
@@ -70,9 +71,10 @@ const Search = () => {
             totalRows: result.result.totalRows,
             limit: result.result.limit,
           });
-          setTotal(search.length - 1);
+          setTotal(result.result.items.length);
           // Store the retrieved data in the browser storage
           sessionStorage.setItem('templateData', JSON.stringify(result.result.items));
+          sessionStorage.setItem('totalRows', JSON.stringify(result.result.items.length));
         });
   };
   const handlePageChange = (newPage) => {
@@ -92,13 +94,18 @@ const Search = () => {
       sortByPriceAsc();
     } else if (e.target.value === "highest") {
       sortByPriceDesc();
+    }else if (e.target.value === "recommended") {
+      sortByBestSeller();
     }
   };
 
   const sortByPriceAsc = () => {
     setTemplates(template.sort((a, b) => (a.pricePlusPerOne - b.pricePlusPerOne)));
   };
-
+  const sortByBestSeller = () => {
+    const sortedTemplate = [...template].sort((a, b) => b.quantitySold - a.quantitySold);
+    setTemplates(sortedTemplate);
+  };
   const sortByPriceDesc = () => {
     setTemplates(template.sort((a, b) => (b.pricePlusPerOne - a.pricePlusPerOne)));
   };
@@ -114,16 +121,12 @@ const Search = () => {
           <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="flex-start"
               py={5}
           >
-            <FilterMenu
-                columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
-                setProducts={template}
-                setSortBy={setSortBy}
-            />
-            <Box display={'flex'} m={3} alignItems={'center'}>
+            <Box>
               <Text fontSize={16} fontWeight={500} mb={0} float={'right'}>&nbsp;{total} Results</Text>
+            </Box>
+            <Box display={'flex'} m={3} alignItems={'center'}>
               <Select colorScheme='facebook' onChange={handleChange} value={sortBy} backgroundColor='#fff' width='170px'>
                 <option value='recommended'>Best Sellers</option>
                 <option value='lowest'>Lowest Price</option>
