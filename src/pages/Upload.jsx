@@ -37,7 +37,7 @@ export default function Upload({
 }) {
   const [images, setImages] = React.useState([]);
   const [myImage, setMyImage] = React.useState([]);
-  const [restoreImages,setRestoreImages] = React.useState([]);
+  const [restoreImages, setRestoreImages] = React.useState([]);
   const { currentUser } = useUserContext();
   const maxNumber = 15;
   const toast = useToast();
@@ -55,12 +55,12 @@ export default function Upload({
 
   useEffect(() => {
     loadImages();
-    if(!openDialog){
+    if (!openDialog) {
       setImages([]);
     }
   }, []);
 
-  const loadImages = async () =>{
+  const loadImages = async () => {
     if (template) {
       var templateId = 1;
       if (template === 1) {
@@ -72,26 +72,26 @@ export default function Upload({
       const userId = currentUser.id;
       console.log("Id", templateId);
       const res = await LoadImagesByTemplateIdAsync(templateId, userId);
-      if(res.data.status === 200){
+      if (res.data.status === 200) {
         var result = res.data.result;
-        console.log("cm",result);
+        console.log("cm", result);
         setMyImage(result);
-          if (result && Array.isArray(result.images) && result.images.length > 0) {
-            result.images.forEach((image) => {
-              const img = {
-                id: image.id,
-                data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
-              };
-              setImages((prev) => [...prev, img]);
-            });
-          }
-          console.log(images);
-        
+        if (result && Array.isArray(result.images) && result.images.length > 0) {
+          result.images.forEach((image) => {
+            const img = {
+              id: image.id,
+              data_url: `${process.env.REACT_APP_API_BASE_URL_LOCAL}${image.imageUrl}`,
+            };
+            setImages((prev) => [...prev, img]);
+          });
+        }
+        console.log(images);
+
       }
     }
   }
 
- 
+
 
   const CustomDialogContent = styled(DialogContent)({
     display: "flex",
@@ -100,22 +100,28 @@ export default function Upload({
     margin: "20px",
   });
   const submit = async () => {
-   var isContinue = true;
-   if(images.length === 0){
-    errorPopup("You can't delete all files in here!")
-   }
+    var isContinue = true;
+    if (images.length === 0) {
+      errorPopup("The uploading must be have some images!")
+      return;
+    }
     if (restoreImages && restoreImages.length > 0 && images.length > 0) {
       const deletedIds = restoreImages.map((image) => image.id);
-     await deleteImages(deletedIds).then(response => {
-        if(response.data.status !== 200){
-            errorPopup(response.data.message);
-            isContinue = false;
+      await deleteImages(deletedIds).then(response => {
+        if (response.data.status !== 200) {
+          errorPopup(response.data.message);
+          isContinue = false;
         }
       })
     }
-    if (images.length > 0 && isContinue ) {
+    if (images.length > 0 && isContinue) {
       const formData = new FormData();
       formData.append("userID", currentUser.id);
+      if(template === 1){
+        formData.append("templateID", 1);
+      }else{
+        formData.append("templateID", myImage.templateId);
+      }
       formData.append("templateID", myImage.templateId);
       console.log("Imagesssssss", images)
       var isUpload = false;
@@ -141,7 +147,7 @@ export default function Upload({
             errorPopup(response.data.message);
           }
         });
-      }else{
+      } else {
         toast({
           title: "Success",
           description: "Update images successfully!.",

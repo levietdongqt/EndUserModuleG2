@@ -28,6 +28,7 @@ import { useToast } from "@chakra-ui/react";
 import "../upload.css";
 import { deleteImages } from "../services/ImageServices";
 import swal from "sweetalert";
+import { deleteMyImage } from "../services/ImageServices";
 
 export default function CustomImages({
   openDialog,
@@ -126,6 +127,20 @@ export default function CustomImages({
 
     }
   };
+  const hanlderRemoveAll = () => {
+      // eslint-disable-next-line no-restricted-globals
+      if(confirm("Are you sure to detele this template?")){
+        deleteMyImage(myImage.id).then(response => {
+          swal({
+            title: "Information",
+            text: "Delete template successfully!",
+            icon: "info",
+          })
+          handleCloseDialog(true);
+
+        })
+      }
+  }
   //XỬ lý Upload Hình ảnh
   const loadImages = async () => {
     console.log(myImage);
@@ -193,7 +208,7 @@ export default function CustomImages({
                 >
                   Click or Drop here 
                 </button> */}
-                    <Tooltip title="Upload">
+                    <Tooltip title="Plus">
                       <Button
                         size="100px"
                         startIcon={<AddPhotoAlternateIcon />}
@@ -203,7 +218,7 @@ export default function CustomImages({
                       ></Button>
                     </Tooltip>
                     &nbsp;
-                    <Tooltip title="Delete All">
+                    <Tooltip title="Delete Template">
                       <Button
                         size="100px"
                         startIcon={<DeleteForeverIcon />}
@@ -214,7 +229,7 @@ export default function CustomImages({
                           );
                           // const deletedIds = imagesHsId.map((item) => item.id);
                           setRestoreImages(imagesHsId);
-                          onImageRemoveAll();
+                          hanlderRemoveAll();
                         }}
                         {...dragProps}
                       ></Button>

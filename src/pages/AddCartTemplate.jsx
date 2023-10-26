@@ -122,8 +122,8 @@ export default function AddCartTemplate({ openDialog, handleCloseDialog, myImage
         }
         return acc;
       }, 0)
-      var pricee = pricePerInch * area * amount + myImage.pricePlusPerOne;
-      console.log("Gia ne",myImage.pricePlusPerOne)
+      var pricee = (pricePerInch * area  + myImage.pricePlusPerOne) * myImage.images.length * amount;
+
       setPrice(pricee.toFixed(2))
     }
   }, [amount, materialID, templateSizeID])
