@@ -79,7 +79,7 @@ const Contact = () => {
                                     borderRadius="8px"
                                     p="10px 10px 10px 30px"
                                     transition="all .15s ease-out"
-                                    placeholder="Tên"
+                                    placeholder="Name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     marginY="normal"
@@ -111,7 +111,7 @@ const Contact = () => {
                                     borderRadius="8px"
                                     p="10px 10px 10px 30px"
                                     transition="all .15s ease-out"
-                                    placeholder="Tin nhắn"
+                                    placeholder="Message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     marginY="normal"
