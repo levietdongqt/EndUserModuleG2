@@ -82,7 +82,7 @@ const Login = () => {
       const hashedPassword = bcrypt.hashSync(values.password, salt);
       LogIn(values.email, hashedPassword)
         .then((result) => {
-          handldeResponse(result, remember);
+          handldeResponse(result, true);
         });
     },
     validationSchema: LoginValidations,
@@ -186,8 +186,6 @@ const Login = () => {
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        <Checkbox value={remember} onChange={() => setRemember(!remember)} mt={5} >Remember me</Checkbox>
-
         <Button mt={5} width='100%' variant='solid' colorScheme='facebook' disabled={!isValid} onClick={handleSubmit} >Login</Button>
         <br />
         <Text my={3} width='100%' textAlign='center' >or</Text>
