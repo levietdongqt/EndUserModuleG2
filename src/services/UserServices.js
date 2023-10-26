@@ -78,6 +78,21 @@ export const confirm = async (userId, code) => {
   return response;
 };
 
+export const feedback = async (content, userId, email) => {
+  try {
+    const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/FeedBack/Create`, {
+          content,
+          userId,
+          email,
+        }
+    );
+    return response;
+  } catch (error) {
+    console.error("Lỗi khi gửi yêu cầu API:", error);
+    throw error; // Ném lỗi để báo hiệu rằng có lỗi xảy ra
+  }
+}
 
 // SENMAIL PR 
 export const sendmail = async (email) => {

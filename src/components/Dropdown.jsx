@@ -8,13 +8,19 @@ const Dropdown = ({ title, CategoryId }) => {
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [category, setCategory] = useState(null);
+    const [isShow, setIsShow] = useState(false);
 
     useEffect(() => {
         try {
             getCategoryById(CategoryId)
                 .then((result) => {
                     setCategory(result.result);
-                });
+                    result.result.collections.forEach((item) => {
+                            if(item.templateDTO.length >0){
+                                setIsShow(true);
+                            }}
+                        )
+                    })
         } catch (error) {
             console.log(error);
         }
@@ -27,7 +33,7 @@ const Dropdown = ({ title, CategoryId }) => {
     };
 
     return (
-        <Box px={{ base: 2, md: 4 }} py={{ base: 1, md:1 }}>
+        isShow ? <Box px={{ base: 2, md: 4 }} py={{ base: 1, md:1 }}>
             <Menu isOpen={isOpen}>
                 <MenuButton
                     color='black'
@@ -110,7 +116,7 @@ const Dropdown = ({ title, CategoryId }) => {
                     </Grid>
                 </MenuList>
             </Menu>
-        </Box>
+        </Box> : ''
     );
 };
 

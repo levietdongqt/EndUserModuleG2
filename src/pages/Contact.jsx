@@ -1,18 +1,50 @@
-import React, {useState} from 'react';
-import {Box, Grid, Image, Alert, Input, Textarea, Button, Text, FormControl, Heading} from '@chakra-ui/react';
+import React, {useEffect, useState} from 'react';
+import {Box, Grid, Image, Alert, Input, Textarea, Button, Text, FormControl, Heading,useToast} from '@chakra-ui/react';
 import {FaSquareTwitter,FaSquareFacebook,FaSquareInstagram,FaSquareYoutube} from 'react-icons/fa6';
-
+import {feedback} from '../services/UserServices';
+import { useUserContext } from '../contexts/UserContext';
+import {useNavigate} from "react-router-dom";
 const Contact = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
-    const [emailSent, setEmailSent] = useState(false);
+    const navigate = useNavigate();
+    const { currentUser } = useUserContext();
+    const toast = useToast();
+    useEffect(() => {
+        if (currentUser) {
+            setName(currentUser.fullName);
+            setEmail(currentUser.email);
+        }
+    }, [currentUser]);
+    const handleSubmit = () => {
+        feedback(message,currentUser ? currentUser.id : null,email).then(
+            (result)=>{
+                console.log("sdsds",result && result.status);
+                if (result && result.status === 200){
+                    toast({
+                        title: "Information",
+                        description: "Your message has been sent successfully",
+                        status: "success",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                    navigate('/');
+                }else{
+                    toast({
+                        title: "Error",
+                        description: "Your message has not been sent",
+                        status: "error",
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Xử lý logic khi người dùng submit form
+            }
+        )
     };
-    const position = [51.505, -0.09]
+
+
     return (
         <Box maxW="1140px" mx="auto" p={8}>
             <Box textAlign={'center'} mb={10}>
@@ -38,7 +70,7 @@ const Contact = () => {
                         <Text variant="h4" align="center" mb={5} color={'#16113a'} fontSize={24} fontWeight={700}>
                             Send us a message
                         </Text>
-                        <form onSubmit={handleSubmit} style={{width: '100%'}}>
+                        <form  style={{width: '100%'}} method="post">
                             <Box mb={4}>
                                 <Input
                                     lineHeight={'28px'}
@@ -90,10 +122,11 @@ const Contact = () => {
 
                             <Button
                                 width={'100%'}
-                                type="submit"
+                                type="button"
                                 marginTop="2"
                                 backgroundColor="#000"
                                 color="#fff"
+                                onClick={handleSubmit}
                                 _hover={{
                                     backgroundColor: '#111',
                                 }}
