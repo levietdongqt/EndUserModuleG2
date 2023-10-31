@@ -122,7 +122,6 @@ export default function Upload({
       }else{
         formData.append("templateID", myImage.templateId);
       }
-      formData.append("templateID", myImage.templateId);
       console.log("Imagesssssss", images)
       var isUpload = false;
       images.forEach((image) => {
