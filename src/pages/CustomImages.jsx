@@ -75,13 +75,40 @@ export default function CustomImages({
     whiteSpace: "nowrap",
     width: 1,
   });
+  const checkSame = (images) => {
+    const fileName = new Set();
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+      if (image.file) {
+        if (fileName.has(image.file.name)) {
+          console.log("Trùng rồi");
+          return false;
+        }
+        fileName.add(image.file.name);
+      } else {
+        var data_url = image.data_url;
+        var parts = data_url.split('/');
+        var name = parts[parts.length - 1];
+        if (fileName.has(name)) {
+          console.log("Trùng rồi");
+          return false;
+        }
+        fileName.add(name);
+      }
+    }
+    console.log("File name: ", fileName);
+    return true;
+  }
   const submit = async () => {
     var isContinue = true;
     if (images.length === 0) {
       errorPopup("The uploading must be have some images!")
       return;
+    } else if (!checkSame(images)) {
+      errorPopup("Some images are duplicated !")
+      isContinue = false;
     }
-    if (restoreImages && restoreImages.length > 0 && images.length > 0) {
+    if (restoreImages && restoreImages.length > 0 && images.length > 0 && isContinue) {
       const deletedIds = restoreImages.map((image) => image.id);
      await deleteImages(deletedIds).then(response => {
         if(response.data.status !== 200){
