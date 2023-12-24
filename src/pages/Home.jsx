@@ -75,7 +75,7 @@ const Home = () => {
                                   navigate(`/template/${bested.name}`, {
                                     state: {productId: bested.id},
                                   })
-                              } > {bested.name} ></Link>
+                              } > {bested.name} </Link>
                             </Box>
                           </Box>
                         </Box>
@@ -102,7 +102,7 @@ const Home = () => {
                               <Box mt={3}>
                                 <Link color={'#284b9b'} onClick={() =>
                                     navigate(`/categories/${collection.category.name}/collection/${collection.name}/`, { state: { collectionsId: collection.id } })
-                                } > {collection.name} ></Link>
+                                } > {collection.name} </Link>
                               </Box>
                             </Box>
                         );

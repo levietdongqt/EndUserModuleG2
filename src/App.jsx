@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import {React,useState} from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -24,12 +24,16 @@ import Checkout from './pages/Checkout';
 import OnlinePayment from './pages/OnlinePayment';
 
 const App = () => {
-
+  const [refreshMyImage1, setRefreshMyImage] = useState(false);
+  const refreshMyImageHandler = () => {
+    console.log("vooooo appp")
+    setRefreshMyImage((prev) => !prev);
+  };
   const { currentUser } = useUserContext();
 
   return (
     <>
-      <Navbar />
+      <Navbar refreshMyImage ={refreshMyImageHandler} />
       <Routes>
         <Route exact path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
@@ -46,8 +50,8 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/upload' element={<Upload />} />
-        <Route path='/myimages' element={<MyImages />} />
-        <Route path='/myimages/noTemplate' element={<AddCartNoTemplate />} />
+        <Route path='/myimages' element={<MyImages key={refreshMyImage1} />} />
+        <Route path='/myimages/noTemplate' element={<AddCartNoTemplate />}  />
         <Route path='/template' element={<Template />} />
         <Route path='/template/:name' element={<Template />} />
         <Route path='/infos' element={currentUser ? <Infos /> : <Navigate to='/' />} />
