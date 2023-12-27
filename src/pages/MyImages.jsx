@@ -16,7 +16,7 @@ import CustomImages from './CustomImages';
 import IsoIcon from '@mui/icons-material/Iso';
 import format from 'date-fns/format';
 
-const MyImages = (props) => {
+const MyImages = ({key}) => {
 
   const { currentUser } = useUserContext();
   const navigate = useNavigate();
@@ -29,13 +29,14 @@ const MyImages = (props) => {
 
   useEffect(() => {
     if (currentUser) {
+      console.log("voo image")
       getMyImages(currentUser.id)
         .then(result => {
           setMyImages(result.data.result);
         });
     }
 
-  }, [refreshPage]);
+  }, [refreshPage,key]);
   const showAddCart = (myImage) => {
     setMyImage(myImage)
     setOpenCartDialog(true);

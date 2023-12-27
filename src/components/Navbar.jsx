@@ -23,7 +23,7 @@ import Hamburger from './Hamburger';
 import Dropdown from './Dropdown';
 import Searchbar from './Searchbar';
 import Upload from '../pages/Upload';
-const Navbar = () => {
+const Navbar = ({refreshMyImage}) => {
 
   const [categories, setCategories] = useState([]);
   const [openUpload,setOpenUpload] = useState(false);
@@ -36,6 +36,8 @@ const Navbar = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['currentUser']);
   const handleCloseDialogEdit = () => {
     setOpenUpload(false);
+    console.log("voooo narbar")
+    refreshMyImage();
   }
   const handleUpload = () => {
 

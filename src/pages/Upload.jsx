@@ -56,6 +56,7 @@ export default function Upload({
   useEffect(() => {
     loadImages();
     if (!openDialog) {
+      console.log("Set rong roiii")
       setImages([]);
     }
   }, []);
@@ -132,8 +133,10 @@ export default function Upload({
       errorPopup("Some images are duplicated !")
       isContinue = false;
     }
+    // eslint-disable-next-line eqeqeq
     if (restoreImages && restoreImages.length > 0 && images.length > 0 && isContinue) {
       const deletedIds = restoreImages.map((image) => image.id);
+      console.log("Vo xoaaa")
       await deleteImages(deletedIds).then(response => {
         if (response.data.status !== 200) {
           errorPopup(response.data.message);
@@ -144,12 +147,11 @@ export default function Upload({
     if (images.length > 0 && isContinue) {
       const formData = new FormData();
       formData.append("userID", currentUser.id);
-      if(template === 1){
+      if (template === 1) {
         formData.append("templateID", 1);
-      }else{
+      } else {
         formData.append("templateID", myImage.templateId);
       }
-      console.log("Imagesssssss", images)
       var isUpload = false;
       images.forEach((image) => {
         if (image.file) {
@@ -170,6 +172,7 @@ export default function Upload({
             });
             handleCloseDialog(true)
           } else {
+            console.log("Vo datttttt")
             errorPopup(response.data.message);
           }
         });
@@ -249,7 +252,7 @@ export default function Upload({
                       ></Button>
                     </Tooltip>
                     &nbsp;
-                    <Tooltip title="Delete All">
+                    <Tooltip title="Delete Album">
                       <Button
                         size="100px"
                         startIcon={<DeleteForeverIcon />}
